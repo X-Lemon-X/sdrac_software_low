@@ -72,7 +72,9 @@ Middlewares/ST/STM32_USB_Device_Library/Core/Src/usbd_core.c \
 Middlewares/ST/STM32_USB_Device_Library/Core/Src/usbd_ctlreq.c \
 Middlewares/ST/STM32_USB_Device_Library/Core/Src/usbd_ioreq.c \
 Middlewares/ST/STM32_USB_Device_Library/Class/DFU/Src/usbd_dfu.c\
-app/src/main_prog.c
+app/src/main_prog.c\
+app/src/encoder.c
+
 
 # ASM sources
 ASM_SOURCES =  \
