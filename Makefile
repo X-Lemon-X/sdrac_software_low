@@ -71,7 +71,8 @@ USB_DEVICE/Target/usbd_conf.c \
 Middlewares/ST/STM32_USB_Device_Library/Core/Src/usbd_core.c \
 Middlewares/ST/STM32_USB_Device_Library/Core/Src/usbd_ctlreq.c \
 Middlewares/ST/STM32_USB_Device_Library/Core/Src/usbd_ioreq.c \
-Middlewares/ST/STM32_USB_Device_Library/Class/DFU/Src/usbd_dfu.c
+Middlewares/ST/STM32_USB_Device_Library/Class/DFU/Src/usbd_dfu.c\
+app/src/main_prog.c
 
 # ASM sources
 ASM_SOURCES =  \
@@ -139,7 +140,8 @@ C_INCLUDES =  \
 -IUSB_DEVICE/App \
 -IUSB_DEVICE/Target \
 -IMiddlewares/ST/STM32_USB_Device_Library/Core/Inc \
--IMiddlewares/ST/STM32_USB_Device_Library/Class/DFU/Inc
+-IMiddlewares/ST/STM32_USB_Device_Library/Class/DFU/Inc\
+-Iapp/inc
 
 
 # compile gcc flags
