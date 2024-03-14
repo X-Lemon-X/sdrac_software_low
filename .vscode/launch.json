@@ -11,7 +11,7 @@
       "request": "launch",
       "type": "cortex-debug",
       "runToEntryPoint": "main",
-      "servertype": "stutil"
+      "servertype": "stlink"
     }
   ]
 }

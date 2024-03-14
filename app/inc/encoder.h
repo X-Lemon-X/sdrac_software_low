@@ -4,14 +4,13 @@
 #ifndef ENCODERS_H
 #define ENCODERS_H
 
-#define ENCODER_MT6701_I2C_ADDRESS 0x06
-#define ENCODER_MT6702_RESOLUTION 16384
 
 
 typedef struct {
   uint16_t resolution;
   uint8_t address;
-  I2C_HandleTypeDef *hi2c1;
+  I2C_HandleTypeDef *hi2c;
+  uint8_t angle_register;
 
   
   uint8_t reverse;
@@ -30,7 +29,7 @@ int encoder_init_struct(encoder_encoder *encoder);
 /// @param encoder - pointer to the new encoder object
 /// @param address - I2C address of the encoder
 /// @return 
-int encoder_init(encoder_encoder *encoder, uint8_t address, I2C_HandleTypeDef *hi2c1, uint16_t resolution);
+int encoder_init(encoder_encoder *encoder);
 
 /// @brief set offset for the encoder
 /// @param encoder - pointer to the encoder object
@@ -41,8 +40,8 @@ int encoder_set_offset(encoder_encoder *encoder, float offset, uint8_t reverse);
 
 /// @brief read the raw angle from the encoder
 /// @param encoder - pointer to the encoder object
-/// @return angle as integer without modifications
-uint16_t encoder_read_raw_angle(encoder_encoder *encoder);
+/// @return 0 if success
+int encoder_read_raw_angle(encoder_encoder *encoder);
 
 /// @brief  read the angle from the encoder
 /// @param encoder pointer to the encoder object

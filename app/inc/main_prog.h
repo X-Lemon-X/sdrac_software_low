@@ -11,6 +11,11 @@
 #define true 1
 #define false 0
 
+
+#define ENCODER_MEM_ADDR_ANNGLE 0x03
+#define ENCODER_MT6701_I2C_ADDRESS 0b000110
+#define ENCODER_MT6702_RESOLUTION 16384
+
 int main_app();
 
 #endif // MAIN_PROG_H
