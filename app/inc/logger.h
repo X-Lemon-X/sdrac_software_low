@@ -11,7 +11,7 @@ enum LOG_LEVEL {
 
 typedef int log_lvl;
 
-log_lvl log_level;
+extern log_lvl log_level;
 void log_error(const char *msg);
 void log_warning(const char *msg);
 void log_info(const char *msg);

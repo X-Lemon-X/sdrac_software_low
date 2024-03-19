@@ -2,6 +2,8 @@
 #include "main.h"
 #include "usbd_cdc_if.h"
 
+log_lvl log_level;
+
 void log_debug(const char *msg){
   if (log_level <= LOG_LEVEL_DEBUG) return;
   CDC_Transmit_FS((uint8_t*)msg, strlen(msg));
