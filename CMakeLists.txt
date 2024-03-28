@@ -1,0 +1,116 @@
+cmake_minimum_required(VERSION 3.16)
+
+set(CMAKE_TOOLCHAIN_FILE "toolchain/arm-none-eabi.cmake")
+
+project(executable)
+
+enable_language(C ASM)
+
+
+set(TARGET executable.elf) #${CMAKE_PROJECT_NAME}
+
+
+# ważne żeby dodać startup_stm32f412rx.s" do listy source files
+# inaczej nie będzie działać
+
+add_executable(${TARGET}
+"Drivers/CMSIS/Device/ST/STM32F4xx/Source/Templates/gcc/startup_stm32f412rx.s"
+
+"Core/Src/main.c"
+"Core/Src/stm32f4xx_it.c"
+"Core/Src/stm32f4xx_hal_msp.c"
+"USB_DEVICE/App/usb_device.c"
+"USB_DEVICE/App/usbd_desc.c"
+"USB_DEVICE/App/usbd_cdc_if.c"
+"USB_DEVICE/Target/usbd_conf.c"
+"Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pcd.c"
+"Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pcd_ex.c"
+"Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_usb.c"
+"Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc.c"
+"Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc_ex.c"
+"Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash.c"
+"Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash_ex.c"
+"Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash_ramfunc.c"
+"Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_gpio.c"
+"Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma_ex.c"
+"Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma.c"
+"Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pwr.c"
+"Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pwr_ex.c"
+"Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_cortex.c"
+"Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal.c"
+"Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_exti.c"
+"Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc.c"
+"Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc_ex.c"
+"Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_adc.c"
+"Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_can.c"
+"Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c"
+"Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c_ex.c"
+"Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim.c"
+"Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim_ex.c"
+"Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c"
+"Core/Src/system_stm32f4xx.c"
+"Middlewares/ST/STM32_USB_Device_Library/Core/Src/usbd_core.c"
+"Middlewares/ST/STM32_USB_Device_Library/Core/Src/usbd_ctlreq.c"
+"Middlewares/ST/STM32_USB_Device_Library/Core/Src/usbd_ioreq.c"
+"Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc.c"
+
+"app/src/encoder.c"
+"app/src/logger.c"
+"app/src/main_prog.c"
+)
+
+
+# utaiwmay jakie stm32 używamy
+target_compile_definitions(${TARGET} PRIVATE
+	STM32F412Rx
+	USE_HAL
+)
+
+target_include_directories(${TARGET} PRIVATE
+"USB_DEVICE/App"
+"USB_DEVICE/Target"
+"Core/Inc"
+"Drivers/STM32F4xx_HAL_Driver/Inc"
+"Drivers/STM32F4xx_HAL_Driver/Inc/Legacy"
+"Middlewares/ST/STM32_USB_Device_Library/Core/Inc"
+"Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Inc"
+"Drivers/CMSIS/Device/ST/STM32F4xx/Include"
+"Drivers/CMSIS/Include"
+"app/inc"
+)
+
+target_compile_options(${TARGET} PRIVATE
+
+	-g
+  -Og
+	
+	-Wextra
+	-Wpedantic
+	-Wdouble-promotion
+	
+	-mcpu=cortex-m4
+	-mfloat-abi=hard
+	-mfpu=fpv4-sp-d16
+
+	-specs=nosys.specs
+)
+
+target_link_options(${TARGET} PRIVATE
+	-T ${CMAKE_SOURCE_DIR}/STM32F412RGTx_FLASH.ld
+
+	-mthumb
+	-mcpu=cortex-m4
+	-mfpu=fpv4-sp-d16
+	-mfloat-abi=hard
+
+	-specs=nosys.specs
+)
+
+target_link_libraries(${TARGET} m)
+
+add_custom_command(
+	TARGET ${TARGET} POST_BUILD
+	COMMAND ${CMAKE_OBJCOPY} -O binary ${TARGET} ${CMAKE_PROJECT_NAME}.bin
+	COMMAND ${CMAKE_OBJCOPY} -O ihex ${TARGET} ${CMAKE_PROJECT_NAME}.hex
+	COMMAND ${CMAKE_SIZE} ${TARGET}
+)

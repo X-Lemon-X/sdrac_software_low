@@ -7,7 +7,7 @@
     {
       "name": "Cortex Debug",
       "cwd": "${workspaceFolder}",
-      "executable": "./build/sdrac_cubemx.elf",
+      "executable": "./build/executable.elf",
       "request": "launch",
       "type": "cortex-debug",
       "runToEntryPoint": "main",

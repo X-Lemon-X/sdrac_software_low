@@ -1,3 +1,3 @@
 file=$1
 
-st-flash --reset write build/sdrac_cubemx.bin 0x08000000
+st-flash --reset write build/executable.bin 0x08000000

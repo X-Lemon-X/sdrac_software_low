@@ -2,6 +2,10 @@
 #ifndef LOGER_H
 #define LOGER_H
 
+#define LOGER_MAX_MSG_LEN 1024
+
+// #define PUTCHAR_PROTOTYPE int __io_putchar(int ch)
+
 enum LOG_LEVEL {
   LOG_LEVEL_DEBUG=0,
   LOG_LEVEL_INFO=1,
@@ -11,7 +15,13 @@ enum LOG_LEVEL {
 
 typedef int log_lvl;
 
-extern log_lvl log_level;
+/// @brief  initiate the logger
+/// @param level - log level
+void log_init(log_lvl level);
+
+/// @brief  deinit the logger
+void log_deinit();
+
 void log_error(const char *msg);
 void log_warning(const char *msg);
 void log_info(const char *msg);
