@@ -57,7 +57,6 @@ add_executable(${TARGET}
 
 "app/src/encoder.cpp"
 "app/src/logger.cpp"
-# "app/src/main_prog.c"
 "app/src/main_prog.cpp"
 )
 
@@ -97,7 +96,7 @@ $<$<COMPILE_LANGUAGE:ASM>:
   $<$<COMPILE_LANGUAGE:C>:
   -O0 -g
   -std=c17
-
+  -fexceptions
   -Wall
   -Wextra
   -Wpedantic
@@ -113,7 +112,7 @@ $<$<COMPILE_LANGUAGE:ASM>:
 $<$<COMPILE_LANGUAGE:CXX>:
 -O0 -g
 -std=c++17
-
+-fexceptions
 -Wall
 -Wextra
 -Wpedantic

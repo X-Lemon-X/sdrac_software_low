@@ -1,50 +1,52 @@
 
 #include "main.h"
 #include "encoder.hpp"
+#include <stdexcept>
+// #include "main_prog.hpp"
+
+using namespace ENCODER;
 
 
+#define PIx2 6.28318530717958647692
 
-int encoder_init_struct(encoder_encoder *encoder){
-  if(encoder == NULL) return 1;
-  encoder->resolution = 4096;
-  encoder->address = 0x40;
-  encoder->hi2c = NULL;
-  encoder->reverse = 0;
-  encoder->offset = 0;
-  encoder->raw_angle = 0;
-  encoder->data[0] = 0;
-  encoder->data[1] = 0;
-  return 0;
+Encoder::Encoder(I2C_HandleTypeDef *hi2c){
+  if(hi2c == NULL) return;
+  this->hi2c = hi2c;
+  this->resolution = 4096;
+  this->address = 0x40;
+  this->reverse = false;
+  this->offset = 0;
+  this->raw_angle = 0;
+  this->data[0] = 0;
+  this->data[1] = 0;
 }
 
-
-int encoder_init(encoder_encoder *encoder){
-  if(encoder == NULL) return 1;
-  return HAL_I2C_IsDeviceReady(encoder->hi2c, encoder->address, 1, 100);
+bool Encoder::ping_encoder(){
+  return HAL_I2C_IsDeviceReady(this->hi2c, this->address, 1, 100) == HAL_OK;
 }
 
-int encoder_set_offset(encoder_encoder *encoder, float offset, uint8_t reverse){
-  if(encoder == NULL) return 1;
-  encoder->offset = offset;
-  encoder->reverse = reverse;
-  return 0;
+void Encoder::set_offset(float offset, bool reverse){
+  this->offset = offset;
+  this->reverse = reverse;
 }
 
-int encoder_read_raw_angle(encoder_encoder *encoder){
-  if(encoder == NULL) return -1;
-  HAL_StatusTypeDef status = HAL_I2C_Mem_Read(encoder->hi2c, encoder->address, encoder->angle_register, 1, encoder->data, 2, 20);
+int Encoder::read_raw_angle(){
+  HAL_StatusTypeDef status = HAL_I2C_Mem_Read(this->hi2c, this->address, this->angle_register, 1, this->data, 2, 20);
   if(status != HAL_OK) return -2;
   
-  uint16_t reg1 = (uint16_t)encoder->data[0] << 6;
-  uint16_t reg2 = encoder->data[1] & 0xfe;
-  encoder->raw_angle = reg1 + reg2;
-  return encoder->raw_angle;
+  log.debug("data[0]: " + std::to_string(this->data[0]));
+  log.debug("data[1]: " + std::to_string(this->data[1]));
+
+  uint16_t reg1 = (uint16_t)this->data[0] << 6;
+  uint16_t reg2 = this->data[1] & 0xfe;
+  this->raw_angle = reg1 + reg2;
+  return this->raw_angle;
 }
 
-
-float encoder_read_angle(encoder_encoder *encoder){
-  if(encoder == NULL) return 1;
-
-
-  return 0;
+float Encoder::read_angle(){
+  int prev_raw_angle = this->raw_angle;
+  int angle = read_raw_angle()*PIx2;
+  if(this->reverse) angle = -angle;
+  angle += this->offset;
+  return angle;
 }

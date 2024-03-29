@@ -51,6 +51,7 @@ void Logger::debug(std::string msg){
 
 
 void Logger::transmit(std::string msg){
+  msg += "\n";
   CDC_Transmit_FS((uint8_t*)msg.c_str(), msg.length());
   HAL_Delay(1);
 }
