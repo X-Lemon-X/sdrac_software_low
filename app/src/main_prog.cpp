@@ -41,8 +41,8 @@ int main_app(void)
     // log_debug("main loop\n");
     // USBD_UsrLog("main loop");
 
-    float angle = encoder_read_raw_angle(&encoder);
-    CDC_Transmit_FS((uint8_t*)msg, strlen(msg));
+    int angle = encoder_read_raw_angle(&encoder);
+    // CDC_Transmit_FS((uint8_t*)msg, strlen(msg));
     HAL_Delay(10);
     log.debug("angle: \n");
     log.debug(std::to_string(angle));
