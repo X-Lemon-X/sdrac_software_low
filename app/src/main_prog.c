@@ -45,6 +45,7 @@ int main_app(void)
     // log_debug("angle: \n");
     // USBD_UsrLog("angle: %f", angle);
     CDC_Transmit_FS((uint8_t*)msg, strlen(msg));
+    HAL_Delay(10);
     CDC_Transmit_FS((uint8_t*)msg2, strlen(msg2));
     HAL_GPIO_TogglePin(GPIOC,GPIO_PIN_7);
     HAL_GPIO_TogglePin(GPIOC,GPIO_PIN_6);
