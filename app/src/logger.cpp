@@ -1,9 +1,8 @@
-#include "logger.h"
+#include "logger.hpp"
 #include "main.h"
 #include "usbd_cdc_if.h"
 
-log_lvl log_level;
-char *logbuffer = NULL; 
+using namespace LOGGER;
 
 // void log_test (const char *__restrict logbuffer const char *__restrict msg, ...){
 //   if (log_level <= LOG_LEVEL_DEBUG) return;
@@ -26,39 +25,32 @@ char *logbuffer = NULL;
 //   return ch;
 // }
 
-
-void log_transmit(const char *msg){
-  size_t len = strlen(msg);
-  CDC_Transmit_FS((uint8_t*)msg, len);
-  // memset(logbuffer, 0, len);
-}
-
-void log_init(log_lvl level){
+Logger::Logger(LOG_LEVEL level){
   log_level = level;
-  logbuffer = (char*)malloc(LOGER_MAX_MSG_LEN);
-  memset(logbuffer, 0, LOGER_MAX_MSG_LEN);
 }
 
-void log_deinit(){
-  free(logbuffer);
+void Logger::error(std::string msg){
+  if (log_level < LOG_LEVEL::LOG_LEVEL_ERROR) return;
+  transmit(msg);
 }
 
-void log_debug(const char *msg){
-  if (log_level < LOG_LEVEL_DEBUG) return;
-  log_transmit(msg);
+void Logger::warning(std::string msg){
+  if (log_level < LOG_LEVEL::LOG_LEVEL_WARNING ) return;
+  transmit(msg);
 }
 
-void log_info(const char *msg){
-  if (log_level < LOG_LEVEL_INFO) return;
-  log_transmit(msg);
+void Logger::info(std::string msg){
+  if (log_level < LOG_LEVEL::LOG_LEVEL_INFO) return;
+  transmit(msg);
 }
 
-void log_warning(const char *msg){
-  if (log_level < LOG_LEVEL_WARNING) return;
-  log_transmit(msg);
+void Logger::debug(std::string msg){
+  if (log_level < LOG_LEVEL::LOG_LEVEL_DEBUG) return;
+  transmit(msg);
 }
 
-void log_error(const char *msg){
-  if (log_level < LOG_LEVEL_ERROR) return;
-  log_transmit(msg);
+
+void Logger::transmit(std::string msg){
+  CDC_Transmit_FS((uint8_t*)msg.c_str(), msg.length());
+  HAL_Delay(1);
 }

@@ -4,11 +4,12 @@ set(CMAKE_TOOLCHAIN_FILE "toolchain/arm-none-eabi.cmake")
 
 project(executable)
 
-enable_language(C ASM)
+enable_language(CXX C ASM)
 
 
 set(TARGET executable.elf) #${CMAKE_PROJECT_NAME}
 
+set(CMAKE_CXX_STANDARD 17)
 
 # ważne żeby dodać startup_stm32f412rx.s" do listy source files
 # inaczej nie będzie działać
@@ -16,7 +17,7 @@ set(TARGET executable.elf) #${CMAKE_PROJECT_NAME}
 add_executable(${TARGET}
 "Drivers/CMSIS/Device/ST/STM32F4xx/Source/Templates/gcc/startup_stm32f412rx.s"
 
-"Core/Src/main.c"
+"Core/Src/main.cpp"
 "Core/Src/stm32f4xx_it.c"
 "Core/Src/stm32f4xx_hal_msp.c"
 "USB_DEVICE/App/usb_device.c"
@@ -54,9 +55,10 @@ add_executable(${TARGET}
 "Middlewares/ST/STM32_USB_Device_Library/Core/Src/usbd_ioreq.c"
 "Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc.c"
 
-"app/src/encoder.c"
-"app/src/logger.c"
-"app/src/main_prog.c"
+"app/src/encoder.cpp"
+"app/src/logger.cpp"
+# "app/src/main_prog.c"
+"app/src/main_prog.cpp"
 )
 
 
@@ -77,34 +79,104 @@ target_include_directories(${TARGET} PRIVATE
 "Drivers/CMSIS/Device/ST/STM32F4xx/Include"
 "Drivers/CMSIS/Include"
 "app/inc"
+"app/src"
 )
 
 target_compile_options(${TARGET} PRIVATE
+$<$<COMPILE_LANGUAGE:ASM>:
+		-O0 -g
 
-	-g
-  -Og
-	
-	-Wextra
-	-Wpedantic
-	-Wdouble-promotion
-	
-	-mcpu=cortex-m4
-	-mfloat-abi=hard
-	-mfpu=fpv4-sp-d16
+		-mthumb
+		-mhard-float
+		-mcpu=cortex-m4
+		-mfpu=fpv4-sp-d16
+		-specs=nano.specs
 
-	-specs=nosys.specs
+		-x assembler-with-cpp
+	>
+  $<$<COMPILE_LANGUAGE:C>:
+  -O0 -g
+  -std=c17
+
+  -Wall
+  -Wextra
+  -Wpedantic
+  -Wdouble-promotion
+
+  -mthumb
+  -mhard-float
+  -mcpu=cortex-m4
+  -mfpu=fpv4-sp-d16
+  -specs=nano.specs
+>
+
+$<$<COMPILE_LANGUAGE:CXX>:
+-O0 -g
+-std=c++17
+
+-Wall
+-Wextra
+-Wpedantic
+-Wdouble-promotion
+-Werror=return-type
+
+-fno-threadsafe-statics
+-fno-common
+-fno-exceptions
+-fno-rtti
+
+-mthumb
+-mhard-float
+-mcpu=cortex-m4
+-mfloat-abi=hard
+-mfpu=fpv4-sp-d16
+-specs=nosys.specs
+-specs=nano.specs
+>
+
 )
+# /\
+#  |
+# -g
+# -Og
+
+# -Wextra
+# -Wpedantic
+# -Wdouble-promotion
+
+# -mcpu=cortex-m4
+# -mfloat-abi=hard
+# -mfpu=fpv4-sp-d16
+
+# -specs=nosys.specs
+
+
 
 target_link_options(${TARGET} PRIVATE
 	-T ${CMAKE_SOURCE_DIR}/STM32F412RGTx_FLASH.ld
+	-Wl,-Map=${CMAKE_PROJECT_NAME}.map
+	-Wl,--gc-sections
+	-Wl,-cref
+	-Wl,--start-group -lc -lm -lstdc++ -lsupc++ -Wl,--end-group
 
 	-mthumb
+	-mhard-float
+	-mfloat-abi=hard
 	-mcpu=cortex-m4
 	-mfpu=fpv4-sp-d16
-	-mfloat-abi=hard
-
+	-specs=nano.specs
 	-specs=nosys.specs
+
+	-static
+
 )
+
+# -mthumb
+# -mcpu=cortex-m4
+# -mfpu=fpv4-sp-d16
+# -mfloat-abi=hard
+
+# -specs=nosys.specs
 
 target_link_libraries(${TARGET} m)
 

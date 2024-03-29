@@ -1,6 +1,6 @@
 
 #include "main.h"
-#include "encoder.h"
+#include "encoder.hpp"
 
 
 
@@ -38,7 +38,7 @@ int encoder_read_raw_angle(encoder_encoder *encoder){
   uint16_t reg1 = (uint16_t)encoder->data[0] << 6;
   uint16_t reg2 = encoder->data[1] & 0xfe;
   encoder->raw_angle = reg1 + reg2;
-  return 0;
+  return encoder->raw_angle;
 }
 
 

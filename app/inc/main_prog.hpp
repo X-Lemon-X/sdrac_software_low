@@ -1,3 +1,4 @@
+#include "logger.hpp"
 
 #ifndef MAIN_PROG_H
 #define MAIN_PROG_H
@@ -13,9 +14,10 @@
 
 
 #define ENCODER_MEM_ADDR_ANNGLE 0x03
-#define ENCODER_MT6701_I2C_ADDRESS 0b0000110 << 1
+// #define ENCODER_MT6701_I2C_ADDRESS 0b0000110 << 1
 #define ENCODER_MT6702_RESOLUTION 16384
 
+extern LOGGER::Logger log;
 int main_app();
 
 #endif // MAIN_PROG_H

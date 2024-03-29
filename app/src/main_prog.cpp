@@ -1,9 +1,9 @@
 #include "main.h"
-#include "encoder.h"
-#include "main_prog.h"
+#include "encoder.hpp"
+#include "main_prog.hpp"
 #include "usb_device.h"
 #include "usbd_cdc_if.h"
-#include "logger.h" 
+#include "logger.hpp" 
 #include <string.h>
 
 extern ADC_HandleTypeDef hadc1;
@@ -12,17 +12,17 @@ extern I2C_HandleTypeDef hi2c1;
 extern TIM_HandleTypeDef htim2;
 extern TIM_HandleTypeDef htim3;
 
-extern log_lvl log_level;
+LOGGER::Logger log(LOGGER::LOG_LEVEL::LOG_LEVEL_DEBUG);
 
 int main_app(void)
 {
-  log_init(LOG_LEVEL_DEBUG);
+  log.debug("Start main_app\n");
   HAL_I2C_MspInit(&hi2c1);
 
   encoder_encoder encoder;
   encoder_init_struct(&encoder);
   encoder.hi2c = &hi2c1;
-  encoder.address = ENCODER_MT6701_I2C_ADDRESS;
+  encoder.address = 0b0000110 << 1; //ENCODER_MT6701_I2C_ADDRESS;
   encoder.resolution = ENCODER_MT6702_RESOLUTION;
 
   //send string to the  usb
@@ -41,11 +41,13 @@ int main_app(void)
     // log_debug("main loop\n");
     // USBD_UsrLog("main loop");
 
-    // float angle = encoder_read_raw_angle(&encoder);
-    // log_debug("angle: \n");
-    // USBD_UsrLog("angle: %f", angle);
+    float angle = encoder_read_raw_angle(&encoder);
     CDC_Transmit_FS((uint8_t*)msg, strlen(msg));
-    CDC_Transmit_FS((uint8_t*)msg2, strlen(msg2));
+    HAL_Delay(10);
+    log.debug("angle: \n");
+    log.debug(std::to_string(angle));
+    // USBD_UsrLog("angle: %f", angle);
+    // CDC_Transmit_FS((uint8_t*)msg2, strlen(msg2));
     HAL_GPIO_TogglePin(GPIOC,GPIO_PIN_7);
     HAL_GPIO_TogglePin(GPIOC,GPIO_PIN_6);
     HAL_Delay(300);
