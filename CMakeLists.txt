@@ -14,6 +14,7 @@ set(CMAKE_CXX_STANDARD 17)
 # ważne żeby dodać startup_stm32f412rx.s" do listy source files
 # inaczej nie będzie działać
 
+
 add_executable(${TARGET}
 "Drivers/CMSIS/Device/ST/STM32F4xx/Source/Templates/gcc/startup_stm32f412rx.s"
 
@@ -55,9 +56,10 @@ add_executable(${TARGET}
 "Middlewares/ST/STM32_USB_Device_Library/Core/Src/usbd_ioreq.c"
 "Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc.c"
 
-"app/src/encoder.cpp"
-"app/src/logger.cpp"
-"app/src/main_prog.cpp"
+"app/Encoder/src/encoder.cpp"
+"app/Logger/src/logger.cpp"
+"app/main_prog.cpp"
+"app/Timing/src/Timing.cpp"
 )
 
 
@@ -77,10 +79,18 @@ target_include_directories(${TARGET} PRIVATE
 "Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Inc"
 "Drivers/CMSIS/Device/ST/STM32F4xx/Include"
 "Drivers/CMSIS/Include"
-"app/inc"
-"app/src"
+
+"app"
+"app/Encoder/inc"
+"app/Logger/inc"
+"app/Memory/inc"
+"app/EngineControler/inc"
+"app/Timing/inc"
 )
 
+
+# use   -u_printf_float to enable float to string conversion add about 10kb to binary
+ 
 target_compile_options(${TARGET} PRIVATE
 $<$<COMPILE_LANGUAGE:ASM>:
 		-O0 -g
@@ -107,6 +117,7 @@ $<$<COMPILE_LANGUAGE:ASM>:
   -mcpu=cortex-m4
   -mfpu=fpv4-sp-d16
   -specs=nano.specs
+  -u_printf_float
 >
 
 $<$<COMPILE_LANGUAGE:CXX>:
@@ -123,6 +134,7 @@ $<$<COMPILE_LANGUAGE:CXX>:
 -fno-common
 -fno-exceptions
 -fno-rtti
+-u_printf_float
 
 -mthumb
 -mhard-float
@@ -134,20 +146,6 @@ $<$<COMPILE_LANGUAGE:CXX>:
 >
 
 )
-# /\
-#  |
-# -g
-# -Og
-
-# -Wextra
-# -Wpedantic
-# -Wdouble-promotion
-
-# -mcpu=cortex-m4
-# -mfloat-abi=hard
-# -mfpu=fpv4-sp-d16
-
-# -specs=nosys.specs
 
 
 
@@ -165,17 +163,10 @@ target_link_options(${TARGET} PRIVATE
 	-mfpu=fpv4-sp-d16
 	-specs=nano.specs
 	-specs=nosys.specs
-
+  -u_printf_float
 	-static
 
 )
-
-# -mthumb
-# -mcpu=cortex-m4
-# -mfpu=fpv4-sp-d16
-# -mfloat-abi=hard
-
-# -specs=nosys.specs
 
 target_link_libraries(${TARGET} m)
 

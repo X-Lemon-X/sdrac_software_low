@@ -3,8 +3,6 @@
 #ifndef LOGER_H
 #define LOGER_H
 
-#define LOGER_MAX_MSG_LEN 1024
-
 // #define PUTCHAR_PROTOTYPE int __io_putchar(int ch)
 
 namespace LOGGER {
