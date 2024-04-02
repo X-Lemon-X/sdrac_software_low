@@ -1,5 +1,10 @@
 #include "logger.hpp"
 #include "Timing.hpp"
+#include "main.h"
+#include "stm32f4xx_hal.h"
+#include "usb_device.h"
+#include "usbd_cdc_if.h"
+#include "usbd_def.h"
 
 #ifndef MAIN_PROG_H
 #define MAIN_PROG_H
@@ -11,12 +16,16 @@
 // #define LOG_WARN
 // #define LOG_ERROR
 
+
 //**************************************************************************************************
 // CONSTANTS
 #define PI 3.14159265358979323846
 #define PI_d2 1.57079632679489661923
 #define PI_d4 0.78539816339744830962
 #define PI_m2 6.28318530717958647692
+
+
+#define ADC_DMA_BUFFER_SIZE 16
 
 //**************************************************************************************************
 // I2C CONSTANTS
@@ -29,8 +38,74 @@
 
 
 //**************************************************************************************************
-// all the global variables and peripherals are declared here
+// PINOUT CONSTANTS
+
+struct Pin {
+  uint16_t pin;
+  GPIO_TypeDef *port;
+};
+
+extern Pin pin_user_led_1;
+extern Pin pin_user_led_2;
+extern Pin pin_user_btn_1;
+extern Pin pin_tx_led;
+extern Pin pin_rx_led;
+extern Pin pin_encoder;
+extern Pin pin_poz_zero_sensor;
+extern Pin pin_inout_ca1;
+extern Pin pin_inout_ca2;
+extern Pin pin_inout_crx;
+extern Pin pin_inout_ctx;
+extern Pin pin_sync_puls;
+extern Pin pin_sync_dir;
+extern Pin pin_temp_steper_board;
+extern Pin pin_temp_board;
+extern Pin pin_temp_motor;
+extern Pin pin_vsense;
+extern Pin pin_steper_direction;
+extern Pin pin_steper_enable ;
+extern Pin pin_steper_step ;
+extern Pin pin_boot_device;
+
+// Pin pin_user_led_1 = {GPIO_PIN_6, GPIOC};
+// Pin pin_user_led_2 = {GPIO_PIN_7, GPIOC};
+// Pin pin_user_btn_1 = {GPIO_PIN_9, GPIOC};
+
+// Pin pin_tx_led = {GPIO_PIN_12, GPIOB};
+// Pin pin_rx_led = {GPIO_PIN_13, GPIOB};
+
+// Pin pin_encoder = {GPIO_PIN_3, GPIOB};
+// Pin pin_poz_zero_sensor = {GPIO_PIN_4, GPIOA};
+
+// Pin pin_inout_ca1 = {GPIO_PIN_5, GPIOA};
+// Pin pin_inout_ca2 = {GPIO_PIN_7, GPIOA};
+// Pin pin_inout_crx = {GPIO_PIN_10, GPIOB};
+// Pin pin_inout_ctx = {GPIO_PIN_4, GPIOC};
+
+// Pin pin_sync_puls = {GPIO_PIN_8, GPIOA};
+// Pin pin_sync_dir = {GPIO_PIN_9, GPIOA};
+
+// Pin pin_temp_steper_board = {GPIO_PIN_0, GPIOA};
+// Pin pin_temp_board = {GPIO_PIN_1, GPIOA};
+// Pin pin_temp_motor = {GPIO_PIN_2, GPIOA};
+
+// Pin pin_vsense = {GPIO_PIN_3, GPIOA};
+
+// Pin pin_steper_direction = {GPIO_PIN_0, GPIOB};
+// Pin pin_steper_enable = {GPIO_PIN_1, GPIOB};
+// Pin pin_steper_step = {GPIO_PIN_6, GPIOA};
+
+// Pin pin_boot_device = {GPIO_PIN_8, GPIOC};
+
+
+
+//**************************************************************************************************
+// all the global variables, peripherals, and buffors are declared here
+
+extern uint32_t adc_dma_buffer[ADC_DMA_BUFFER_SIZE];
+
 extern ADC_HandleTypeDef hadc1;
+extern DMA_HandleTypeDef hdma_adc1;
 extern CAN_HandleTypeDef hcan1;
 extern I2C_HandleTypeDef hi2c1;
 extern TIM_HandleTypeDef htim1;
@@ -39,11 +114,22 @@ extern TIM_HandleTypeDef htim3;
 extern TIM_HandleTypeDef htim8;
 extern TIM_HandleTypeDef htim10;
 extern UART_HandleTypeDef huart3;
+
+extern USBD_HandleTypeDef hUsbDeviceFS;
+
 extern LOGGER::Logger loger;
 extern TIMING::Ticker ticker;
+
+
+
 int main_prog();
 
 
+
+// struct Pin{
+//   uint16_t pin;
+//   GPIO_TypeDef *port;
+// };
 
 
 

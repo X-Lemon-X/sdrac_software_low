@@ -12,3 +12,6 @@ and add main_app(); in int main(); before the loop after all the initializations
 Add all include direcotries and c files to  a mekefile
 
 
+### Problems with MXCube genrations
+In main.c 
+- DMA for ADC should be initaied after ADC is initated not befor whitch couses th emain code not to be executed

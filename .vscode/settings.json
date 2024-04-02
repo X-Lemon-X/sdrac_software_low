@@ -59,6 +59,8 @@
     "typeinfo": "cpp",
     "optional": "cpp",
     "ranges": "cpp",
-    "charconv": "cpp"
+    "charconv": "cpp",
+    "usbd_cdc_if.h": "c",
+    "usbd_cdc.h": "c"
   }
 }

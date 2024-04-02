@@ -23,6 +23,7 @@ this->enable_velocity = false;
 
   for(int i = 0; i < VELOCITY_FILTER_SIZE; i++){
     this->velocity_previous.push_back(0.0f);
+    this->angle_previous.push_back(0.0f);
   }
 }
 
@@ -47,7 +48,11 @@ float Encoder::calculate_velocity(float angle){
   uint64_t current_tiem = ticker.get_micros();
   
   float current_velocity = (angle-prev_angle) / ((float)(current_tiem - last_time)*0.000001f);
-  if(!this->enable_filter) return current_velocity;
+  if(!this->enable_filter) {
+    this->last_time = current_tiem;
+    this->prev_angle = angle;
+    return current_velocity;
+  }
 
   velocity_previous.push_back(current_velocity);
   velocity_previous.pop_front();
@@ -63,6 +68,14 @@ float Encoder::read_angle(){
   float angle = (float)read_raw_angle()*6.28318530f / (float)this->resolution;
   if(this->reverse) angle = -angle;
   angle += this->offset;
+
+  // angle_previous.push_back(angle);
+  // angle_previous.pop_front();
+  // float sum = 0;
+  // for (int j = 0 ; j < VELOCITY_FILTER_SIZE; j++){
+  //   sum += angle_previous[j] * velocity_filter_weight[j];
+  // }
+  // angle = sum;
 
   if(this->enable_velocity)
     this->velocity = calculate_velocity(angle);

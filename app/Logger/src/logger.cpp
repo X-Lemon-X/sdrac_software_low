@@ -31,27 +31,29 @@ Logger::Logger(LOG_LEVEL level){
 
 void Logger::error(std::string msg){
   if (log_level > LOG_LEVEL::LOG_LEVEL_ERROR) return;
-  transmit(msg);
+  transmit("[ERROR]"+msg);
 }
 
 void Logger::warning(std::string msg){
   if (log_level > LOG_LEVEL::LOG_LEVEL_WARNING ) return;
-  transmit(msg);
+  transmit("[WARNING]"+msg);
 }
 
 void Logger::info(std::string msg){
   if (log_level > LOG_LEVEL::LOG_LEVEL_INFO) return;
-  transmit(msg);
+  transmit("[INFO]"+msg);
 }
 
 void Logger::debug(std::string msg){
   if (log_level > LOG_LEVEL::LOG_LEVEL_DEBUG) return;
-  transmit(msg);
+  transmit("[DEBUG]"+msg);
 }
 
 
 void Logger::transmit(std::string msg){
   msg += "\n";
+  msg = "["+std::to_string(HAL_GetTick())+"]"+ msg;
   CDC_Transmit_FS((uint8_t*)msg.c_str(), msg.length());
+
   HAL_Delay(1);
 }

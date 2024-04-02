@@ -21,6 +21,7 @@ private:
   uint16_t raw_angle;
   uint8_t data[2];
   std::deque<float> velocity_previous;
+  std::deque<float> angle_previous;
   float *velocity_filter_weight;
   uint64_t last_time;
   float prev_angle;

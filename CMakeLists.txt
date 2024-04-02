@@ -16,9 +16,6 @@ set(CMAKE_CXX_STANDARD 17)
 
 
 add_executable(${TARGET}
-"Drivers/CMSIS/Device/ST/STM32F4xx/Source/Templates/gcc/startup_stm32f412rx.s"
-
-"Core/Src/main.cpp"
 "Core/Src/stm32f4xx_it.c"
 "Core/Src/stm32f4xx_hal_msp.c"
 "USB_DEVICE/App/usb_device.c"
@@ -56,10 +53,15 @@ add_executable(${TARGET}
 "Middlewares/ST/STM32_USB_Device_Library/Core/Src/usbd_ioreq.c"
 "Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc.c"
 
+"Core/Src/main.cpp"
+"Drivers/CMSIS/Device/ST/STM32F4xx/Source/Templates/gcc/startup_stm32f412rx.s"
+
 "app/Encoder/src/encoder.cpp"
 "app/Logger/src/logger.cpp"
 "app/main_prog.cpp"
 "app/Timing/src/Timing.cpp"
+"app/UsbPrograming/src/usb_programer.cpp"
+"app/SteperMotor/src/steper_motor.cpp"
 )
 
 
@@ -84,8 +86,9 @@ target_include_directories(${TARGET} PRIVATE
 "app/Encoder/inc"
 "app/Logger/inc"
 "app/Memory/inc"
-"app/EngineControler/inc"
 "app/Timing/inc"
+"app/UsbPrograming/inc"
+"app/SteperMotor/inc"
 )
 
 
