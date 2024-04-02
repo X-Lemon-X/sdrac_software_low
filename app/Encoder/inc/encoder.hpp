@@ -16,12 +16,13 @@ const float basic_velocity_filter_weight[VELOCITY_FILTER_SIZE] = {
   
 class Encoder {
 private:
-  I2C_HandleTypeDef *hi2c;
+  I2C_HandleTypeDef &hi2c;
+  TIMING::Ticker &ticker;
   uint16_t raw_angle;
   uint8_t data[2];
   std::deque<float> velocity_previous;
   float *velocity_filter_weight;
-  float last_time;
+  uint64_t last_time;
   float prev_angle;
   float velocity;
 
@@ -29,7 +30,7 @@ private:
   /// @param angle current angle
   /// @param current_time  current time
   /// @return returns the filtered velocity
-  float calculate_velocity(float angle, float current_time);
+  float calculate_velocity(float angle);
 
 public:
   uint16_t resolution;
@@ -38,12 +39,25 @@ public:
   uint8_t address;
   uint8_t angle_register;
   uint8_t magnes_detection_register;
+  bool enable_filter;
+  bool enable_velocity;
   
-  Encoder(I2C_HandleTypeDef *hi2c, float *velocity_filter_weight = (float*)basic_velocity_filter_weight);
+  Encoder(I2C_HandleTypeDef &hi2c,TIMING::Ticker &ticker ,float *velocity_filter_weight = (float*)basic_velocity_filter_weight);
+  
+  /// @brief Pings the encoder to check if it is connected
+  /// @return true if the encoder is connected
   bool ping_encoder();
-  void set_offset(float offset, bool reverse);
-  int read_raw_angle();
+
+  /// @brief reads the raw angle from the encoder
+  /// @return the raw angle in uint16_t
+  uint16_t read_raw_angle();
+
+  /// @brief reads the angle from the encoder
+  /// @return the angle in radians
   float read_angle();
+
+  /// @brief reads the velocity from the encoder and filters it
+  /// @return the velocity in radians per second 
   float get_velocity();
 };
 

@@ -30,22 +30,22 @@ Logger::Logger(LOG_LEVEL level){
 }
 
 void Logger::error(std::string msg){
-  if (log_level < LOG_LEVEL::LOG_LEVEL_ERROR) return;
+  if (log_level > LOG_LEVEL::LOG_LEVEL_ERROR) return;
   transmit(msg);
 }
 
 void Logger::warning(std::string msg){
-  if (log_level < LOG_LEVEL::LOG_LEVEL_WARNING ) return;
+  if (log_level > LOG_LEVEL::LOG_LEVEL_WARNING ) return;
   transmit(msg);
 }
 
 void Logger::info(std::string msg){
-  if (log_level < LOG_LEVEL::LOG_LEVEL_INFO) return;
+  if (log_level > LOG_LEVEL::LOG_LEVEL_INFO) return;
   transmit(msg);
 }
 
 void Logger::debug(std::string msg){
-  if (log_level < LOG_LEVEL::LOG_LEVEL_DEBUG) return;
+  if (log_level > LOG_LEVEL::LOG_LEVEL_DEBUG) return;
   transmit(msg);
 }
 

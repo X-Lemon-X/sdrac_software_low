@@ -28,23 +28,21 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 
 int main_prog(void)
 {
-  loger.debug("Start main_app\n");
-  // HAL_I2C_MspInit(&hi2c1);
+  log_debug("Start main_prog\n");
 
-  TIMING::Ticker ticker;
-  TIMING::Timing timing(ticker);
-  timing.set_behaviour(500000, true);
-  // TIMING::Timing timing2(ticker);
-
-  ENCODER::Encoder encoder(&hi2c1);
+  TIMING::Timing tim_blink(ticker);
+  TIMING::Timing tim_encoder(ticker);
+  tim_blink.set_behaviour(100000, true);
+  tim_encoder.set_behaviour(100000, true);
+  
+  ENCODER::Encoder encoder(hi2c1,ticker);
   encoder.address = ENCODER_MT6701_I2C_ADDRESS;
   encoder.resolution = ENCODER_MT6702_RESOLUTION;
   encoder.angle_register = ENCODER_MEM_ADDR_ANNGLE;
-  encoder.set_offset(0, false);
-
-
-  loger.debug("Encoder status True if ready:"+ std::to_string(encoder.ping_encoder()));
-
+  encoder.offset = 0;
+  encoder.reverse = false;
+  encoder.enable_filter = true;
+  encoder.enable_velocity= true;
   //send string to the  usb
   
   // encoder_set_offset(&encoder, 0, 0);
@@ -59,25 +57,16 @@ int main_prog(void)
     // log_debug("main loop\n");
     // USBD_UsrLog("main loop");
 
-    if(timing.triggered()){
+    if(tim_blink.triggered()){
       HAL_GPIO_TogglePin(GPIOC,GPIO_PIN_7);
-      
-      float angle_f = encoder.read_angle();
-      float velocity = encoder.get_velocity();
-      // CDC_Transmit_FS((uint8_t*)msg, strlen(msg));
-      // auto st= std::string(std::to_chars(velocity));
-      // loger.debug("raw angle:" + std::to_string(angle));
-      loger.debug("angle:");
-      loger.debug("velocity 2:" + std::to_string(velocity));
-      // loger.debug("triggered");
-      // USBD_UsrLog("triggered");
     }
-    
-    // USBD_UsrLog("angle: %f", angle);
-    // CDC_Transmit_FS((uint8_t*)msg2, strlen(msg2));
-    int angle = encoder.read_raw_angle();
-    loger.debug("raw angle:" + std::to_string(angle));
-    HAL_GPIO_TogglePin(GPIOC,GPIO_PIN_6);
-    // HAL_Delay(30);
+
+    if(tim_encoder.triggered()){
+      float angle = encoder.read_angle();
+      float velocity = encoder.get_velocity();
+      log_debug("angle:" + std::to_string(angle) + " velocity:" + std::to_string(velocity));
+    }
+
+
   }
 }
