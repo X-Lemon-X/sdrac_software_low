@@ -62,6 +62,7 @@ add_executable(${TARGET}
 "app/Timing/src/Timing.cpp"
 "app/UsbPrograming/src/usb_programer.cpp"
 "app/SteperMotor/src/steper_motor.cpp"
+"app/Filter/src/filter.cpp"
 )
 
 
@@ -89,6 +90,7 @@ target_include_directories(${TARGET} PRIVATE
 "app/Timing/inc"
 "app/UsbPrograming/inc"
 "app/SteperMotor/inc"
+"app/Filter/inc"
 )
 
 

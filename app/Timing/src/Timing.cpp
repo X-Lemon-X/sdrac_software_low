@@ -12,6 +12,7 @@ Ticker::Ticker(){
 
 void Ticker::irq_update_ticker(){
   tick_millis++;
+  tick_micros = tick_millis*1000;
 }
 
 void Timing::set_behaviour(uint64_t _period, bool _repeat){
@@ -19,19 +20,19 @@ void Timing::set_behaviour(uint64_t _period, bool _repeat){
   repeat = _repeat;
 }
 
-uint64_t Ticker::get_micros() {
+uint32_t Ticker::get_micros() {
   __disable_irq();
-  tick_micros = (uint64_t)TIM10->CNT + ((uint64_t)tick_millis)*1000;
+  uint32_t mic =  (uint32_t)TIM10->CNT + tick_micros;
   __enable_irq();
-  return tick_micros;
+  return mic;
 }
 
-uint64_t Ticker::get_millis() const {
+uint32_t Ticker::get_millis() const {
   return tick_millis;
 }
 
 float Ticker::get_seconds() {
-  return (float)get_micros() / 1000000.0f;
+  return (float)get_micros() * 0.000001f;
 }
 
 Timing::Timing(Ticker &_ticker): ticker(_ticker){
