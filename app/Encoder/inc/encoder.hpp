@@ -2,6 +2,7 @@
 #include "main_prog.hpp"
 #include <deque>
 #include "Timing.hpp"
+#include "filter.hpp"
 // #include <cstdint>
 
 #ifndef ENCODERS_H
@@ -10,23 +11,17 @@
 #define VELOCITY_FILTER_SIZE 6
 
 namespace ENCODER {
-
-const float basic_velocity_filter_weight[VELOCITY_FILTER_SIZE] = {
-  0.1, 0.2, 0.3, 0.4, 0.5, 0.6};
   
 class Encoder {
 private:
   I2C_HandleTypeDef &hi2c;
   TIMING::Ticker &ticker;
+  FILTERS::FilterBase &filter;
+
   uint16_t raw_angle;
   uint8_t data[2];
-  std::deque<float> velocity_previous;
-  std::deque<float> angle_previous;
-  float *velocity_filter_weight;
   uint64_t last_time;
-  float prev_angle;
-  float velocity;
-
+  
   /// @brief Calucaltes velcoicty, and passes it thoroung a filter
   /// @param angle current angle
   /// @param current_time  current time
@@ -43,7 +38,8 @@ public:
   bool enable_filter;
   bool enable_velocity;
   
-  Encoder(I2C_HandleTypeDef &hi2c,TIMING::Ticker &ticker ,float *velocity_filter_weight = (float*)basic_velocity_filter_weight);
+  /// @brief Init fucnion of the encoder
+  Encoder(I2C_HandleTypeDef &hi2c,TIMING::Ticker &ticker , FILTERS::FilterBase &filter);
   
   /// @brief Pings the encoder to check if it is connected
   /// @return true if the encoder is connected

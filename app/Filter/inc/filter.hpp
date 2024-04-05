@@ -6,9 +6,16 @@
 
 namespace FILTERS{
 
-class FilterAlphaBeta{
-private:
+class FilterBase{
+protected:
   TIMING::Ticker &ticker;
+public:
+  FilterBase(TIMING::Ticker &ticker);
+  float calculate(float calculate);
+};
+
+class FilterAlphaBeta: private FilterBase{
+private:
   float ypri;
   float ypost;
   float vpri;
@@ -18,7 +25,7 @@ public:
   float alfa;
   float beta;
 FilterAlphaBeta(TIMING::Ticker &ticker);
-void calculate(float x);
+ float calculate(float x) override;
 };
 
 

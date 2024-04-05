@@ -2,8 +2,12 @@
 
 using namespace FILTERS;
 
+FilterBase::FilterBase(TIMING::Ticker &_ticker): ticker(_ticker){}
 
-FilterAlphaBeta::FilterAlphaBeta(TIMING::Ticker &_ticker): ticker(_ticker){
+float FilterBase::calculate(float x){return x;}
+
+
+FilterAlphaBeta::FilterAlphaBeta(TIMING::Ticker &_ticker): FilterBase(_ticker){
   alfa =0.2;
   beta = 0.1;
   ypri = 0;
@@ -14,7 +18,7 @@ FilterAlphaBeta::FilterAlphaBeta(TIMING::Ticker &_ticker): ticker(_ticker){
 
 
 float FilterAlphaBeta::calculate(float x){
-  float time = ticker.get_seconds();;
+  float time = FilterBase::ticker.get_seconds();
   float dt = prev_time - time;
   ypri = ypost + dt*vpost;
   vpri = vpost;

@@ -6,10 +6,10 @@
 
 using namespace ENCODER;
 
-Encoder::Encoder(I2C_HandleTypeDef &_hi2c,TIMING::Ticker &_ticker,float *_velocity_filter_weight): 
+Encoder::Encoder(I2C_HandleTypeDef &_hi2c,TIMING::Ticker &_ticker,FILTERS::FilterBase &_filter): 
 hi2c(_hi2c),
 ticker(_ticker),
-velocity_filter_weight(_velocity_filter_weight) {
+filter(_filter) {
 
 this->resolution = 4096;
 this->address = 0x40;
@@ -21,10 +21,6 @@ this->data[1] = 0;
 this->enable_filter = false;
 this->enable_velocity = false;
 
-  for(int i = 0; i < VELOCITY_FILTER_SIZE; i++){
-    this->velocity_previous.push_back(0.0f);
-    this->angle_previous.push_back(0.0f);
-  }
 }
 
 bool Encoder::ping_encoder(){
@@ -54,13 +50,13 @@ float Encoder::calculate_velocity(float angle){
     return current_velocity;
   }
 
-  velocity_previous.push_back(current_velocity);
-  velocity_previous.pop_front();
-  float sum = 0;
-  for (int j = 0 ; j < VELOCITY_FILTER_SIZE; j++)
-    sum += velocity_previous[j] * velocity_filter_weight[j];
-  this->last_time = current_tiem;
-  this->prev_angle = angle;
+  // velocity_previous.push_back(current_velocity);
+  // velocity_previous.pop_front();
+  // float sum = 0;
+  // for (int j = 0 ; j < VELOCITY_FILTER_SIZE; j++)
+  //   sum += velocity_previous[j] * velocity_filter_weight[j];
+  // this->last_time = current_tiem;
+  // this->prev_angle = angle;
   return sum;
 }
 
@@ -69,13 +65,7 @@ float Encoder::read_angle(){
   if(this->reverse) angle = -angle;
   angle += this->offset;
 
-  // angle_previous.push_back(angle);
-  // angle_previous.pop_front();
-  // float sum = 0;
-  // for (int j = 0 ; j < VELOCITY_FILTER_SIZE; j++){
-  //   sum += angle_previous[j] * velocity_filter_weight[j];
-  // }
-  // angle = sum;
+  angle = filter.calculate(angle);
 
   if(this->enable_velocity)
     this->velocity = calculate_velocity(angle);

@@ -15,7 +15,7 @@ void Ticker::irq_update_ticker(){
   tick_micros = tick_millis*1000;
 }
 
-void Timing::set_behaviour(uint64_t _period, bool _repeat){
+void Timing::set_behaviour(uint32_t _period, bool _repeat){
   period = _period;
   repeat = _repeat;
 }
