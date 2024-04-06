@@ -25,14 +25,14 @@ class AlphaBeta:
   
 
 # load csv file
-file = 'measures/data 1000hz.csv'
+file = 'measures/data_bin.csv'
 
 p = pd.read_csv(file, header=None)
 arrays = p.to_numpy()
 
 ab = AlphaBeta()
-ab.alfa = 0.01
-ab.beta = 0.001
+ab.alfa = 0.7
+ab.beta = 0.01
 
 read_angles = []
 read_velocity = []
@@ -52,23 +52,28 @@ for a in arrays:
   time_read.append(time)
   read_angles.append(x)
   read_velocity.append(time)
-  an = ab.calculate(x, time)
-  calc_angles.append(an)
-  vel = (an - ang_p)/ (time - tim)
+  # an = ab.calculate(x, time)
+  # calc_angles.append(an)
+  vel = (x - ang_p)/ (time - tim)
   freq_read.append(1/(time - tim))
   
   tim = time
-  ang_p = an
+  ang_p = x
   calc_velocity.append(vel)
+
+def avg(arr):
+  return sum(arr)/len(arr)
+print(f"signal frequency:{avg(freq_read)}")
 
 #plot on a single graph calcualted velocity and read velocity
 # plt.plot(time_read, read_velocity, label='read velocity')
-# plt.plot(time_read, calc_velocity, label='calculated velocity')
+plt.plot(time_read, calc_velocity, label='calculated velocity')
+plt.show()
 
 #plot on a second graph calculated angle and read angle
 # add circles for each point
 plt.plot(time_read, read_angles, label='read angle', marker='o')
-plt.plot(time_read, calc_angles, label='calculated angle', marker='o')
+# plt.plot(time_read, calc_angles, label='calculated angle', marker='o')
 
 #dilpsay both graphs
 plt.xlabel('Time')
@@ -76,9 +81,7 @@ plt.ylabel('Value')
 plt.legend()
 plt.show()
 #calcayle avarage frequency
-def avg(arr):
-  return sum(arr)/len(arr)
-print(avg(freq_read))
+
 
 
 

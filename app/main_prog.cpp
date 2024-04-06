@@ -60,7 +60,6 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
 {
   // log_debug("ADC1: " + std::to_string(adc_dma_buffer[0]));
-  HAL_GPIO_TogglePin(GPIOC,GPIO_PIN_6);
 }
 
 
@@ -106,9 +105,11 @@ int main_prog(void)
   // Start the main loop
   float angle;
   float velocity;
+  uint16_t raw_angle;
 
   std::vector<float> angles;
   std::vector<float> velocities;
+  std::vector<uint16_t> raw_angles;
   while (1){
     // log_debug("main loop\n");
     // USBD_UsrLog("main loop");
@@ -119,16 +120,20 @@ int main_prog(void)
 
     if(tim_encoder.triggered()){
       angle = encoder.read_angle();
-      velocity = encoder.get_velocity();
-      angles.push_back(angle);
-      velocities.push_back(velocity);
+      raw_angle = encoder.read_raw_angle();
+      velocity = ticker.get_seconds();
+      // velocity = encoder.get_velocity();
+      log_debug(std::to_string(raw_angle) + ";" + std::to_string(velocity));
+      // raw_angles.push_back(raw_angle);
+      // angles.push_back(angle);
+      // velocities.push_back(velocity);
       // log_debug(std::to_string(angle) + ";" + std::to_string(velocity));
     }
 
     if(tim_usb.triggered()){
       // log_debug("angle:" + std::to_string(angle) + " velocity:" + std::to_string(velocity));
-      for (size_t i = 0; i < angles.size(); i++){
-        log_debug(std::to_string(angles[i]) + ";" + std::to_string(velocities[i]));
+      for (size_t i = 0; i < velocities.size(); i++){
+        log_debug(std::to_string(raw_angles[i]) + ";" + std::to_string(velocities[i]));
       }      
       angles.clear();
       velocities.clear();

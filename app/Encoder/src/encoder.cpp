@@ -34,8 +34,28 @@ uint16_t Encoder::read_raw_angle(){
   // loger.debug("data[0]: " + std::to_string(this->data[0]));
   // loger.debug("data[1]: " + std::to_string(this->data[1]));
 
-  uint16_t reg1 = (uint16_t)this->data[0] << 6;
-  uint16_t reg2 = this->data[1] & 0xfe;
+  uint16_t reg1 = (uint16_t)this->data[0];
+  reg1 = reg1 << 6;
+  uint16_t reg2 = (this->data[1] & 0xfc) >> 2;
+  // write all hex values in buyers
+  //1 -> 00000001
+  //2 -> 00000010
+  //3 -> 00000011
+  //4 -> 00000100
+  //5 -> 00000101
+  //6 -> 00000110
+  //7 -> 00000111
+  //8 -> 00001000
+  //9 -> 00001001
+  //A -> 00001010
+  //B -> 00001011
+  //C -> 00001100
+  //D -> 00001101
+  //E -> 00001110
+  //F -> 00001111
+
+  // uint16_t reg1 = (uint16_t)this->data[0] << 6;
+  // uint16_t reg2 = this->data[1] & 0x11111100;
   this->raw_angle = reg1 + reg2;
   return this->raw_angle;
 }
