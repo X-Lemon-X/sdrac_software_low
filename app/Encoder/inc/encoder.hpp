@@ -20,7 +20,10 @@ private:
 
   uint16_t raw_angle;
   uint8_t data[2];
-  uint64_t last_time;
+  float last_time;
+  float prev_angle;
+  float velocity;
+
   
   /// @brief Calucaltes velcoicty, and passes it thoroung a filter
   /// @param angle current angle

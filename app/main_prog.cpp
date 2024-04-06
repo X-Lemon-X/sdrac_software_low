@@ -6,11 +6,14 @@
 #include "logger.hpp"
 #include "usb_programer.hpp"
 #include "steper_motor.hpp"
+#include "filter.hpp"
+#include "filter_alfa_beta.hpp"
+
 
 
 #include <string>
 #include <charconv>
-
+#include <vector>
 // extern ADC_HandleTypeDef hadc1;
 // extern CAN_HandleTypeDef hcan1;
 // extern I2C_HandleTypeDef hi2c1;
@@ -18,7 +21,7 @@
 // extern TIM_HandleTypeDef htim3;
 void main_prog_setings();
 
-LOGGER::Logger loger(LOGGER::LOG_LEVEL::LOG_LEVEL_DEBUG);
+LOGGER::Logger loger(LOGGER::LOG_LEVEL::LOG_LEVEL_DEBUG,false);
 TIMING::Ticker ticker;
 
 uint32_t adc_dma_buffer[ADC_DMA_BUFFER_SIZE];
@@ -73,10 +76,15 @@ int main_prog(void)
   TIMING::Timing tim_eng(ticker);
   tim_blink.set_behaviour(100000, true);
   tim_encoder.set_behaviour(10000, true);
-  tim_usb.set_behaviour(200000, true);
+  tim_usb.set_behaviour(20000000, true);
   tim_eng.set_behaviour(500000, true);
 
-  ENCODER::Encoder encoder(hi2c1,ticker);
+  FILTERS::FilterAlfaBeta filter(ticker);
+  filter.alfa = 0.5;
+  filter.beta = 0.1;
+  FILTERS::FilterBase filter_base(ticker);  
+
+  ENCODER::Encoder encoder(hi2c1,ticker,filter_base);
   encoder.address = ENCODER_MT6701_I2C_ADDRESS;
   encoder.resolution = ENCODER_MT6702_RESOLUTION;
   encoder.angle_register = ENCODER_MEM_ADDR_ANNGLE;
@@ -92,12 +100,15 @@ int main_prog(void)
   stp_motor.reverse = false;
   stp_motor.init();
   stp_motor.set_enable(true);
-  stp_motor.set_speed(PI/8.0f);
+  stp_motor.set_speed(PI/12.0f);
 
   USB_PROGRAMER::UsbProgramer usb_programer(pin_boot_device);
   // Start the main loop
   float angle;
   float velocity;
+
+  std::vector<float> angles;
+  std::vector<float> velocities;
   while (1){
     // log_debug("main loop\n");
     // USBD_UsrLog("main loop");
@@ -109,10 +120,18 @@ int main_prog(void)
     if(tim_encoder.triggered()){
       angle = encoder.read_angle();
       velocity = encoder.get_velocity();
+      angles.push_back(angle);
+      velocities.push_back(velocity);
+      // log_debug(std::to_string(angle) + ";" + std::to_string(velocity));
     }
 
     if(tim_usb.triggered()){
-      log_debug("angle:" + std::to_string(angle) + " velocity:" + std::to_string(velocity));
+      // log_debug("angle:" + std::to_string(angle) + " velocity:" + std::to_string(velocity));
+      for (size_t i = 0; i < angles.size(); i++){
+        log_debug(std::to_string(angles[i]) + ";" + std::to_string(velocities[i]));
+      }      
+      angles.clear();
+      velocities.clear();
     }
 
     if (tim_eng.triggered()){

@@ -25,34 +25,34 @@ using namespace LOGGER;
 //   return ch;
 // }
 
-Logger::Logger(LOG_LEVEL level){
-  log_level = level;
-}
+Logger::Logger(LOG_LEVEL level, bool _print_info): log_level(level),print_info(_print_info) {}
 
 void Logger::error(std::string msg){
   if (log_level > LOG_LEVEL::LOG_LEVEL_ERROR) return;
-  transmit("[ERROR]"+msg);
+  transmit(msg,"[ERROR]");
 }
 
 void Logger::warning(std::string msg){
   if (log_level > LOG_LEVEL::LOG_LEVEL_WARNING ) return;
-  transmit("[WARNING]"+msg);
+  transmit(msg,"[WARNING]");
 }
 
 void Logger::info(std::string msg){
   if (log_level > LOG_LEVEL::LOG_LEVEL_INFO) return;
-  transmit("[INFO]"+msg);
+  transmit(msg,"[INFO]");
 }
 
 void Logger::debug(std::string msg){
   if (log_level > LOG_LEVEL::LOG_LEVEL_DEBUG) return;
-  transmit("[DEBUG]"+msg);
+  transmit(msg,"[DEBUG]");
 }
 
 
-void Logger::transmit(std::string msg){
+void Logger::transmit(std::string msg,std::string prefix){
+  if(print_info)
+    msg = "["+std::to_string(HAL_GetTick())+"]["+prefix+"]" + msg;
+  
   msg += "\n";
-  msg = "["+std::to_string(HAL_GetTick())+"]"+ msg;
   CDC_Transmit_FS((uint8_t*)msg.c_str(), msg.length());
 
   HAL_Delay(1);

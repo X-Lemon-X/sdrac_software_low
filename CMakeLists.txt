@@ -63,6 +63,7 @@ add_executable(${TARGET}
 "app/UsbPrograming/src/usb_programer.cpp"
 "app/SteperMotor/src/steper_motor.cpp"
 "app/Filter/src/filter.cpp"
+"app/Filter/src/filter_alfa_beta.cpp"
 )
 
 

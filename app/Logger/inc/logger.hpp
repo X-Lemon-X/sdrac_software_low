@@ -17,11 +17,12 @@ enum class LOG_LEVEL {
 class Logger {
 private:
   LOG_LEVEL log_level;
-  void transmit(std::string msg);
+  bool print_info;
+  void transmit(std::string msg, std::string prefix);
 public:
   /// @brief  initiate the logger
   /// @param level - log level
-  Logger(LOG_LEVEL level);
+  Logger(LOG_LEVEL level, bool print_info);
 
   void error(std::string msg);
   void warning(std::string msg);
