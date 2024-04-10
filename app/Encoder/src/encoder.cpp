@@ -6,10 +6,11 @@
 
 using namespace ENCODER;
 
-Encoder::Encoder(I2C_HandleTypeDef &_hi2c,TIMING::Ticker &_ticker,FILTERS::FilterBase &_filter): 
+Encoder::Encoder(I2C_HandleTypeDef &_hi2c,TIMING::Ticker &_ticker,FILTERS::FilterBase &_filter,FILTERS::FilterBase &_filter_velocity): 
 hi2c(_hi2c),
 ticker(_ticker),
-filter(_filter) {
+filter_angle(_filter).
+filter_velocity(_filter_velocity) {
 
 this->resolution = 4096;
 this->address = 0x40;
@@ -20,6 +21,7 @@ this->data[0] = 0;
 this->data[1] = 0;
 this->enable_filter = false;
 this->enable_velocity = false;
+this->enable_velocity_filter = false;
 
 }
 
@@ -30,32 +32,9 @@ bool Encoder::ping_encoder(){
 uint16_t Encoder::read_raw_angle(){
   HAL_StatusTypeDef status = HAL_I2C_Mem_Read(&hi2c, address, angle_register, 1, data, 2, 20);
   if(status != HAL_OK) return -2;
-  
-  // loger.debug("data[0]: " + std::to_string(this->data[0]));
-  // loger.debug("data[1]: " + std::to_string(this->data[1]));
-
   uint16_t reg1 = (uint16_t)this->data[0];
   reg1 = reg1 << 6;
   uint16_t reg2 = (this->data[1] & 0xfc) >> 2;
-  // write all hex values in buyers
-  //1 -> 00000001
-  //2 -> 00000010
-  //3 -> 00000011
-  //4 -> 00000100
-  //5 -> 00000101
-  //6 -> 00000110
-  //7 -> 00000111
-  //8 -> 00001000
-  //9 -> 00001001
-  //A -> 00001010
-  //B -> 00001011
-  //C -> 00001100
-  //D -> 00001101
-  //E -> 00001110
-  //F -> 00001111
-
-  // uint16_t reg1 = (uint16_t)this->data[0] << 6;
-  // uint16_t reg2 = this->data[1] & 0x11111100;
   this->raw_angle = reg1 + reg2;
   return this->raw_angle;
 }
@@ -65,7 +44,9 @@ float Encoder::calculate_velocity(float angle){
   float current_velocity = (angle-prev_angle) / (current_tiem - last_time);
   last_time = current_tiem;
   prev_angle = angle;
-  return current_tiem; //changed to time for param check
+  if(this->enable_velocity_filter)
+    current_velocity = filter_angle.calculate(current_velocity);
+  return current_velocity;
 }
 
 float Encoder::read_angle(){
@@ -73,7 +54,7 @@ float Encoder::read_angle(){
   if(this->reverse) angle = -angle;
   angle += this->offset;
 
-  angle = filter.calculate(angle);
+  angle = filter_angle.calculate(angle);
 
   if(this->enable_velocity)
     this->velocity = calculate_velocity(angle);

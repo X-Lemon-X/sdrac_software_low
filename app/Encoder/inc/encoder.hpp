@@ -16,7 +16,8 @@ class Encoder {
 private:
   I2C_HandleTypeDef &hi2c;
   TIMING::Ticker &ticker;
-  FILTERS::FilterBase &filter;
+  FILTERS::FilterBase &filter_angle;
+  FILTERS::FilterBase &filter_velocity;
 
   uint16_t raw_angle;
   uint8_t data[2];
@@ -40,9 +41,10 @@ public:
   uint8_t magnes_detection_register;
   bool enable_filter;
   bool enable_velocity;
+  bool enable_velocity_filter;
   
   /// @brief Init fucnion of the encoder
-  Encoder(I2C_HandleTypeDef &hi2c,TIMING::Ticker &ticker , FILTERS::FilterBase &filter);
+  Encoder(I2C_HandleTypeDef &hi2c,TIMING::Ticker &ticker , FILTERS::FilterBase &filter_angle,FILTERS::FilterBase &filter_velocity);
   
   /// @brief Pings the encoder to check if it is connected
   /// @return true if the encoder is connected

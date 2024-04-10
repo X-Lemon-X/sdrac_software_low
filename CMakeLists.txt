@@ -64,6 +64,8 @@ add_executable(${TARGET}
 "app/SteperMotor/src/steper_motor.cpp"
 "app/Filter/src/filter.cpp"
 "app/Filter/src/filter_alfa_beta.cpp"
+"app/Memory/src/sram_menager.cpp"
+"app/CanControl/src/can_control.cpp"
 )
 
 
@@ -92,6 +94,8 @@ target_include_directories(${TARGET} PRIVATE
 "app/UsbPrograming/inc"
 "app/SteperMotor/inc"
 "app/Filter/inc"
+"app/Memory/inc"
+"app/CanControl/inc"
 )
 
 
