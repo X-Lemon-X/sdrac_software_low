@@ -67,6 +67,7 @@ add_executable(${TARGET}
 "app/Memory/src/sram_menager.cpp"
 "app/CanControl/src/can_control.cpp"
 "app/EngineControl/src/engine_controler.cpp"
+"app/EngineControl/src/linear_ec.cpp"
 )
 
 
