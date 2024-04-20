@@ -67,37 +67,6 @@ extern Pin pin_steper_enable ;
 extern Pin pin_steper_step ;
 extern Pin pin_boot_device;
 
-// Pin pin_user_led_1 = {GPIO_PIN_6, GPIOC};
-// Pin pin_user_led_2 = {GPIO_PIN_7, GPIOC};
-// Pin pin_user_btn_1 = {GPIO_PIN_9, GPIOC};
-
-// Pin pin_tx_led = {GPIO_PIN_12, GPIOB};
-// Pin pin_rx_led = {GPIO_PIN_13, GPIOB};
-
-// Pin pin_encoder = {GPIO_PIN_3, GPIOB};
-// Pin pin_poz_zero_sensor = {GPIO_PIN_4, GPIOA};
-
-// Pin pin_inout_ca1 = {GPIO_PIN_5, GPIOA};
-// Pin pin_inout_ca2 = {GPIO_PIN_7, GPIOA};
-// Pin pin_inout_crx = {GPIO_PIN_10, GPIOB};
-// Pin pin_inout_ctx = {GPIO_PIN_4, GPIOC};
-
-// Pin pin_sync_puls = {GPIO_PIN_8, GPIOA};
-// Pin pin_sync_dir = {GPIO_PIN_9, GPIOA};
-
-// Pin pin_temp_steper_board = {GPIO_PIN_0, GPIOA};
-// Pin pin_temp_board = {GPIO_PIN_1, GPIOA};
-// Pin pin_temp_motor = {GPIO_PIN_2, GPIOA};
-
-// Pin pin_vsense = {GPIO_PIN_3, GPIOA};
-
-// Pin pin_steper_direction = {GPIO_PIN_0, GPIOB};
-// Pin pin_steper_enable = {GPIO_PIN_1, GPIOB};
-// Pin pin_steper_step = {GPIO_PIN_6, GPIOA};
-
-// Pin pin_boot_device = {GPIO_PIN_8, GPIOC};
-
-
 
 //**************************************************************************************************
 // all the global variables, peripherals, and buffors are declared here

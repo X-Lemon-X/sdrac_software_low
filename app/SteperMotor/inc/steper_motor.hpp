@@ -29,6 +29,7 @@ public:
   float gear_ratio;
   // float max_acceleration;
   float max_velocity;
+  float min_velocity;
   bool reverse;
 
 

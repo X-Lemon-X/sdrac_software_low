@@ -66,6 +66,7 @@ add_executable(${TARGET}
 "app/Filter/src/filter_alfa_beta.cpp"
 "app/Memory/src/sram_menager.cpp"
 "app/CanControl/src/can_control.cpp"
+"app/EngineControl/src/engine_controler.cpp"
 )
 
 
@@ -96,6 +97,7 @@ target_include_directories(${TARGET} PRIVATE
 "app/Filter/inc"
 "app/Memory/inc"
 "app/CanControl/inc"
+"app/EngineControl/inc"
 )
 
 

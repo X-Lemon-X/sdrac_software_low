@@ -35,13 +35,25 @@ void SteperMotor::init(){
 
 void SteperMotor::set_speed(float speed){
 
-  if (speed > 0)
+  if (speed > this->max_velocity)
+    speed = this->max_velocity;
+
+  if (speed < this->min_velocity){
+    htim.Instance->CCR1 = 0;
+    return;
+  }
+
+  if (speed >= 0)
     HAL_GPIO_WritePin(direction_pin.port, direction_pin.pin,direction_positive);
   else {
     HAL_GPIO_WritePin(direction_pin.port, direction_pin.pin,direction_negative);
     speed = -speed;
   }
 
+  if(speed == 0){
+    htim.Instance->CCR1 = 0;
+    return;
+  }
   uint16_t counter = this->radians_to_frequency / speed;
   htim.Instance->ARR = counter;
   htim.Instance->CCR1 = counter/2;

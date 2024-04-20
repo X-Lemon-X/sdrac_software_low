@@ -15,3 +15,19 @@ Add all include direcotries and c files to  a mekefile
 ### Problems with MXCube genrations
 In main.c 
 - DMA for ADC should be initaied after ADC is initated not befor whitch couses th emain code not to be executed
+
+### TO DO:
+ - simple arm control
+ - CAN reciving data and and sending data
+ - reading ADC
+ - USB data reciving
+ - saveing stuff to SRAM
+ - reading data from SRAM
+ - IO control
+ - making deference between boards
+### DONE:
+ - steper motor interface
+ - ADC interface
+ - reading angles from encoder
+ - USB data sending
+ - Timing and timers 
