@@ -84,7 +84,7 @@ void id_config();
 void main_prog()
 {
   id_config();
-  prefiferal_config();
+  periferal_config();
   main_loop();
 }
 
@@ -98,6 +98,12 @@ void id_config(){
     CAN_KONARM_X_STATUS_FRAME_ID = CAN_KONARM_1_STATUS_FRAME_ID;
     CAN_KONARM_X_SET_POS_FRAME_ID = CAN_KONARM_1_SET_POS_FRAME_ID;
     CAN_KONARM_X_GET_POS_FRAME_ID = CAN_KONARM_1_GET_POS_FRAME_ID;
+    
+    // ids 11bit 0b110 0001 0000  and 18 bit 0b00 0000 0000 0000 0000
+    //mask 11bit 0b111 1111 0000  and 18 bit 0b00 0000 0000 0000 0000
+    CAN_X_FILTER_ID_HIGH = 0x610;
+    CAN_X_FILTER_ID_LOW = 0x000;
+    CAN_X_FILTER_MASK_HIGH = 0x7F0;
     break;
   case SDRAC_ID_2:
     CAN_KONARM_X_CLEAR_ERRORS_FRAME_ID = CAN_KONARM_2_CLEAR_ERRORS_FRAME_ID;
@@ -135,7 +141,7 @@ void id_config(){
 
 }
 
-void prefiferal_config(){
+void periferal_config(){
 
   // dma adc1 settings
   HAL_ADC_Start_DMA(&hadc1, (uint32_t*)adc_dma_buffer, 3);
@@ -168,12 +174,17 @@ void handle_can_rx(){
   CAN_CONTROL::CAN_MSG msg = {0};
   if(can_controler.get_message(&msg)) return;
 
-  if(msg.id == CAN_KONARM_X_SET_POS_FRAME_ID){
+  if(msg.frame_id == CAN_KONARM_X_SET_POS_FRAME_ID){
     can_konarm_1_set_pos_t dst_p;
-    can_konarm_1_set_pos_unpack(&dst_p, msg.data, msg.len);
-    float targetPosition = can_konarm_1_set_pos_position_decode(signals.position);
-
+    can_konarm_1_set_pos_unpack(&dst_p, msg.data, msg.data_size);
   }
+  else if (msg.frame_id == CAN_KONARM_X_GET_POS_FRAME_ID){
+  }
+  else if (msg.frame_id == CAN_KONARM_X_STATUS_FRAME_ID){
+  }
+  else if (msg.frame_id == CAN_KONARM_X_CLEAR_ERRORS_FRAME_ID){
+  }
+  
 }
 
 void main_loop(){
@@ -220,7 +231,7 @@ void main_loop(){
   while (1){
     // log_debug("main loop\n");
     // USBD_UsrLog("main loop");
-
+    handle_can_rx();
     can_controler.handle_led_blink();
 
     if(tim_blink.triggered()){

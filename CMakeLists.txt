@@ -126,6 +126,8 @@ $<$<COMPILE_LANGUAGE:ASM>:
   -O0 -g
   -std=c17
   -fexceptions
+  -fdata-sections
+  -ffunction-sections
   -Wall
   -Wextra
   -Wpedantic
@@ -153,7 +155,9 @@ $<$<COMPILE_LANGUAGE:CXX>:
 -fno-common
 -fno-exceptions
 -fno-rtti
--u_printf_float
+-u_printf_float  # enable float to string conversion add about 10kb to binary
+-fdata-sections  # place data in separate sections to be bale to remove unused data decrease binary size drastically
+-ffunction-sections # place data in separate sections to be bale to remove unused data decrease binary size drastically
 
 -mthumb
 -mhard-float
@@ -171,7 +175,7 @@ $<$<COMPILE_LANGUAGE:CXX>:
 target_link_options(${TARGET} PRIVATE
 	-T ${CMAKE_SOURCE_DIR}/STM32F412RGTx_FLASH.ld
 	-Wl,-Map=${CMAKE_PROJECT_NAME}.map
-	-Wl,--gc-sections
+	-Wl,--gc-sections  # remove unused sections
 	-Wl,-cref
 	-Wl,--start-group -lc -lm -lstdc++ -lsupc++ -Wl,--end-group
 
@@ -184,6 +188,7 @@ target_link_options(${TARGET} PRIVATE
 	-specs=nosys.specs
   -u_printf_float
 	-static
+  --data-sections
 
 )
 
