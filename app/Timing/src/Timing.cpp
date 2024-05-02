@@ -41,6 +41,10 @@ Timing::Timing(Ticker &_ticker): ticker(_ticker){
   repeat = true;
 }
 
+void Timing::reset(){
+  last_time = ticker.get_micros();
+}
+
 bool Timing::triggered(){
   uint32_t current_time = ticker.get_micros();
   if (current_time - last_time > period){

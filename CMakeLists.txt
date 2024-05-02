@@ -56,6 +56,7 @@ add_executable(${TARGET}
 "Core/Src/main.cpp"
 "Drivers/CMSIS/Device/ST/STM32F4xx/Source/Templates/gcc/startup_stm32f412rx.s"
 
+"app/main_prog_callbacks.cpp"
 "app/Encoder/src/encoder.cpp"
 "app/Logger/src/logger.cpp"
 "app/main_prog.cpp"
@@ -64,10 +65,14 @@ add_executable(${TARGET}
 "app/SteperMotor/src/steper_motor.cpp"
 "app/Filter/src/filter.cpp"
 "app/Filter/src/filter_alfa_beta.cpp"
-"app/Memory/src/sram_menager.cpp"
+"app/Memory/src/fram_menager.cpp"
 "app/CanControl/src/can_control.cpp"
 "app/EngineControl/src/engine_controler.cpp"
 "app/EngineControl/src/linear_ec.cpp"
+"app/CanControl/src/CanDB.c"
+"app/CanControl/src/can_control.cpp"
+"app/BOARD_ID/src/board_id.cpp"
+
 )
 
 
@@ -99,6 +104,7 @@ target_include_directories(${TARGET} PRIVATE
 "app/Memory/inc"
 "app/CanControl/inc"
 "app/EngineControl/inc"
+"app/BOARD_ID/inc"
 )
 
 

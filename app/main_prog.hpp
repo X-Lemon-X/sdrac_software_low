@@ -5,6 +5,9 @@
 #include "usb_device.h"
 #include "usbd_cdc_if.h"
 #include "usbd_def.h"
+#include "pin.hpp"
+#include "can_control.hpp"
+#include "board_id.hpp"
 
 #ifndef MAIN_PROG_H
 #define MAIN_PROG_H
@@ -36,36 +39,51 @@
 //**************************************************************************************************
 // CAN CONSTANTS
 
+extern uint32_t CAN_KONARM_X_CLEAR_ERRORS_FRAME_ID;
+extern uint32_t CAN_KONARM_X_STATUS_FRAME_ID;
+extern uint32_t CAN_KONARM_X_SET_POS_FRAME_ID;
+extern uint32_t CAN_KONARM_X_GET_POS_FRAME_ID;
+// extern uint32_t CAN_KONARM_X_GET_TEMP_FRAME_ID;
+
+//**************************************************************************************************
+// ID CONSTANTS
+#define SDRAC_ID_1 0x01
+#define SDRAC_ID_2 0x02
+#define SDRAC_ID_3 0x03
+#define SDRAC_ID_4 0x04
+#define SDRAC_ID_5 0x05
+#define SDRAC_ID_6 0x06
+#define SDRAC_ID_7 0x07
 
 //**************************************************************************************************
 // PINOUT CONSTANTS
 
-struct Pin {
-  uint16_t pin;
-  GPIO_TypeDef *port;
-};
+extern const Pin pin_user_led_1;
+extern const Pin pin_user_led_2;
+extern const Pin pin_user_btn_1;
+extern const Pin pin_tx_led;
+extern const Pin pin_rx_led;
+extern const Pin pin_encoder;
+extern const Pin pin_poz_zero_sensor;
+extern const Pin pin_inout_ca1;
+extern const Pin pin_inout_ca2;
+extern const Pin pin_inout_crx;
+extern const Pin pin_inout_ctx;
+extern const Pin pin_sync_puls;
+extern const Pin pin_sync_dir;
+extern const Pin pin_temp_steper_board;
+extern const Pin pin_temp_board;
+extern const Pin pin_temp_motor;
+extern const Pin pin_vsense;
+extern const Pin pin_steper_direction;
+extern const Pin pin_steper_enable ;
+extern const Pin pin_steper_step ;
+extern const Pin pin_boot_device;
 
-extern Pin pin_user_led_1;
-extern Pin pin_user_led_2;
-extern Pin pin_user_btn_1;
-extern Pin pin_tx_led;
-extern Pin pin_rx_led;
-extern Pin pin_encoder;
-extern Pin pin_poz_zero_sensor;
-extern Pin pin_inout_ca1;
-extern Pin pin_inout_ca2;
-extern Pin pin_inout_crx;
-extern Pin pin_inout_ctx;
-extern Pin pin_sync_puls;
-extern Pin pin_sync_dir;
-extern Pin pin_temp_steper_board;
-extern Pin pin_temp_board;
-extern Pin pin_temp_motor;
-extern Pin pin_vsense;
-extern Pin pin_steper_direction;
-extern Pin pin_steper_enable ;
-extern Pin pin_steper_step ;
-extern Pin pin_boot_device;
+//to do
+extern const Pin pin_cid_0;
+extern const Pin pin_cid_1;
+extern const Pin pin_cid_2;
 
 
 //**************************************************************************************************
@@ -83,22 +101,21 @@ extern TIM_HandleTypeDef htim3;
 extern TIM_HandleTypeDef htim8;
 extern TIM_HandleTypeDef htim10;
 extern UART_HandleTypeDef huart3;
-
 extern USBD_HandleTypeDef hUsbDeviceFS;
+
+//-----------------------------------
 
 extern LOGGER::Logger loger;
 extern TIMING::Ticker ticker;
+extern CAN_CONTROL::CanControl can_controler;
+extern BOARD_ID::Board_id board_id;
 
 
 
-int main_prog();
 
-
-
-// struct Pin{
-//   uint16_t pin;
-//   GPIO_TypeDef *port;
-// };
+//**************************************************************************************************
+// main functions
+void main_prog();
 
 
 

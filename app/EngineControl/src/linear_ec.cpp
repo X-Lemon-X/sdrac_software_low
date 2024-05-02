@@ -9,11 +9,11 @@ using namespace EC_LINEAR;
 
 void lenear_ec::init(){
   steper_motor.init();
-  encoder.init();
 }
 
+
 void lenear_ec::handler(){
-  float current_position = encoder.get_position();
+  float current_position = encoder.read_angle();
   float delta_position = target_position - current_position;
   
 }

@@ -53,6 +53,9 @@ public:
   /// @brief Check if the timer has triggered
   /// @return true if the timer has triggered
   bool triggered();
+
+  /// @brief Reset the timer, it current time and repeat status
+  void reset();
 };
 
 } // namespace TIMING

@@ -24,7 +24,7 @@ class EngineControler{
   void set_velocity(float speed);
   void set_enable(bool enable);
   void set_position(float position);
-}
+};
 
 
 

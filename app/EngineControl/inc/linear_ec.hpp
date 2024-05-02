@@ -14,7 +14,7 @@ class lenear_ec : public ENGINE_CONTROLER::EngineControler
 {
 private:
   float velocity;
-  float position;
+  float target_position;
 public:
   lenear_ec(TIMING::Ticker &ticker, STEPER_MOTOR::SteperMotor &steper_motor, ENCODER::Encoder &encoder): 
     ENGINE_CONTROLER::EngineControler(ticker, steper_motor, encoder){};

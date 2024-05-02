@@ -9,7 +9,7 @@ using namespace ENCODER;
 Encoder::Encoder(I2C_HandleTypeDef &_hi2c,TIMING::Ticker &_ticker,FILTERS::FilterBase &_filter,FILTERS::FilterBase &_filter_velocity): 
 hi2c(_hi2c),
 ticker(_ticker),
-filter_angle(_filter).
+filter_angle(_filter),
 filter_velocity(_filter_velocity) {
 
 this->resolution = 4096;

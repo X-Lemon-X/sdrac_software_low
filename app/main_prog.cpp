@@ -8,65 +8,150 @@
 #include "steper_motor.hpp"
 #include "filter.hpp"
 #include "filter_alfa_beta.hpp"
-
-
+#include "can_control.hpp"
+#include "board_id.hpp"
 
 #include <string>
 #include <charconv>
 #include <vector>
-// extern ADC_HandleTypeDef hadc1;
-// extern CAN_HandleTypeDef hcan1;
-// extern I2C_HandleTypeDef hi2c1;
-// extern TIM_HandleTypeDef htim2;
-// extern TIM_HandleTypeDef htim3;
-void main_prog_setings();
 
-LOGGER::Logger loger(LOGGER::LOG_LEVEL::LOG_LEVEL_DEBUG,false);
-TIMING::Ticker ticker;
+const Pin pin_user_led_1 = {GPIO_PIN_6, GPIOC};
+const Pin pin_user_led_2 = {GPIO_PIN_7, GPIOC};
+const Pin pin_user_btn_1 = {GPIO_PIN_9, GPIOC};
+const Pin pin_tx_led = {GPIO_PIN_12, GPIOB};
+const Pin pin_rx_led = {GPIO_PIN_13, GPIOB};
+const Pin pin_encoder = {GPIO_PIN_3, GPIOB};
+const Pin pin_poz_zero_sensor = {GPIO_PIN_4, GPIOA};
+const Pin pin_inout_ca1 = {GPIO_PIN_5, GPIOA};
+const Pin pin_inout_ca2 = {GPIO_PIN_7, GPIOA};
+const Pin pin_inout_crx = {GPIO_PIN_10, GPIOB};
+const Pin pin_inout_ctx = {GPIO_PIN_4, GPIOC};
+const Pin pin_sync_puls = {GPIO_PIN_8, GPIOA};
+const Pin pin_sync_dir = {GPIO_PIN_9, GPIOA};
+const Pin pin_temp_steper_board = {GPIO_PIN_0, GPIOA};
+const Pin pin_temp_board = {GPIO_PIN_1, GPIOA};
+const Pin pin_temp_motor = {GPIO_PIN_2, GPIOA};
+const Pin pin_vsense = {GPIO_PIN_3, GPIOA};
+const Pin pin_steper_direction = {GPIO_PIN_0, GPIOB};
+const Pin pin_steper_enable = {GPIO_PIN_1, GPIOB};
+const Pin pin_steper_step = {GPIO_PIN_6, GPIOA};
+const Pin pin_boot_device = {GPIO_PIN_8, GPIOC};
+
+// to do
+const Pin pin_cid_0 = {GPIO_PIN_0, GPIOC};
+const Pin pin_cid_1 = {GPIO_PIN_1, GPIOC};
+const Pin pin_cid_2 = {GPIO_PIN_2, GPIOC};
 
 uint32_t adc_dma_buffer[ADC_DMA_BUFFER_SIZE];
 
-Pin pin_user_led_1 = {GPIO_PIN_6, GPIOC};
-Pin pin_user_led_2 = {GPIO_PIN_7, GPIOC};
-Pin pin_user_btn_1 = {GPIO_PIN_9, GPIOC};
-Pin pin_tx_led = {GPIO_PIN_12, GPIOB};
-Pin pin_rx_led = {GPIO_PIN_13, GPIOB};
-Pin pin_encoder = {GPIO_PIN_3, GPIOB};
-Pin pin_poz_zero_sensor = {GPIO_PIN_4, GPIOA};
-Pin pin_inout_ca1 = {GPIO_PIN_5, GPIOA};
-Pin pin_inout_ca2 = {GPIO_PIN_7, GPIOA};
-Pin pin_inout_crx = {GPIO_PIN_10, GPIOB};
-Pin pin_inout_ctx = {GPIO_PIN_4, GPIOC};
-Pin pin_sync_puls = {GPIO_PIN_8, GPIOA};
-Pin pin_sync_dir = {GPIO_PIN_9, GPIOA};
-Pin pin_temp_steper_board = {GPIO_PIN_0, GPIOA};
-Pin pin_temp_board = {GPIO_PIN_1, GPIOA};
-Pin pin_temp_motor = {GPIO_PIN_2, GPIOA};
-Pin pin_vsense = {GPIO_PIN_3, GPIOA};
-Pin pin_steper_direction = {GPIO_PIN_0, GPIOB};
-Pin pin_steper_enable = {GPIO_PIN_1, GPIOB};
-Pin pin_steper_step = {GPIO_PIN_6, GPIOA};
-Pin pin_boot_device = {GPIO_PIN_8, GPIOC};
 
-void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+//-----------------------------------------------------------------------------------------------
+
+LOGGER::Logger loger(LOGGER::LOG_LEVEL::LOG_LEVEL_DEBUG,false);
+TIMING::Ticker ticker;
+CAN_CONTROL::CanControl can_controler;
+BOARD_ID::Board_id board_id(pin_cid_0, pin_cid_1, pin_cid_2);
+uint32_t CAN_KONARM_X_CLEAR_ERRORS_FRAME_ID;
+uint32_t CAN_KONARM_X_STATUS_FRAME_ID;
+uint32_t CAN_KONARM_X_SET_POS_FRAME_ID;
+uint32_t CAN_KONARM_X_GET_POS_FRAME_ID;
+
+
+void prefiferal_config();
+void handle_can_rx();
+void main_loop();
+void id_config();
+
+
+void main_prog()
 {
-  if (htim->Instance == TIM10){
-    ticker.irq_update_ticker();
+  id_config();
+  prefiferal_config();
+  main_loop();
+}
+
+void handle_can_rx(){
+  CAN_CONTROL::CAN_MSG msg = {0};
+  if(can_controler.get_message(&msg)) return;
+
+}
+
+void id_config(){
+
+  switch (board_id.get_id())
+  {
+  case SDRAC_ID_1:
+    CAN_KONARM_X_CLEAR_ERRORS_FRAME_ID = CAN_KONARM_1_CLEAR_ERRORS_FRAME_ID;
+    CAN_KONARM_X_STATUS_FRAME_ID = CAN_KONARM_1_STATUS_FRAME_ID;
+    CAN_KONARM_X_SET_POS_FRAME_ID = CAN_KONARM_1_SET_POS_FRAME_ID;
+    CAN_KONARM_X_GET_POS_FRAME_ID = CAN_KONARM_1_GET_POS_FRAME_ID;
+    break;
+  case SDRAC_ID_2:
+    CAN_KONARM_X_CLEAR_ERRORS_FRAME_ID = CAN_KONARM_2_CLEAR_ERRORS_FRAME_ID;
+    CAN_KONARM_X_STATUS_FRAME_ID = CAN_KONARM_2_STATUS_FRAME_ID;
+    CAN_KONARM_X_SET_POS_FRAME_ID = CAN_KONARM_2_SET_POS_FRAME_ID;
+    CAN_KONARM_X_GET_POS_FRAME_ID = CAN_KONARM_2_GET_POS_FRAME_ID;
+    break;
+  case SDRAC_ID_3:
+    CAN_KONARM_X_CLEAR_ERRORS_FRAME_ID = CAN_KONARM_3_CLEAR_ERRORS_FRAME_ID;
+    CAN_KONARM_X_STATUS_FRAME_ID = CAN_KONARM_3_STATUS_FRAME_ID;
+    CAN_KONARM_X_SET_POS_FRAME_ID = CAN_KONARM_3_SET_POS_FRAME_ID;
+    CAN_KONARM_X_GET_POS_FRAME_ID = CAN_KONARM_3_GET_POS_FRAME_ID;
+    break;
+  case SDRAC_ID_4:
+    CAN_KONARM_X_CLEAR_ERRORS_FRAME_ID = CAN_KONARM_4_CLEAR_ERRORS_FRAME_ID;
+    CAN_KONARM_X_STATUS_FRAME_ID = CAN_KONARM_4_STATUS_FRAME_ID;
+    CAN_KONARM_X_SET_POS_FRAME_ID = CAN_KONARM_4_SET_POS_FRAME_ID;
+    CAN_KONARM_X_GET_POS_FRAME_ID = CAN_KONARM_4_GET_POS_FRAME_ID;
+    break;
+  case SDRAC_ID_5:
+    CAN_KONARM_X_CLEAR_ERRORS_FRAME_ID = CAN_KONARM_5_CLEAR_ERRORS_FRAME_ID;
+    CAN_KONARM_X_STATUS_FRAME_ID = CAN_KONARM_5_STATUS_FRAME_ID;
+    CAN_KONARM_X_SET_POS_FRAME_ID = CAN_KONARM_5_SET_POS_FRAME_ID;
+    CAN_KONARM_X_GET_POS_FRAME_ID = CAN_KONARM_5_GET_POS_FRAME_ID;
+    break;
+  // case SDRAC_ID_6:
+  //   CAN_KONARM_X_CLEAR_ERRORS_FRAME_ID = CAN_KONARM_6_CLEAR_ERRORS_FRAME_ID;
+  //   CAN_KONARM_X_STATUS_FRAME_ID = CAN_KONARM_6_STATUS_FRAME_ID;
+  //   CAN_KONARM_X_SET_POS_FRAME_ID = CAN_KONARM_6_SET_POS_FRAME_ID;
+  //   CAN_KONARM_X_GET_POS_FRAME_ID = CAN_KONARM_6_GET_POS_FRAME_ID;
+  //   break;
+  default:
+    break;
   }
-  
-  // if (htim->Instance == TIM3)
+
 }
 
-void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
-{
-  // log_debug("ADC1: " + std::to_string(adc_dma_buffer[0]));
+void prefiferal_config(){
+
+  // dma adc1 settings
+  HAL_ADC_Start_DMA(&hadc1, (uint32_t*)adc_dma_buffer, 3);
+
+  // timer 10 settings
+  HAL_NVIC_SetPriority(TIM1_TRG_COM_TIM11_IRQn,6,0);
+  HAL_NVIC_EnableIRQ(TIM1_TRG_COM_TIM11_IRQn);
+  HAL_TIM_Base_Start_IT(&htim10);
+
+  // timer 3 settings
+  HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_1);
+
+  // Can1 settings
+  CAN_FilterTypeDef can_filter;
+  can_filter.FilterBank = 0;
+  can_filter.FilterMode = CAN_FILTERMODE_IDLIST;
+  can_filter.FilterScale = CAN_FILTERSCALE_32BIT;
+  can_filter.FilterFIFOAssignment = CAN_FILTER_FIFO0;
+  can_filter.FilterActivation = CAN_FILTER_ENABLE;
+  can_filter.FilterIdHigh = 0x0000;
+  can_filter.FilterIdLow = 0x0000;
+  can_filter.FilterMaskIdHigh = 0x0000;
+  can_filter.FilterMaskIdLow = 0x0000;
+  HAL_CAN_ConfigFilter(&hcan1, &can_filter);
+  can_controler.init(hcan1, CAN_FILTER_FIFO0, ticker, pin_tx_led, pin_rx_led);
+  HAL_CAN_Start(&hcan1);
 }
 
-
-int main_prog(void)
-{
-  main_prog_setings();
-
+void main_loop(){
   log_debug("Start main_prog\n");
 
   TIMING::Timing tim_blink(ticker);
@@ -83,7 +168,7 @@ int main_prog(void)
   filter.beta = 0.1;
   FILTERS::FilterBase filter_base(ticker);  
 
-  ENCODER::Encoder encoder(hi2c1,ticker,filter_base);
+  ENCODER::Encoder encoder(hi2c1,ticker,filter_base,filter_base);
   encoder.address = ENCODER_MT6701_I2C_ADDRESS;
   encoder.resolution = ENCODER_MT6702_RESOLUTION;
   encoder.angle_register = ENCODER_MEM_ADDR_ANNGLE;
@@ -107,12 +192,11 @@ int main_prog(void)
   float velocity;
   uint16_t raw_angle;
 
-  std::vector<float> angles;
-  std::vector<float> velocities;
-  std::vector<uint16_t> raw_angles;
   while (1){
     // log_debug("main loop\n");
     // USBD_UsrLog("main loop");
+
+    can_controler.handle_led_blink();
 
     if(tim_blink.triggered()){
       HAL_GPIO_TogglePin(GPIOC,GPIO_PIN_7);
@@ -124,38 +208,14 @@ int main_prog(void)
       velocity = ticker.get_seconds();
       // velocity = encoder.get_velocity();
       log_debug(std::to_string(raw_angle) + ";" + std::to_string(velocity));
-      // raw_angles.push_back(raw_angle);
-      // angles.push_back(angle);
-      // velocities.push_back(velocity);
-      // log_debug(std::to_string(angle) + ";" + std::to_string(velocity));
     }
 
     if(tim_usb.triggered()){
       // log_debug("angle:" + std::to_string(angle) + " velocity:" + std::to_string(velocity));
-      for (size_t i = 0; i < velocities.size(); i++){
-        log_debug(std::to_string(raw_angles[i]) + ";" + std::to_string(velocities[i]));
-      }      
-      angles.clear();
-      velocities.clear();
     }
 
     if (tim_eng.triggered()){
       // stp_motor.set_speed(PI_m2);
     }
   }
-}
-
-
-void main_prog_setings(){
-
-  // dma adc1 settings
-  HAL_ADC_Start_DMA(&hadc1, (uint32_t*)adc_dma_buffer, 3);
-
-  // timer 10 settings
-  HAL_NVIC_SetPriority(TIM1_TRG_COM_TIM11_IRQn,6,0);
-  HAL_NVIC_EnableIRQ(TIM1_TRG_COM_TIM11_IRQn);
-  HAL_TIM_Base_Start_IT(&htim10);
-
-  // timer 3 settings
-  HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_1);
 }
