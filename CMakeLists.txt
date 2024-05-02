@@ -71,7 +71,7 @@ add_executable(${TARGET}
 "app/EngineControl/src/linear_ec.cpp"
 "app/CanControl/src/CanDB.c"
 "app/CanControl/src/can_control.cpp"
-"app/BOARD_ID/src/board_id.cpp"
+"app/BoardId/src/board_id.cpp"
 
 )
 
@@ -104,7 +104,7 @@ target_include_directories(${TARGET} PRIVATE
 "app/Memory/inc"
 "app/CanControl/inc"
 "app/EngineControl/inc"
-"app/BOARD_ID/inc"
+"app/BoardId/inc"
 )
 
 

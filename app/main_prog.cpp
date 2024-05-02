@@ -10,11 +10,14 @@
 #include "filter_alfa_beta.hpp"
 #include "can_control.hpp"
 #include "board_id.hpp"
+#include "CanDB.h"
 
 #include <string>
 #include <charconv>
 #include <vector>
 
+//**************************************************************************************************
+// Pin assigments
 const Pin pin_user_led_1 = {GPIO_PIN_6, GPIOC};
 const Pin pin_user_led_2 = {GPIO_PIN_7, GPIOC};
 const Pin pin_user_btn_1 = {GPIO_PIN_9, GPIOC};
@@ -42,27 +45,42 @@ const Pin pin_cid_0 = {GPIO_PIN_0, GPIOC};
 const Pin pin_cid_1 = {GPIO_PIN_1, GPIOC};
 const Pin pin_cid_2 = {GPIO_PIN_2, GPIOC};
 
+//**************************************************************************************************
+// Global variables
+
 uint32_t adc_dma_buffer[ADC_DMA_BUFFER_SIZE];
-
-
-//-----------------------------------------------------------------------------------------------
-
 LOGGER::Logger loger(LOGGER::LOG_LEVEL::LOG_LEVEL_DEBUG,false);
 TIMING::Ticker ticker;
 CAN_CONTROL::CanControl can_controler;
 BOARD_ID::Board_id board_id(pin_cid_0, pin_cid_1, pin_cid_2);
+
+//**************************************************************************************************
+// Id dependable configuration 
+uint32_t CAN_X_FILTER_MASK_LOW;
+uint32_t CAN_X_FILTER_MASK_HIGH;
+uint32_t CAN_X_FILTER_ID_LOW;
+uint32_t CAN_X_FILTER_ID_HIGH;
 uint32_t CAN_KONARM_X_CLEAR_ERRORS_FRAME_ID;
 uint32_t CAN_KONARM_X_STATUS_FRAME_ID;
 uint32_t CAN_KONARM_X_SET_POS_FRAME_ID;
 uint32_t CAN_KONARM_X_GET_POS_FRAME_ID;
 
 
-void prefiferal_config();
+/// @brief This function is used to configure the periferals
+/// mostly stff that have to be configurated after CumeMX generation
+void periferal_config();
+
+/// @brief This function is used to handle the can controll
 void handle_can_rx();
+
+/// @brief This function is used to handle the main loop, never returns
 void main_loop();
+
+/// @brief This function is used to configure the board base on it's hardware id
 void id_config();
 
 
+//**************************************************************************************************
 void main_prog()
 {
   id_config();
@@ -70,11 +88,6 @@ void main_prog()
   main_loop();
 }
 
-void handle_can_rx(){
-  CAN_CONTROL::CAN_MSG msg = {0};
-  if(can_controler.get_message(&msg)) return;
-
-}
 
 void id_config(){
 
@@ -138,17 +151,29 @@ void prefiferal_config(){
   // Can1 settings
   CAN_FilterTypeDef can_filter;
   can_filter.FilterBank = 0;
-  can_filter.FilterMode = CAN_FILTERMODE_IDLIST;
+  can_filter.FilterMode = CAN_FILTERMODE_IDMASK;
   can_filter.FilterScale = CAN_FILTERSCALE_32BIT;
   can_filter.FilterFIFOAssignment = CAN_FILTER_FIFO0;
   can_filter.FilterActivation = CAN_FILTER_ENABLE;
-  can_filter.FilterIdHigh = 0x0000;
-  can_filter.FilterIdLow = 0x0000;
-  can_filter.FilterMaskIdHigh = 0x0000;
-  can_filter.FilterMaskIdLow = 0x0000;
+  can_filter.FilterIdHigh = CAN_X_FILTER_ID_HIGH;
+  can_filter.FilterIdLow = CAN_X_FILTER_ID_LOW;
+  can_filter.FilterMaskIdHigh = CAN_X_FILTER_MASK_HIGH;
+  can_filter.FilterMaskIdLow = CAN_X_FILTER_MASK_LOW;
   HAL_CAN_ConfigFilter(&hcan1, &can_filter);
   can_controler.init(hcan1, CAN_FILTER_FIFO0, ticker, pin_tx_led, pin_rx_led);
   HAL_CAN_Start(&hcan1);
+}
+
+void handle_can_rx(){
+  CAN_CONTROL::CAN_MSG msg = {0};
+  if(can_controler.get_message(&msg)) return;
+
+  if(msg.id == CAN_KONARM_X_SET_POS_FRAME_ID){
+    can_konarm_1_set_pos_t dst_p;
+    can_konarm_1_set_pos_unpack(&dst_p, msg.data, msg.len);
+    float targetPosition = can_konarm_1_set_pos_position_decode(signals.position);
+
+  }
 }
 
 void main_loop(){

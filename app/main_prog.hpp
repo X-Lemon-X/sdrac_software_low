@@ -27,9 +27,6 @@
 #define PI_d4 0.78539816339744830962
 #define PI_m2 6.28318530717958647692
 
-
-#define ADC_DMA_BUFFER_SIZE 16
-
 //**************************************************************************************************
 // I2C CONSTANTS
 #define ENCODER_MEM_ADDR_ANNGLE 0x03
@@ -39,6 +36,11 @@
 //**************************************************************************************************
 // CAN CONSTANTS
 
+extern uint32_t CAN_X_FILTER_MASK_LOW;
+extern uint32_t CAN_X_FILTER_MASK_HIGH;
+extern uint32_t CAN_X_FILTER_ID_LOW;
+extern uint32_t CAN_X_FILTER_ID_HIGH;
+
 extern uint32_t CAN_KONARM_X_CLEAR_ERRORS_FRAME_ID;
 extern uint32_t CAN_KONARM_X_STATUS_FRAME_ID;
 extern uint32_t CAN_KONARM_X_SET_POS_FRAME_ID;
@@ -47,6 +49,8 @@ extern uint32_t CAN_KONARM_X_GET_POS_FRAME_ID;
 
 //**************************************************************************************************
 // ID CONSTANTS
+
+#define SDRAC_ID_0 0x00
 #define SDRAC_ID_1 0x01
 #define SDRAC_ID_2 0x02
 #define SDRAC_ID_3 0x03
@@ -89,6 +93,7 @@ extern const Pin pin_cid_2;
 //**************************************************************************************************
 // all the global variables, peripherals, and buffors are declared here
 
+#define ADC_DMA_BUFFER_SIZE 16
 extern uint32_t adc_dma_buffer[ADC_DMA_BUFFER_SIZE];
 
 extern ADC_HandleTypeDef hadc1;
@@ -114,7 +119,7 @@ extern BOARD_ID::Board_id board_id;
 
 
 //**************************************************************************************************
-// main functions
+/// @brief main program, this function is called from main and never returns
 void main_prog();
 
 
