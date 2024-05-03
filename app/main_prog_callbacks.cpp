@@ -28,6 +28,20 @@ void HAL_CAN_RxFifo1MsgPendingCallback(CAN_HandleTypeDef *hcan)
   }
 }
 
+// void HAL_CAN_TxMailbox0CompleteCallback(CAN_HandleTypeDef *hcan)
+// {
+//   if(hcan->Instance == CAN1){
+//     can_controler.irq_handle_tx();
+//   }
+// }
+
+// void HAL_CAN_TxMailbox1CompleteCallback(CAN_HandleTypeDef *hcan)
+// {
+//   if(hcan->Instance == CAN1){
+//     can_controler.irq_handle_tx();
+//   }
+// }
+
 
 void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
 {

@@ -104,9 +104,9 @@ void id_config(){
     
     // ids 11bit 0b110 0001 0000  and 18 bit 0b00 0000 0000 0000 0000
     //mask 11bit 0b111 1111 0000  and 18 bit 0b00 0000 0000 0000 0000
-    CAN_X_FILTER_ID_HIGH = CAN_STRIP_BITS_FOR_MASK(CAN_KONARM_1_STATUS_FRAME_ID); // why 5? becouase the 11 bit id is shifted 5 bits to the left in the first 16 bits
+    CAN_X_FILTER_ID_HIGH = 0x610<<5;
     CAN_X_FILTER_ID_LOW = 0x000;
-    CAN_X_FILTER_MASK_HIGH = CAN_STRIP_BITS_FOR_MASK(0xFF0);
+    CAN_X_FILTER_MASK_HIGH = 0xff0<<5;
     CAN_X_FILTER_MASK_LOW = 0x000;
     break;
   case SDRAC_ID_2:
@@ -166,9 +166,9 @@ void id_config(){
 }
 
 void periferal_config(){
-
+  
   // dma adc1 settings
-  HAL_ADC_Start_DMA(&hadc1, (uint32_t*)adc_dma_buffer, 3);
+  // HAL_ADC_Start_DMA(&hadc1, (uint32_t*)adc_dma_buffer, 3);
 
   // timer 10 settings
   HAL_NVIC_SetPriority(TIM1_TRG_COM_TIM11_IRQn,6,0);
@@ -178,27 +178,35 @@ void periferal_config(){
   // timer 3 settings
   HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_1);
 
+  HAL_CAN_DeInit(&hcan1);
+  HAL_CAN_Init(&hcan1);
+
   // Can1 settings
+  // HAL_CAN_MspInit(&hcan1);
   CAN_FilterTypeDef can_filter;
-  can_filter.FilterBank = 0;
+  can_filter.FilterBank = 1;
   can_filter.FilterMode = CAN_FILTERMODE_IDMASK;
   can_filter.FilterScale = CAN_FILTERSCALE_32BIT;
   can_filter.FilterFIFOAssignment = CAN_FILTER_FIFO0;
   can_filter.FilterActivation = CAN_FILTER_ENABLE;
   can_filter.FilterIdHigh = CAN_X_FILTER_ID_HIGH;
   can_filter.FilterIdLow = CAN_X_FILTER_ID_LOW;
-  can_filter.FilterMaskIdHigh = 0x0;//CAN_X_FILTER_MASK_HIGH;
-  can_filter.FilterMaskIdLow = 0x0;//CAN_X_FILTER_MASK_LOW;
-  // can_filter.SlaveStartFilterBank = 2;
+  can_filter.FilterMaskIdHigh = CAN_X_FILTER_MASK_HIGH;
+  can_filter.FilterMaskIdLow = CAN_X_FILTER_MASK_LOW;
+  can_filter.SlaveStartFilterBank = 2;
   HAL_StatusTypeDef status =  HAL_CAN_ConfigFilter(&hcan1, &can_filter);
   can_controler.init(hcan1, CAN_FILTER_FIFO0, ticker, pin_tx_led, pin_rx_led);
   status =  HAL_CAN_Start(&hcan1);
   status =  HAL_CAN_ActivateNotification(&hcan1, CAN_IT_RX_FIFO0_MSG_PENDING | CAN_IT_RX_FIFO1_MSG_PENDING);
+
+  
 }
 
 void handle_can_rx(){
   CAN_CONTROL::CAN_MSG recived_msg = {0};
   if(can_controler.get_message(&recived_msg)) return;
+
+  log_debug("Recived message: " + std::to_string(recived_msg.frame_id));
 
   if(recived_msg.frame_id == CAN_KONARM_X_SET_POS_FRAME_ID){
     can_konarm_1_set_pos_t dst_p;
@@ -206,7 +214,7 @@ void handle_can_rx(){
   }
   else if (recived_msg.frame_id == CAN_KONARM_X_GET_POS_FRAME_ID){
   }
-  else if (recived_msg.frame_id == CAN_KONARM_X_STATUS_FRAME_ID){
+  else if (recived_msg.frame_id == CAN_KONARM_X_STATUS_FRAME_ID && recived_msg.remote_request){
     CAN_CONTROL::CAN_MSG send_msg = {0};
     send_msg.frame_id = CAN_KONARM_X_STATUS_FRAME_ID;
     can_konarm_1_status_t src_p;
@@ -228,7 +236,7 @@ void main_loop(){
   TIMING::Timing tim_encoder(ticker);
   TIMING::Timing tim_usb(ticker);
   TIMING::Timing tim_eng(ticker);
-  tim_blink.set_behaviour(100000, true);
+  tim_blink.set_behaviour(500000, true);
   tim_encoder.set_behaviour(10000, true);
   tim_usb.set_behaviour(20000000, true);
   tim_eng.set_behaviour(500000, true);
@@ -261,7 +269,7 @@ void main_loop(){
   float angle;
   float velocity;
   uint16_t raw_angle;
-
+  uint8_t data_can=0;
   while (1){
     // log_debug("main loop\n");
     // USBD_UsrLog("main loop");
@@ -270,14 +278,36 @@ void main_loop(){
 
     if(tim_blink.triggered()){
       HAL_GPIO_TogglePin(GPIOC,GPIO_PIN_7);
+      // log_debug("Fifo 0 LVL" +std::to_string(HAL_CAN_GetRxFifoFillLevel(&hcan1, CAN_RX_FIFO0)));
+      // log_debug("Fifo 1 LVL" +std::to_string(HAL_CAN_GetRxFifoFillLevel(&hcan1, CAN_RX_FIFO1)));
+
+
+      // if(HAL_CAN_GetRxMessage(&hcan1, CAN_RX_FIFO0, &rx_header, rx_data) == HAL_OK){
+      //   log_debug("CAN F0 RX: " + std::to_string(rx_header.StdId) + " " + std::to_string(rx_header.DLC));
+      // }else{
+      //   log_debug("CAN F0 RX: no message");
+      // }
+
+      // if(HAL_CAN_GetRxMessage(&hcan1, CAN_RX_FIFO1, &rx_header, rx_data) == HAL_OK){
+      //   log_debug("CAN F1 RX: " + std::to_string(rx_header.StdId) + " " + std::to_string(rx_header.DLC));
+      // }else{
+      //   log_debug("CAN F1 RX: no message");
+      //   }
+
+
+      // CAN_CONTROL::CAN_MSG send_msg = {0};
+      // send_msg.frame_id = 0x611 << 5;
+      // send_msg.data_size = 1;
+      // send_msg.data[0] = ++data_can;
+      // can_controler.send_message(send_msg);
     }
 
     if(tim_encoder.triggered()){
       angle = encoder.read_angle();
       raw_angle = encoder.read_raw_angle();
-      velocity = ticker.get_seconds();
+      velocity = encoder.get_velocity();
       // velocity = encoder.get_velocity();
-      log_debug(std::to_string(raw_angle) + ";" + std::to_string(velocity));
+      // log_debug(std::to_string(raw_angle) + ";" + std::to_string(velocity));
     }
 
     if(tim_usb.triggered()){

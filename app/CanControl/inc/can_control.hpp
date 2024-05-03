@@ -10,7 +10,7 @@
 
 #define CAN_DATA_FRAME_MAX_SIZE 8
 #define CAN_QUEUE_SIZE 128
-#define CAN_LED_BLINK_PERIOD_US 500
+#define CAN_LED_BLINK_PERIOD_US 1000
 
 namespace CAN_CONTROL {
 
@@ -19,6 +19,7 @@ struct CAN_MSG{
   bool remote_request;
   uint8_t data[CAN_DATA_FRAME_MAX_SIZE];
   uint8_t data_size;
+
 };
 
 class CanControl{
@@ -33,6 +34,7 @@ private:
   std::list<CAN_MSG> rx_msg_buffer;
   const Pin *pin_tx_led;
   const Pin *pin_rx_led;
+  uint32_t last_tx_mailbox;
 
   /// @brief  turn on the TX led for a short period
  void blink_tx_led();

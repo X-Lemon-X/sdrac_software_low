@@ -57,9 +57,9 @@ add_executable(${TARGET}
 "Drivers/CMSIS/Device/ST/STM32F4xx/Source/Templates/gcc/startup_stm32f412rx.s"
 
 "app/main_prog_callbacks.cpp"
+"app/main_prog.cpp"
 "app/Encoder/src/encoder.cpp"
 "app/Logger/src/logger.cpp"
-"app/main_prog.cpp"
 "app/Timing/src/Timing.cpp"
 "app/UsbPrograming/src/usb_programer.cpp"
 "app/SteperMotor/src/steper_motor.cpp"
@@ -188,7 +188,7 @@ target_link_options(${TARGET} PRIVATE
 	-specs=nosys.specs
   -u_printf_float
 	-static
-  --data-sections
+  # --data-sections
 
 )
 
