@@ -7,6 +7,8 @@ Board_id::Board_id(const Pin &_id_0,const Pin &_id_1,const Pin &_id_2): id_0(_id
 }
 
 uint8_t Board_id::get_id(){
+  return 1;
+  
   if (id_set) return id;
   id = 0;
   id |= (uint8_t)HAL_GPIO_ReadPin(id_0.port,id_0.pin);

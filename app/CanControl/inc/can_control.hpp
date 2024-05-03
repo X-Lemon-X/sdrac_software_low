@@ -72,7 +72,7 @@ public:
   void handle_led_blink();
 
   /// @brief  Send a message over CAN bus
-  void send_message(CAN_MSG &&msg);
+  void send_message(CAN_MSG &msg);
   
   /// @brief  Get the message from the RX buffer
   /// @param msg  pointer to the CAN_MSG object

@@ -24,7 +24,7 @@ void CanControl::init(
   timing_led_rx = new TIMING::Timing(*ticker);
   timing_led_tx = new TIMING::Timing(*ticker);
   
-  rx_msg_buffer.resize(CAN_QUEUE_SIZE+1);
+  // rx_msg_buffer.resize(CAN_QUEUE_SIZE+1);
   timing_led_rx->set_behaviour(CAN_LED_BLINK_PERIOD_US,false);
   timing_led_tx->set_behaviour(CAN_LED_BLINK_PERIOD_US,false);
 }
@@ -72,7 +72,7 @@ void CanControl::handle_led_blink(){
     HAL_GPIO_WritePin(pin_tx_led->port,pin_tx_led->pin,GPIO_PIN_RESET);
 }
 
-void CanControl::send_message(CAN_MSG &&msg){
+void CanControl::send_message(CAN_MSG &msg){
   CAN_TxHeaderTypeDef tx_header = {0};
   tx_header.StdId = msg.frame_id;
   tx_header.DLC = msg.data_size;

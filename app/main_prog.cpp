@@ -65,6 +65,9 @@ uint32_t CAN_KONARM_X_STATUS_FRAME_ID;
 uint32_t CAN_KONARM_X_SET_POS_FRAME_ID;
 uint32_t CAN_KONARM_X_GET_POS_FRAME_ID;
 
+#define CAN_STRIP_BITS_FOR_MASK(id) ((id & 0xFF0) << 5)
+
+
 
 /// @brief This function is used to configure the periferals
 /// mostly stff that have to be configurated after CumeMX generation
@@ -94,40 +97,61 @@ void id_config(){
   switch (board_id.get_id())
   {
   case SDRAC_ID_1:
-    CAN_KONARM_X_CLEAR_ERRORS_FRAME_ID = CAN_KONARM_1_CLEAR_ERRORS_FRAME_ID;
     CAN_KONARM_X_STATUS_FRAME_ID = CAN_KONARM_1_STATUS_FRAME_ID;
     CAN_KONARM_X_SET_POS_FRAME_ID = CAN_KONARM_1_SET_POS_FRAME_ID;
     CAN_KONARM_X_GET_POS_FRAME_ID = CAN_KONARM_1_GET_POS_FRAME_ID;
+    CAN_KONARM_X_CLEAR_ERRORS_FRAME_ID = CAN_KONARM_1_CLEAR_ERRORS_FRAME_ID;
     
     // ids 11bit 0b110 0001 0000  and 18 bit 0b00 0000 0000 0000 0000
     //mask 11bit 0b111 1111 0000  and 18 bit 0b00 0000 0000 0000 0000
-    CAN_X_FILTER_ID_HIGH = 0x610;
+    CAN_X_FILTER_ID_HIGH = CAN_STRIP_BITS_FOR_MASK(CAN_KONARM_1_STATUS_FRAME_ID); // why 5? becouase the 11 bit id is shifted 5 bits to the left in the first 16 bits
     CAN_X_FILTER_ID_LOW = 0x000;
-    CAN_X_FILTER_MASK_HIGH = 0x7F0;
+    CAN_X_FILTER_MASK_HIGH = CAN_STRIP_BITS_FOR_MASK(0xFF0);
+    CAN_X_FILTER_MASK_LOW = 0x000;
     break;
   case SDRAC_ID_2:
-    CAN_KONARM_X_CLEAR_ERRORS_FRAME_ID = CAN_KONARM_2_CLEAR_ERRORS_FRAME_ID;
     CAN_KONARM_X_STATUS_FRAME_ID = CAN_KONARM_2_STATUS_FRAME_ID;
     CAN_KONARM_X_SET_POS_FRAME_ID = CAN_KONARM_2_SET_POS_FRAME_ID;
     CAN_KONARM_X_GET_POS_FRAME_ID = CAN_KONARM_2_GET_POS_FRAME_ID;
+    CAN_KONARM_X_CLEAR_ERRORS_FRAME_ID = CAN_KONARM_2_CLEAR_ERRORS_FRAME_ID;
+
+    CAN_X_FILTER_ID_HIGH = CAN_STRIP_BITS_FOR_MASK(CAN_KONARM_2_STATUS_FRAME_ID); // why 5? becouase the 11 bit id is shifted 5 bits to the left in the first 16 bits
+    CAN_X_FILTER_ID_LOW = 0x000;
+    CAN_X_FILTER_MASK_HIGH = CAN_STRIP_BITS_FOR_MASK(0xFF0);
+    CAN_X_FILTER_MASK_LOW = 0x000;
     break;
   case SDRAC_ID_3:
-    CAN_KONARM_X_CLEAR_ERRORS_FRAME_ID = CAN_KONARM_3_CLEAR_ERRORS_FRAME_ID;
     CAN_KONARM_X_STATUS_FRAME_ID = CAN_KONARM_3_STATUS_FRAME_ID;
     CAN_KONARM_X_SET_POS_FRAME_ID = CAN_KONARM_3_SET_POS_FRAME_ID;
     CAN_KONARM_X_GET_POS_FRAME_ID = CAN_KONARM_3_GET_POS_FRAME_ID;
+    CAN_KONARM_X_CLEAR_ERRORS_FRAME_ID = CAN_KONARM_3_CLEAR_ERRORS_FRAME_ID;
+
+    CAN_X_FILTER_ID_HIGH = CAN_STRIP_BITS_FOR_MASK(CAN_KONARM_3_STATUS_FRAME_ID); // why 5? becouase the 11 bit id is shifted 5 bits to the left in the first 16 bits
+    CAN_X_FILTER_ID_LOW = 0x000;
+    CAN_X_FILTER_MASK_HIGH = CAN_STRIP_BITS_FOR_MASK(0xFF0);
+    CAN_X_FILTER_MASK_LOW = 0x000;
     break;
   case SDRAC_ID_4:
-    CAN_KONARM_X_CLEAR_ERRORS_FRAME_ID = CAN_KONARM_4_CLEAR_ERRORS_FRAME_ID;
     CAN_KONARM_X_STATUS_FRAME_ID = CAN_KONARM_4_STATUS_FRAME_ID;
     CAN_KONARM_X_SET_POS_FRAME_ID = CAN_KONARM_4_SET_POS_FRAME_ID;
     CAN_KONARM_X_GET_POS_FRAME_ID = CAN_KONARM_4_GET_POS_FRAME_ID;
+    CAN_KONARM_X_CLEAR_ERRORS_FRAME_ID = CAN_KONARM_4_CLEAR_ERRORS_FRAME_ID;
+
+    CAN_X_FILTER_ID_HIGH = CAN_STRIP_BITS_FOR_MASK(CAN_KONARM_4_STATUS_FRAME_ID); // why 5? becouase the 11 bit id is shifted 5 bits to the left in the first 16 bits
+    CAN_X_FILTER_ID_LOW = 0x000;
+    CAN_X_FILTER_MASK_HIGH = CAN_STRIP_BITS_FOR_MASK(0xFF0);
+    CAN_X_FILTER_MASK_LOW = 0x000;
     break;
   case SDRAC_ID_5:
-    CAN_KONARM_X_CLEAR_ERRORS_FRAME_ID = CAN_KONARM_5_CLEAR_ERRORS_FRAME_ID;
     CAN_KONARM_X_STATUS_FRAME_ID = CAN_KONARM_5_STATUS_FRAME_ID;
     CAN_KONARM_X_SET_POS_FRAME_ID = CAN_KONARM_5_SET_POS_FRAME_ID;
     CAN_KONARM_X_GET_POS_FRAME_ID = CAN_KONARM_5_GET_POS_FRAME_ID;
+    CAN_KONARM_X_CLEAR_ERRORS_FRAME_ID = CAN_KONARM_5_CLEAR_ERRORS_FRAME_ID;
+
+    CAN_X_FILTER_ID_HIGH = CAN_STRIP_BITS_FOR_MASK(CAN_KONARM_5_STATUS_FRAME_ID); // why 5? becouase the 11 bit id is shifted 5 bits to the left in the first 16 bits
+    CAN_X_FILTER_ID_LOW = 0x000;
+    CAN_X_FILTER_MASK_HIGH = CAN_STRIP_BITS_FOR_MASK(0xFF0);
+    CAN_X_FILTER_MASK_LOW = 0x000;
     break;
   // case SDRAC_ID_6:
   //   CAN_KONARM_X_CLEAR_ERRORS_FRAME_ID = CAN_KONARM_6_CLEAR_ERRORS_FRAME_ID;
@@ -163,26 +187,36 @@ void periferal_config(){
   can_filter.FilterActivation = CAN_FILTER_ENABLE;
   can_filter.FilterIdHigh = CAN_X_FILTER_ID_HIGH;
   can_filter.FilterIdLow = CAN_X_FILTER_ID_LOW;
-  can_filter.FilterMaskIdHigh = CAN_X_FILTER_MASK_HIGH;
-  can_filter.FilterMaskIdLow = CAN_X_FILTER_MASK_LOW;
-  HAL_CAN_ConfigFilter(&hcan1, &can_filter);
+  can_filter.FilterMaskIdHigh = 0x0;//CAN_X_FILTER_MASK_HIGH;
+  can_filter.FilterMaskIdLow = 0x0;//CAN_X_FILTER_MASK_LOW;
+  // can_filter.SlaveStartFilterBank = 2;
+  HAL_StatusTypeDef status =  HAL_CAN_ConfigFilter(&hcan1, &can_filter);
   can_controler.init(hcan1, CAN_FILTER_FIFO0, ticker, pin_tx_led, pin_rx_led);
-  HAL_CAN_Start(&hcan1);
+  status =  HAL_CAN_Start(&hcan1);
+  status =  HAL_CAN_ActivateNotification(&hcan1, CAN_IT_RX_FIFO0_MSG_PENDING | CAN_IT_RX_FIFO1_MSG_PENDING);
 }
 
 void handle_can_rx(){
-  CAN_CONTROL::CAN_MSG msg = {0};
-  if(can_controler.get_message(&msg)) return;
+  CAN_CONTROL::CAN_MSG recived_msg = {0};
+  if(can_controler.get_message(&recived_msg)) return;
 
-  if(msg.frame_id == CAN_KONARM_X_SET_POS_FRAME_ID){
+  if(recived_msg.frame_id == CAN_KONARM_X_SET_POS_FRAME_ID){
     can_konarm_1_set_pos_t dst_p;
-    can_konarm_1_set_pos_unpack(&dst_p, msg.data, msg.data_size);
+    can_konarm_1_set_pos_unpack(&dst_p, recived_msg.data, recived_msg.data_size);
   }
-  else if (msg.frame_id == CAN_KONARM_X_GET_POS_FRAME_ID){
+  else if (recived_msg.frame_id == CAN_KONARM_X_GET_POS_FRAME_ID){
   }
-  else if (msg.frame_id == CAN_KONARM_X_STATUS_FRAME_ID){
+  else if (recived_msg.frame_id == CAN_KONARM_X_STATUS_FRAME_ID){
+    CAN_CONTROL::CAN_MSG send_msg = {0};
+    send_msg.frame_id = CAN_KONARM_X_STATUS_FRAME_ID;
+    can_konarm_1_status_t src_p;
+    src_p.status = can_konarm_1_status_status_encode(CAN_KONARM_1_STATUS_STATUS_OK_CHOICE);
+    send_msg.data_size = CAN_KONARM_1_STATUS_LENGTH;
+    can_konarm_1_status_pack(send_msg.data, &src_p, send_msg.data_size);
+    can_controler.send_message(send_msg);
+    
   }
-  else if (msg.frame_id == CAN_KONARM_X_CLEAR_ERRORS_FRAME_ID){
+  else if (recived_msg.frame_id == CAN_KONARM_X_CLEAR_ERRORS_FRAME_ID){
   }
   
 }
