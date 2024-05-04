@@ -36,7 +36,7 @@ if [ -z $device_path ]; then
   exit 1
 fi
 
-echo -e "${BLUE}Flushing USB device: $device_path${NC}"
+echo -e "${BLUE}Flashing USB device: $device_path${NC}"
 
 
 # open viryal com port and serite SB_enterdfu on boud rate 115200
