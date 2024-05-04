@@ -11,48 +11,50 @@
 #include "can_control.hpp"
 #include "board_id.hpp"
 #include "CanDB.h"
+#include "movement_controler.hpp"
 
 #include <string>
 #include <charconv>
 #include <vector>
 
 //**************************************************************************************************
-// Pin assigments
-const Pin pin_user_led_1 = {GPIO_PIN_6, GPIOC};
-const Pin pin_user_led_2 = {GPIO_PIN_7, GPIOC};
-const Pin pin_user_btn_1 = {GPIO_PIN_9, GPIOC};
-const Pin pin_tx_led = {GPIO_PIN_12, GPIOB};
-const Pin pin_rx_led = {GPIO_PIN_13, GPIOB};
-const Pin pin_encoder = {GPIO_PIN_3, GPIOB};
-const Pin pin_poz_zero_sensor = {GPIO_PIN_4, GPIOA};
-const Pin pin_inout_ca1 = {GPIO_PIN_5, GPIOA};
-const Pin pin_inout_ca2 = {GPIO_PIN_7, GPIOA};
-const Pin pin_inout_crx = {GPIO_PIN_10, GPIOB};
-const Pin pin_inout_ctx = {GPIO_PIN_4, GPIOC};
-const Pin pin_sync_puls = {GPIO_PIN_8, GPIOA};
-const Pin pin_sync_dir = {GPIO_PIN_9, GPIOA};
-const Pin pin_temp_steper_board = {GPIO_PIN_0, GPIOA};
-const Pin pin_temp_board = {GPIO_PIN_1, GPIOA};
-const Pin pin_temp_motor = {GPIO_PIN_2, GPIOA};
-const Pin pin_vsense = {GPIO_PIN_3, GPIOA};
-const Pin pin_steper_direction = {GPIO_PIN_0, GPIOB};
-const Pin pin_steper_enable = {GPIO_PIN_1, GPIOB};
-const Pin pin_steper_step = {GPIO_PIN_6, GPIOA};
-const Pin pin_boot_device = {GPIO_PIN_8, GPIOC};
+// Gpio assigments
+const GPIO_PIN pin_user_led_1 = {GPIO_PIN_6, GPIOC};
+const GPIO_PIN pin_user_led_2 = {GPIO_PIN_7, GPIOC};
+const GPIO_PIN pin_user_btn_1 = {GPIO_PIN_9, GPIOC};
+const GPIO_PIN pin_tx_led = {GPIO_PIN_12, GPIOB};
+const GPIO_PIN pin_rx_led = {GPIO_PIN_13, GPIOB};
+const GPIO_PIN pin_encoder = {GPIO_PIN_3, GPIOB};
+const GPIO_PIN pin_poz_zero_sensor = {GPIO_PIN_4, GPIOA};
+const GPIO_PIN pin_inout_ca1 = {GPIO_PIN_5, GPIOA};
+const GPIO_PIN pin_inout_ca2 = {GPIO_PIN_7, GPIOA};
+const GPIO_PIN pin_inout_crx = {GPIO_PIN_10, GPIOB};
+const GPIO_PIN pin_inout_ctx = {GPIO_PIN_4, GPIOC};
+const GPIO_PIN pin_sync_puls = {GPIO_PIN_8, GPIOA};
+const GPIO_PIN pin_sync_dir = {GPIO_PIN_9, GPIOA};
+const GPIO_PIN pin_temp_steper_board = {GPIO_PIN_0, GPIOA};
+const GPIO_PIN pin_temp_board = {GPIO_PIN_1, GPIOA};
+const GPIO_PIN pin_temp_motor = {GPIO_PIN_2, GPIOA};
+const GPIO_PIN pin_vsense = {GPIO_PIN_3, GPIOA};
+const GPIO_PIN pin_steper_direction = {GPIO_PIN_0, GPIOB};
+const GPIO_PIN pin_steper_enable = {GPIO_PIN_1, GPIOB};
+const GPIO_PIN pin_steper_step = {GPIO_PIN_6, GPIOA};
+const GPIO_PIN pin_boot_device = {GPIO_PIN_8, GPIOC};
 
 // to do
-const Pin pin_cid_0 = {GPIO_PIN_0, GPIOC};
-const Pin pin_cid_1 = {GPIO_PIN_1, GPIOC};
-const Pin pin_cid_2 = {GPIO_PIN_2, GPIOC};
+const GPIO_PIN pin_cid_0 = {GPIO_PIN_0, GPIOC};
+const GPIO_PIN pin_cid_1 = {GPIO_PIN_1, GPIOC};
+const GPIO_PIN pin_cid_2 = {GPIO_PIN_2, GPIOC};
 
 //**************************************************************************************************
-// Global variables
+// Global stuff
 
 uint32_t adc_dma_buffer[ADC_DMA_BUFFER_SIZE];
 LOGGER::Logger loger(LOGGER::LOG_LEVEL::LOG_LEVEL_DEBUG,false);
-TIMING::Ticker ticker;
+TIMING::Ticker main_clock;
 CAN_CONTROL::CanControl can_controler;
 BOARD_ID::Board_id board_id(pin_cid_0, pin_cid_1, pin_cid_2);
+MOVEMENT_CONTROLER::MovementControler movement_controler;
 
 //**************************************************************************************************
 // Id dependable configuration 
@@ -65,7 +67,6 @@ uint32_t CAN_KONARM_X_STATUS_FRAME_ID;
 uint32_t CAN_KONARM_X_SET_POS_FRAME_ID;
 uint32_t CAN_KONARM_X_GET_POS_FRAME_ID;
 
-#define CAN_STRIP_BITS_FOR_MASK(id) ((id & 0xFF0) << 5)
 
 
 
@@ -91,7 +92,6 @@ void main_prog()
   main_loop();
 }
 
-
 void id_config(){
 
   switch (board_id.get_id())
@@ -104,7 +104,7 @@ void id_config(){
     
     // ids 11bit 0b110 0001 0000  and 18 bit 0b00 0000 0000 0000 0000
     //mask 11bit 0b111 1111 0000  and 18 bit 0b00 0000 0000 0000 0000
-    CAN_X_FILTER_ID_HIGH = 0x610<<5;
+    CAN_X_FILTER_ID_HIGH = 0x610<<5;   // why 5 bits shift because we want tu push the 11 bit id to the 16 bit regiser strting from 5th bit
     CAN_X_FILTER_ID_LOW = 0x000;
     CAN_X_FILTER_MASK_HIGH = 0xff0<<5;
     CAN_X_FILTER_MASK_LOW = 0x000;
@@ -115,9 +115,9 @@ void id_config(){
     CAN_KONARM_X_GET_POS_FRAME_ID = CAN_KONARM_2_GET_POS_FRAME_ID;
     CAN_KONARM_X_CLEAR_ERRORS_FRAME_ID = CAN_KONARM_2_CLEAR_ERRORS_FRAME_ID;
 
-    CAN_X_FILTER_ID_HIGH = CAN_STRIP_BITS_FOR_MASK(CAN_KONARM_2_STATUS_FRAME_ID); // why 5? becouase the 11 bit id is shifted 5 bits to the left in the first 16 bits
+    CAN_X_FILTER_ID_HIGH = 0x620<<5;
     CAN_X_FILTER_ID_LOW = 0x000;
-    CAN_X_FILTER_MASK_HIGH = CAN_STRIP_BITS_FOR_MASK(0xFF0);
+    CAN_X_FILTER_MASK_HIGH = 0xff0<<5;
     CAN_X_FILTER_MASK_LOW = 0x000;
     break;
   case SDRAC_ID_3:
@@ -126,9 +126,9 @@ void id_config(){
     CAN_KONARM_X_GET_POS_FRAME_ID = CAN_KONARM_3_GET_POS_FRAME_ID;
     CAN_KONARM_X_CLEAR_ERRORS_FRAME_ID = CAN_KONARM_3_CLEAR_ERRORS_FRAME_ID;
 
-    CAN_X_FILTER_ID_HIGH = CAN_STRIP_BITS_FOR_MASK(CAN_KONARM_3_STATUS_FRAME_ID); // why 5? becouase the 11 bit id is shifted 5 bits to the left in the first 16 bits
+    CAN_X_FILTER_ID_HIGH = 0x630<<5;
     CAN_X_FILTER_ID_LOW = 0x000;
-    CAN_X_FILTER_MASK_HIGH = CAN_STRIP_BITS_FOR_MASK(0xFF0);
+    CAN_X_FILTER_MASK_HIGH = 0xff0<<5;
     CAN_X_FILTER_MASK_LOW = 0x000;
     break;
   case SDRAC_ID_4:
@@ -137,9 +137,9 @@ void id_config(){
     CAN_KONARM_X_GET_POS_FRAME_ID = CAN_KONARM_4_GET_POS_FRAME_ID;
     CAN_KONARM_X_CLEAR_ERRORS_FRAME_ID = CAN_KONARM_4_CLEAR_ERRORS_FRAME_ID;
 
-    CAN_X_FILTER_ID_HIGH = CAN_STRIP_BITS_FOR_MASK(CAN_KONARM_4_STATUS_FRAME_ID); // why 5? becouase the 11 bit id is shifted 5 bits to the left in the first 16 bits
+    CAN_X_FILTER_ID_HIGH = 0x640<<5;
     CAN_X_FILTER_ID_LOW = 0x000;
-    CAN_X_FILTER_MASK_HIGH = CAN_STRIP_BITS_FOR_MASK(0xFF0);
+    CAN_X_FILTER_MASK_HIGH = 0xff0<<5;
     CAN_X_FILTER_MASK_LOW = 0x000;
     break;
   case SDRAC_ID_5:
@@ -148,9 +148,9 @@ void id_config(){
     CAN_KONARM_X_GET_POS_FRAME_ID = CAN_KONARM_5_GET_POS_FRAME_ID;
     CAN_KONARM_X_CLEAR_ERRORS_FRAME_ID = CAN_KONARM_5_CLEAR_ERRORS_FRAME_ID;
 
-    CAN_X_FILTER_ID_HIGH = CAN_STRIP_BITS_FOR_MASK(CAN_KONARM_5_STATUS_FRAME_ID); // why 5? becouase the 11 bit id is shifted 5 bits to the left in the first 16 bits
+    CAN_X_FILTER_ID_HIGH = 0x650<<5;
     CAN_X_FILTER_ID_LOW = 0x000;
-    CAN_X_FILTER_MASK_HIGH = CAN_STRIP_BITS_FOR_MASK(0xFF0);
+    CAN_X_FILTER_MASK_HIGH = 0xff0<<5;
     CAN_X_FILTER_MASK_LOW = 0x000;
     break;
   // case SDRAC_ID_6:
@@ -182,7 +182,6 @@ void periferal_config(){
   HAL_CAN_Init(&hcan1);
 
   // Can1 settings
-  // HAL_CAN_MspInit(&hcan1);
   CAN_FilterTypeDef can_filter;
   can_filter.FilterBank = 1;
   can_filter.FilterMode = CAN_FILTERMODE_IDMASK;
@@ -195,7 +194,7 @@ void periferal_config(){
   can_filter.FilterMaskIdLow = CAN_X_FILTER_MASK_LOW;
   can_filter.SlaveStartFilterBank = 2;
   HAL_StatusTypeDef status =  HAL_CAN_ConfigFilter(&hcan1, &can_filter);
-  can_controler.init(hcan1, CAN_FILTER_FIFO0, ticker, pin_tx_led, pin_rx_led);
+  can_controler.init(hcan1, CAN_FILTER_FIFO0, main_clock, pin_tx_led, pin_rx_led);
   status =  HAL_CAN_Start(&hcan1);
   status =  HAL_CAN_ActivateNotification(&hcan1, CAN_IT_RX_FIFO0_MSG_PENDING | CAN_IT_RX_FIFO1_MSG_PENDING);
 
@@ -207,46 +206,66 @@ void handle_can_rx(){
   if(can_controler.get_message(&recived_msg)) return;
 
   log_debug("Recived message: " + std::to_string(recived_msg.frame_id));
-
+  
   if(recived_msg.frame_id == CAN_KONARM_X_SET_POS_FRAME_ID){
-    can_konarm_1_set_pos_t dst_p;
-    can_konarm_1_set_pos_unpack(&dst_p, recived_msg.data, recived_msg.data_size);
+    can_konarm_1_set_pos_t signals;
+    can_konarm_1_set_pos_unpack(&signals, recived_msg.data, recived_msg.data_size);
+    float targetPosition = can_konarm_1_set_pos_position_decode(signals.position);
+    float targetVelocity = can_konarm_1_set_pos_velocity_decode(signals.velocity);
+    movement_controler.set_velocity(targetVelocity);
+    movement_controler.set_position(targetPosition);
   }
-  else if (recived_msg.frame_id == CAN_KONARM_X_GET_POS_FRAME_ID){
+  else if (recived_msg.frame_id == CAN_KONARM_X_GET_POS_FRAME_ID && recived_msg.remote_request){
+    CAN_CONTROL::CAN_MSG send_msg = {0};
+    can_konarm_1_get_pos_t src_p;
+    send_msg.frame_id = CAN_KONARM_X_GET_POS_FRAME_ID;
+    src_p.position = can_konarm_1_get_pos_position_encode(movement_controler.get_current_position());
+    src_p.velocity = can_konarm_1_get_pos_velocity_encode(movement_controler.get_current_velocity());
+    send_msg.data_size = CAN_KONARM_1_GET_POS_LENGTH;
+    can_konarm_1_get_pos_pack(send_msg.data, &src_p, send_msg.data_size);
+    can_controler.send_message(send_msg);
   }
   else if (recived_msg.frame_id == CAN_KONARM_X_STATUS_FRAME_ID && recived_msg.remote_request){
     CAN_CONTROL::CAN_MSG send_msg = {0};
-    send_msg.frame_id = CAN_KONARM_X_STATUS_FRAME_ID;
     can_konarm_1_status_t src_p;
+    send_msg.frame_id = CAN_KONARM_X_STATUS_FRAME_ID;
     src_p.status = can_konarm_1_status_status_encode(CAN_KONARM_1_STATUS_STATUS_OK_CHOICE);
     send_msg.data_size = CAN_KONARM_1_STATUS_LENGTH;
     can_konarm_1_status_pack(send_msg.data, &src_p, send_msg.data_size);
     can_controler.send_message(send_msg);
-    
   }
   else if (recived_msg.frame_id == CAN_KONARM_X_CLEAR_ERRORS_FRAME_ID){
   }
   
 }
 
+static int8_t CDC_Receive_FS(uint8_t* Buf, uint32_t *Len)
+{
+  /* USER CODE BEGIN 6 */
+  USBD_CDC_SetRxBuffer(&hUsbDeviceFS, &Buf[0]);
+  USBD_CDC_ReceivePacket(&hUsbDeviceFS);
+  return (USBD_OK);
+  /* USER CODE END 6 */
+}
+
 void main_loop(){
   log_debug("Start main_prog\n");
 
-  TIMING::Timing tim_blink(ticker);
-  TIMING::Timing tim_encoder(ticker);
-  TIMING::Timing tim_usb(ticker);
-  TIMING::Timing tim_eng(ticker);
-  tim_blink.set_behaviour(500000, true);
+  TIMING::Timing tim_blink(main_clock);
+  TIMING::Timing tim_encoder(main_clock);
+  TIMING::Timing tim_usb(main_clock);
+  TIMING::Timing tim_eng(main_clock);
+  tim_blink.set_behaviour(200000, true);
   tim_encoder.set_behaviour(10000, true);
   tim_usb.set_behaviour(20000000, true);
   tim_eng.set_behaviour(500000, true);
 
-  FILTERS::FilterAlfaBeta filter(ticker);
+  FILTERS::FilterAlfaBeta filter(main_clock);
   filter.alfa = 0.5;
   filter.beta = 0.1;
-  FILTERS::FilterBase filter_base(ticker);  
+  FILTERS::FilterBase filter_base(main_clock);  
 
-  ENCODER::Encoder encoder(hi2c1,ticker,filter_base,filter_base);
+  ENCODER::Encoder encoder(hi2c1,main_clock,filter_base,filter_base);
   encoder.address = ENCODER_MT6701_I2C_ADDRESS;
   encoder.resolution = ENCODER_MT6702_RESOLUTION;
   encoder.angle_register = ENCODER_MEM_ADDR_ANNGLE;
@@ -264,48 +283,28 @@ void main_loop(){
   stp_motor.set_enable(true);
   stp_motor.set_speed(PI/12.0f);
 
+  // initialization of movement controler algorithm
+  movement_controler.init(main_clock, stp_motor, encoder);
+
+
   USB_PROGRAMER::UsbProgramer usb_programer(pin_boot_device);
+
   // Start the main loop
-  float angle;
-  float velocity;
-  uint16_t raw_angle;
-  uint8_t data_can=0;
   while (1){
     // log_debug("main loop\n");
     // USBD_UsrLog("main loop");
     handle_can_rx();
     can_controler.handle_led_blink();
+    usb_programer.handler();
 
     if(tim_blink.triggered()){
-      HAL_GPIO_TogglePin(GPIOC,GPIO_PIN_7);
-      // log_debug("Fifo 0 LVL" +std::to_string(HAL_CAN_GetRxFifoFillLevel(&hcan1, CAN_RX_FIFO0)));
-      // log_debug("Fifo 1 LVL" +std::to_string(HAL_CAN_GetRxFifoFillLevel(&hcan1, CAN_RX_FIFO1)));
-
-
-      // if(HAL_CAN_GetRxMessage(&hcan1, CAN_RX_FIFO0, &rx_header, rx_data) == HAL_OK){
-      //   log_debug("CAN F0 RX: " + std::to_string(rx_header.StdId) + " " + std::to_string(rx_header.DLC));
-      // }else{
-      //   log_debug("CAN F0 RX: no message");
-      // }
-
-      // if(HAL_CAN_GetRxMessage(&hcan1, CAN_RX_FIFO1, &rx_header, rx_data) == HAL_OK){
-      //   log_debug("CAN F1 RX: " + std::to_string(rx_header.StdId) + " " + std::to_string(rx_header.DLC));
-      // }else{
-      //   log_debug("CAN F1 RX: no message");
-      //   }
-
-
-      // CAN_CONTROL::CAN_MSG send_msg = {0};
-      // send_msg.frame_id = 0x611 << 5;
-      // send_msg.data_size = 1;
-      // send_msg.data[0] = ++data_can;
-      // can_controler.send_message(send_msg);
+      TOGGLE_GPIO(pin_user_led_1);
     }
 
     if(tim_encoder.triggered()){
-      angle = encoder.read_angle();
-      raw_angle = encoder.read_raw_angle();
-      velocity = encoder.get_velocity();
+      float angle = encoder.read_angle();
+      float raw_angle = encoder.read_raw_angle();
+      float velocity = encoder.get_velocity();
       // velocity = encoder.get_velocity();
       // log_debug(std::to_string(raw_angle) + ";" + std::to_string(velocity));
     }

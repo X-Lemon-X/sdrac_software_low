@@ -4,7 +4,7 @@
 
 using namespace STEPER_MOTOR;
 
-SteperMotor::SteperMotor(TIM_HandleTypeDef &_htim,unsigned int _timer_channel, Pin _direction_pin, Pin _enable_pin):
+SteperMotor::SteperMotor(TIM_HandleTypeDef &_htim,unsigned int _timer_channel,const GPIO_PIN &_direction_pin,const GPIO_PIN &_enable_pin):
 htim(_htim),
 direction_pin(_direction_pin),
 timer_channel(_timer_channel),
@@ -44,9 +44,9 @@ void SteperMotor::set_speed(float speed){
   }
 
   if (speed >= 0)
-    HAL_GPIO_WritePin(direction_pin.port, direction_pin.pin,direction_positive);
+    WRITE_GPIO(direction_pin,direction_positive);
   else {
-    HAL_GPIO_WritePin(direction_pin.port, direction_pin.pin,direction_negative);
+    WRITE_GPIO(direction_pin,direction_negative);
     speed = -speed;
   }
 
@@ -61,9 +61,9 @@ void SteperMotor::set_speed(float speed){
 
 void SteperMotor::set_enable(bool enable){
   if (enable){
-    HAL_GPIO_WritePin(enable_pin.port, enable_pin.pin,GPIO_PIN_SET);
+    WRITE_GPIO(enable_pin,GPIO_PIN_SET);
   }else{
-    HAL_GPIO_WritePin(enable_pin.port, enable_pin.pin,GPIO_PIN_RESET);
+    WRITE_GPIO(enable_pin,GPIO_PIN_RESET);
     htim.Instance->CCR1 = 0;
   }
 }

@@ -35,7 +35,7 @@
 
 //**************************************************************************************************
 // CAN CONSTANTS
-
+#define CAN_STRIP_BITS_FOR_MASK(id) ((id & 0xFF0) << 5)
 extern uint32_t CAN_X_FILTER_MASK_LOW;
 extern uint32_t CAN_X_FILTER_MASK_HIGH;
 extern uint32_t CAN_X_FILTER_ID_LOW;
@@ -62,32 +62,32 @@ extern uint32_t CAN_KONARM_X_GET_POS_FRAME_ID;
 //**************************************************************************************************
 // PINOUT CONSTANTS
 
-extern const Pin pin_user_led_1;
-extern const Pin pin_user_led_2;
-extern const Pin pin_user_btn_1;
-extern const Pin pin_tx_led;
-extern const Pin pin_rx_led;
-extern const Pin pin_encoder;
-extern const Pin pin_poz_zero_sensor;
-extern const Pin pin_inout_ca1;
-extern const Pin pin_inout_ca2;
-extern const Pin pin_inout_crx;
-extern const Pin pin_inout_ctx;
-extern const Pin pin_sync_puls;
-extern const Pin pin_sync_dir;
-extern const Pin pin_temp_steper_board;
-extern const Pin pin_temp_board;
-extern const Pin pin_temp_motor;
-extern const Pin pin_vsense;
-extern const Pin pin_steper_direction;
-extern const Pin pin_steper_enable ;
-extern const Pin pin_steper_step ;
-extern const Pin pin_boot_device;
+extern const GPIO_PIN pin_user_led_1;
+extern const GPIO_PIN pin_user_led_2;
+extern const GPIO_PIN pin_user_btn_1;
+extern const GPIO_PIN pin_tx_led;
+extern const GPIO_PIN pin_rx_led;
+extern const GPIO_PIN pin_encoder;
+extern const GPIO_PIN pin_poz_zero_sensor;
+extern const GPIO_PIN pin_inout_ca1;
+extern const GPIO_PIN pin_inout_ca2;
+extern const GPIO_PIN pin_inout_crx;
+extern const GPIO_PIN pin_inout_ctx;
+extern const GPIO_PIN pin_sync_puls;
+extern const GPIO_PIN pin_sync_dir;
+extern const GPIO_PIN pin_temp_steper_board;
+extern const GPIO_PIN pin_temp_board;
+extern const GPIO_PIN pin_temp_motor;
+extern const GPIO_PIN pin_vsense;
+extern const GPIO_PIN pin_steper_direction;
+extern const GPIO_PIN pin_steper_enable ;
+extern const GPIO_PIN pin_steper_step ;
+extern const GPIO_PIN pin_boot_device;
 
 //to do
-extern const Pin pin_cid_0;
-extern const Pin pin_cid_1;
-extern const Pin pin_cid_2;
+extern const GPIO_PIN pin_cid_0;
+extern const GPIO_PIN pin_cid_1;
+extern const GPIO_PIN pin_cid_2;
 
 
 //**************************************************************************************************
@@ -111,18 +111,14 @@ extern USBD_HandleTypeDef hUsbDeviceFS;
 //-----------------------------------
 
 extern LOGGER::Logger loger;
-extern TIMING::Ticker ticker;
+extern TIMING::Ticker main_clock;
 extern CAN_CONTROL::CanControl can_controler;
 extern BOARD_ID::Board_id board_id;
-
-
 
 
 //**************************************************************************************************
 /// @brief main program, this function is called from main and never returns
 void main_prog();
-
-
 
 
 //**************************************************************************************************

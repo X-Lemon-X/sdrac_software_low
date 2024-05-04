@@ -6,7 +6,7 @@
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
   if (htim->Instance == TIM10){
-    ticker.irq_update_ticker();
+    main_clock.irq_update_ticker();
   }
   
   // if (htim->Instance == TIM3)

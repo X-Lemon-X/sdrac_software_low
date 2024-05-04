@@ -67,8 +67,7 @@ add_executable(${TARGET}
 "app/Filter/src/filter_alfa_beta.cpp"
 "app/Memory/src/fram_menager.cpp"
 "app/CanControl/src/can_control.cpp"
-"app/EngineControl/src/engine_controler.cpp"
-"app/EngineControl/src/linear_ec.cpp"
+"app/MovementControl/src/movement_controler.cpp"
 "app/CanControl/src/CanDB.c"
 "app/CanControl/src/can_control.cpp"
 "app/BoardId/src/board_id.cpp"
@@ -103,7 +102,7 @@ target_include_directories(${TARGET} PRIVATE
 "app/Filter/inc"
 "app/Memory/inc"
 "app/CanControl/inc"
-"app/EngineControl/inc"
+"app/MovementControl/inc"
 "app/BoardId/inc"
 )
 

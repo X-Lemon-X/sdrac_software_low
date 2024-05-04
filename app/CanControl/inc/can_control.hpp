@@ -32,8 +32,8 @@ private:
   uint8_t data[CAN_DATA_FRAME_MAX_SIZE];
   CAN_RxHeaderTypeDef header = {0};
   std::list<CAN_MSG> rx_msg_buffer;
-  const Pin *pin_tx_led;
-  const Pin *pin_rx_led;
+  const GPIO_PIN *pin_tx_led;
+  const GPIO_PIN *pin_rx_led;
   uint32_t last_tx_mailbox;
 
   /// @brief  turn on the TX led for a short period
@@ -56,12 +56,7 @@ public:
   /// @param ticker  main system ticker object
   /// @param pin_tx_led  pin object for the TX led
   /// @param pin_rx_led  pin object for the RX led
-  void init(
-    CAN_HandleTypeDef &can_interface, 
-    uint32_t can_fifo,
-    TIMING::Ticker &ticker,
-    const Pin &pin_tx_led,
-    const Pin &pin_rx_led);
+  void init(CAN_HandleTypeDef &can_interface,uint32_t can_fifo,TIMING::Ticker &ticker,const GPIO_PIN &pin_tx_led,const GPIO_PIN &pin_rx_led);
 
 
   /// @brief  Handle the RX interrupt

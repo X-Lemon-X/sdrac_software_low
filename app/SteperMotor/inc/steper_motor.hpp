@@ -19,8 +19,8 @@ private:
   float angle;
   TIM_HandleTypeDef &htim;
   unsigned int timer_channel;
-  Pin direction_pin;
-  Pin enable_pin;
+  const GPIO_PIN &direction_pin;
+  const GPIO_PIN &enable_pin;
   GPIO_PinState direction_positive;
   GPIO_PinState direction_negative;
 
@@ -33,7 +33,7 @@ public:
   bool reverse;
 
 
-  SteperMotor(TIM_HandleTypeDef &htim,unsigned int timer_channel, Pin direction_pin, Pin enable_pin);
+  SteperMotor(TIM_HandleTypeDef &htim,unsigned int timer_channel,const GPIO_PIN &direction_pin, const GPIO_PIN &enable_pin);
   
   /// @brief Initialize the SteperMotor, calcualtes all necessary stuff to avoid calcualting it over again
   /// after the initialization
