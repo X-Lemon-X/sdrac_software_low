@@ -13,8 +13,6 @@ uint32_t usb_programer_buffer_len = 0;
 uint8_t usb_programer_data_recived = 0;
 
 UsbProgramer::UsbProgramer(const GPIO_PIN &_boot_device): boot_device(_boot_device){
-  this->reboot_device_phrase = USB_PROGRAMER_REBOOT;
-  this->enter_dfu_mode_phrase = USB_PROGRAMER_PROGRAM;
 }
 
 void UsbProgramer::reset_device(){
@@ -39,17 +37,15 @@ void UsbProgramer::handler(){
   usb_programer_data_recived = 0;
   size = usb_programer_buffer_len;
   usb_programer_buffer_len = 0;
-  log_debug("USB_Handler:Received size: " + std::to_string(size) + "Received: " + (char*)usb_programer_buffer);
-
-  if(strcmp((char*)usb_programer_buffer, this->reboot_device_phrase) == 0){
-    log_debug("USB_Handler:Rebooting device");
+  if(strcmp((char*)usb_programer_buffer, USB_PROGRAMER_REBOOT)==0){
+    log_debug("UsbProgramer:Rebooting device");
     reset_device();
   }
-  else if(strcmp((char*)usb_programer_buffer, this->enter_dfu_mode_phrase) == 0){
-    log_debug("USB_Handler:Programming device");
+  else if(strcmp((char*)usb_programer_buffer, USB_PROGRAMER_PROGRAM)==0){
+    log_debug("UsbProgramer: Entering USB-DFU mode");
     enter_dfu_mode();
   }
   else{
-    log_debug("USB_Handler:Unknown command");
+    log_debug("UsbProgramer:Unknown command");
   }
 }

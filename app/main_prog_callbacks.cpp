@@ -45,5 +45,10 @@ void HAL_CAN_RxFifo1MsgPendingCallback(CAN_HandleTypeDef *hcan)
 
 void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
 {
+  // if(hadc->Instance == ADC1){
+  //   pin_temp_steper_board.analog_value = adc_dma_buffer[0];
+  //   pin_temp_board.analog_value = adc_dma_buffer[1];
+  //   pin_temp_motor.analog_value = adc_dma_buffer[2];
+  // }
   // log_debug("ADC1: " + std::to_string(adc_dma_buffer[0]));
 }

@@ -7,7 +7,7 @@
 
 namespace FILTERS{
 
-class FilterAlfaBeta: private FilterBase{
+class FilterAlfaBeta: public FilterBase{
 private:
   float ypri;
   float ypost;

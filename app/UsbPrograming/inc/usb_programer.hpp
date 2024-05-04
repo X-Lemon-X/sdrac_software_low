@@ -7,8 +7,8 @@
 #ifndef USB_PROGRAMER_H
 #define USB_PROGRAMER_H
 
-#define USB_PROGRAMER_REBOOT "SB_reboot"
-#define USB_PROGRAMER_PROGRAM "SB_program"
+#define USB_PROGRAMER_REBOOT "SB_reboot\n"
+#define USB_PROGRAMER_PROGRAM "SB_enterdfu\n"
 #define USB_PROGRAMER_BUFFER_SIZE APP_RX_DATA_SIZE
 
 namespace USB_PROGRAMER{
@@ -18,8 +18,6 @@ namespace USB_PROGRAMER{
 class UsbProgramer
 {
 private:
-  std::string reboot_device_phrase;
-  std::string enter_dfu_mode_phrase;
   const GPIO_PIN &boot_device;
   uint8_t buffer[USB_PROGRAMER_BUFFER_SIZE];
 public:

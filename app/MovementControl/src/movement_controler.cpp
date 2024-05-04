@@ -9,6 +9,10 @@ using namespace MOVEMENT_CONTROLER;
 
 MovementControler::MovementControler(){
   initialized = false;
+  target_position = 0;
+  current_position = 0;
+  target_velocity = 0;
+  current_velocity = 0;
 }
 
 void MovementControler::init(TIMING::Ticker &_ticker, STEPER_MOTOR::SteperMotor &_steper_motor, ENCODER::Encoder &_encoder){
@@ -18,7 +22,7 @@ void MovementControler::init(TIMING::Ticker &_ticker, STEPER_MOTOR::SteperMotor 
   initialized = true;
 }
 
-void MovementControler::handler(){
+void MovementControler::handle(){
   if (!initialized)
     return;
 

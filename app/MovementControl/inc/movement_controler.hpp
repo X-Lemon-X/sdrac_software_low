@@ -39,7 +39,7 @@ class MovementControler{
   void init(TIMING::Ticker &ticker, STEPER_MOTOR::SteperMotor &steper_motor, ENCODER::Encoder &encoder);
   
   /// @brief Handler for the controler this function should be called in the main loop as often as possible
-  void handler();
+  void handle();
 
   /// @brief Set the target velocity for the engine
   /// @param velocity Target velocity in rad/s

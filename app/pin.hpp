@@ -10,6 +10,7 @@
 struct GPIO_PIN {
   uint16_t pin;
   GPIO_TypeDef *port;
+  uint16_t analog_value;
 };
 
 

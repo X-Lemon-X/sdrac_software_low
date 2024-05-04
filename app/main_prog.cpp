@@ -19,42 +19,46 @@
 
 //**************************************************************************************************
 // Gpio assigments
-const GPIO_PIN pin_user_led_1 = {GPIO_PIN_6, GPIOC};
-const GPIO_PIN pin_user_led_2 = {GPIO_PIN_7, GPIOC};
-const GPIO_PIN pin_user_btn_1 = {GPIO_PIN_9, GPIOC};
-const GPIO_PIN pin_tx_led = {GPIO_PIN_12, GPIOB};
-const GPIO_PIN pin_rx_led = {GPIO_PIN_13, GPIOB};
-const GPIO_PIN pin_encoder = {GPIO_PIN_3, GPIOB};
-const GPIO_PIN pin_poz_zero_sensor = {GPIO_PIN_4, GPIOA};
-const GPIO_PIN pin_inout_ca1 = {GPIO_PIN_5, GPIOA};
-const GPIO_PIN pin_inout_ca2 = {GPIO_PIN_7, GPIOA};
-const GPIO_PIN pin_inout_crx = {GPIO_PIN_10, GPIOB};
-const GPIO_PIN pin_inout_ctx = {GPIO_PIN_4, GPIOC};
-const GPIO_PIN pin_sync_puls = {GPIO_PIN_8, GPIOA};
-const GPIO_PIN pin_sync_dir = {GPIO_PIN_9, GPIOA};
-const GPIO_PIN pin_temp_steper_board = {GPIO_PIN_0, GPIOA};
-const GPIO_PIN pin_temp_board = {GPIO_PIN_1, GPIOA};
-const GPIO_PIN pin_temp_motor = {GPIO_PIN_2, GPIOA};
-const GPIO_PIN pin_vsense = {GPIO_PIN_3, GPIOA};
-const GPIO_PIN pin_steper_direction = {GPIO_PIN_0, GPIOB};
-const GPIO_PIN pin_steper_enable = {GPIO_PIN_1, GPIOB};
-const GPIO_PIN pin_steper_step = {GPIO_PIN_6, GPIOA};
-const GPIO_PIN pin_boot_device = {GPIO_PIN_8, GPIOC};
+GPIO_PIN pin_user_led_1 = {GPIO_PIN_6, GPIOC};
+GPIO_PIN pin_user_led_2 = {GPIO_PIN_7, GPIOC};
+GPIO_PIN pin_user_btn_1 = {GPIO_PIN_9, GPIOC};
+GPIO_PIN pin_tx_led = {GPIO_PIN_12, GPIOB};
+GPIO_PIN pin_rx_led = {GPIO_PIN_13, GPIOB};
+GPIO_PIN pin_encoder = {GPIO_PIN_3, GPIOB};
+GPIO_PIN pin_poz_zero_sensor = {GPIO_PIN_4, GPIOA};
+GPIO_PIN pin_inout_ca1 = {GPIO_PIN_5, GPIOA};
+GPIO_PIN pin_inout_ca2 = {GPIO_PIN_7, GPIOA};
+GPIO_PIN pin_inout_crx = {GPIO_PIN_10, GPIOB};
+GPIO_PIN pin_inout_ctx = {GPIO_PIN_4, GPIOC};
+GPIO_PIN pin_sync_puls = {GPIO_PIN_8, GPIOA};
+GPIO_PIN pin_sync_dir = {GPIO_PIN_9, GPIOA};
+GPIO_PIN pin_temp_steper_board = {GPIO_PIN_0, GPIOA};
+GPIO_PIN pin_temp_board = {GPIO_PIN_1, GPIOA};
+GPIO_PIN pin_temp_motor = {GPIO_PIN_2, GPIOA};
+GPIO_PIN pin_vsense = {GPIO_PIN_3, GPIOA};
+GPIO_PIN pin_steper_direction = {GPIO_PIN_0, GPIOB};
+GPIO_PIN pin_steper_enable = {GPIO_PIN_1, GPIOB};
+GPIO_PIN pin_steper_step = {GPIO_PIN_6, GPIOA};
+GPIO_PIN pin_boot_device = {GPIO_PIN_8, GPIOC};
 
 // to do
-const GPIO_PIN pin_cid_0 = {GPIO_PIN_0, GPIOC};
-const GPIO_PIN pin_cid_1 = {GPIO_PIN_1, GPIOC};
-const GPIO_PIN pin_cid_2 = {GPIO_PIN_2, GPIOC};
+ GPIO_PIN pin_cid_0 = {GPIO_PIN_0, GPIOC};
+ GPIO_PIN pin_cid_1 = {GPIO_PIN_1, GPIOC};
+ GPIO_PIN pin_cid_2 = {GPIO_PIN_2, GPIOC};
 
 //**************************************************************************************************
 // Global stuff
 
 uint32_t adc_dma_buffer[ADC_DMA_BUFFER_SIZE];
-LOGGER::Logger loger(LOGGER::LOG_LEVEL::LOG_LEVEL_DEBUG,false);
+
 TIMING::Ticker main_clock;
-CAN_CONTROL::CanControl can_controler;
+LOGGER::Logger loger(LOGGER::LOG_LEVEL::LOG_LEVEL_DEBUG,false);
 BOARD_ID::Board_id board_id(pin_cid_0, pin_cid_1, pin_cid_2);
+STEPER_MOTOR::SteperMotor stp_motor(htim3, TIM_CHANNEL_1, pin_steper_direction, pin_steper_enable);
+CAN_CONTROL::CanControl can_controler;
 MOVEMENT_CONTROLER::MovementControler movement_controler;
+ENCODER::Encoder encoder;
+USB_PROGRAMER::UsbProgramer usb_programer(pin_boot_device);
 
 //**************************************************************************************************
 // Id dependable configuration 
@@ -83,17 +87,22 @@ void main_loop();
 /// @brief This function is used to configure the board base on it's hardware id
 void id_config();
 
+/// @brief This function is used to init the interfaces
+void init_controls();
 
 //**************************************************************************************************
 void main_prog()
 {
+  log_debug("Start main_prog\n");
   id_config();
   periferal_config();
+  init_controls();
   main_loop();
 }
 
 void id_config(){
-
+  log_debug("Start id_config\n");
+  log_debug("Board id: " + std::to_string(board_id.get_id()));
   switch (board_id.get_id())
   {
   case SDRAC_ID_1:
@@ -108,6 +117,24 @@ void id_config(){
     CAN_X_FILTER_ID_LOW = 0x000;
     CAN_X_FILTER_MASK_HIGH = 0xff0<<5;
     CAN_X_FILTER_MASK_LOW = 0x000;
+
+    //-------------------STEPER MOTOR CONFIGURATION-------------------
+    stp_motor.set_steps_per_revolution(400);
+    stp_motor.set_gear_ratio(75);
+    stp_motor.set_max_velocity(10);
+    stp_motor.set_min_velocity(0.1);
+    stp_motor.set_reverse(false);
+
+    //-------------------ENCODER CONFIGURATION-------------------
+    encoder.set_offset(0.0);
+    encoder.set_reverse(false);
+    encoder.set_enable_filter(false);
+    encoder.set_enable_velocity(true);
+
+    //-------------------MOVEMENT CONTROLER CONFIGURATION-------------------
+    movement_controler.set_limit_position(-PI/2, PI/2);
+    movement_controler.set_max_velocity(PI);
+
     break;
   case SDRAC_ID_2:
     CAN_KONARM_X_STATUS_FRAME_ID = CAN_KONARM_2_STATUS_FRAME_ID;
@@ -163,10 +190,11 @@ void id_config(){
     break;
   }
 
+  
 }
 
 void periferal_config(){
-  
+  log_debug("Start periferal_config\n");
   // dma adc1 settings
   // HAL_ADC_Start_DMA(&hadc1, (uint32_t*)adc_dma_buffer, 3);
 
@@ -239,82 +267,55 @@ void handle_can_rx(){
   
 }
 
-static int8_t CDC_Receive_FS(uint8_t* Buf, uint32_t *Len)
-{
-  /* USER CODE BEGIN 6 */
-  USBD_CDC_SetRxBuffer(&hUsbDeviceFS, &Buf[0]);
-  USBD_CDC_ReceivePacket(&hUsbDeviceFS);
-  return (USBD_OK);
-  /* USER CODE END 6 */
+void init_controls(){
+  log_debug("Start init_interfaces\n");
+
+  FILTERS::FilterBase fb(main_clock);  
+  encoder.set_address(ENCODER_MT6701_I2C_ADDRESS);
+  encoder.set_resolution(ENCODER_MT6702_RESOLUTION);
+  encoder.set_angle_register(ENCODER_MEM_ADDR_ANNGLE);
+  encoder.init(hi2c1,main_clock,fb,fb); 
+  stp_motor.init();
+  stp_motor.set_enable(false);
+  movement_controler.init(main_clock, stp_motor, encoder);
+  movement_controler.set_position(encoder.get_angle());
+  movement_controler.set_velocity(0);
+  movement_controler.set_enable(false);
 }
 
 void main_loop(){
-  log_debug("Start main_prog\n");
-
+  log_debug("Start main_loop\n");
   TIMING::Timing tim_blink(main_clock);
   TIMING::Timing tim_encoder(main_clock);
   TIMING::Timing tim_usb(main_clock);
-  TIMING::Timing tim_eng(main_clock);
-  tim_blink.set_behaviour(200000, true);
-  tim_encoder.set_behaviour(10000, true);
-  tim_usb.set_behaviour(20000000, true);
-  tim_eng.set_behaviour(500000, true);
-
-  FILTERS::FilterAlfaBeta filter(main_clock);
-  filter.alfa = 0.5;
-  filter.beta = 0.1;
-  FILTERS::FilterBase filter_base(main_clock);  
-
-  ENCODER::Encoder encoder(hi2c1,main_clock,filter_base,filter_base);
-  encoder.address = ENCODER_MT6701_I2C_ADDRESS;
-  encoder.resolution = ENCODER_MT6702_RESOLUTION;
-  encoder.angle_register = ENCODER_MEM_ADDR_ANNGLE;
-  encoder.offset = 0;
-  encoder.reverse = false;
-  encoder.enable_filter = false;
-  encoder.enable_velocity= true;
-
-  STEPER_MOTOR::SteperMotor stp_motor(htim3, TIM_CHANNEL_1, pin_steper_direction, pin_steper_enable);
-  stp_motor.steps_per_revolution = 400;
-  stp_motor.gear_ratio = 75;
-  stp_motor.max_velocity = 10;
-  stp_motor.reverse = false;
-  stp_motor.init();
-  stp_motor.set_enable(true);
-  stp_motor.set_speed(PI/12.0f);
-
-  // initialization of movement controler algorithm
-  movement_controler.init(main_clock, stp_motor, encoder);
-
-
-  USB_PROGRAMER::UsbProgramer usb_programer(pin_boot_device);
+  TIMING::Timing tim_movement(main_clock);
+  tim_blink.set_behaviour(500000, true);
+  tim_encoder.set_behaviour(1000, true);
+  tim_usb.set_behaviour(500000, true);
+  tim_movement.set_behaviour(1000, true);
 
   // Start the main loop
   while (1){
-    // log_debug("main loop\n");
-    // USBD_UsrLog("main loop");
     handle_can_rx();
     can_controler.handle_led_blink();
-    usb_programer.handler();
+    
+    if(tim_encoder.triggered()){
+      encoder.handle();
+    }
+
+    movement_controler.handle();
+
+    // if (tim_movement.triggered()){
+    //   movement_controler.handle();
+    // }
+
+    if(tim_usb.triggered()){
+      usb_programer.handler();
+    }
 
     if(tim_blink.triggered()){
       TOGGLE_GPIO(pin_user_led_1);
     }
 
-    if(tim_encoder.triggered()){
-      float angle = encoder.read_angle();
-      float raw_angle = encoder.read_raw_angle();
-      float velocity = encoder.get_velocity();
-      // velocity = encoder.get_velocity();
-      // log_debug(std::to_string(raw_angle) + ";" + std::to_string(velocity));
-    }
-
-    if(tim_usb.triggered()){
-      // log_debug("angle:" + std::to_string(angle) + " velocity:" + std::to_string(velocity));
-    }
-
-    if (tim_eng.triggered()){
-      // stp_motor.set_speed(PI_m2);
-    }
   }
 }

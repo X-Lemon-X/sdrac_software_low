@@ -62,32 +62,32 @@ extern uint32_t CAN_KONARM_X_GET_POS_FRAME_ID;
 //**************************************************************************************************
 // PINOUT CONSTANTS
 
-extern const GPIO_PIN pin_user_led_1;
-extern const GPIO_PIN pin_user_led_2;
-extern const GPIO_PIN pin_user_btn_1;
-extern const GPIO_PIN pin_tx_led;
-extern const GPIO_PIN pin_rx_led;
-extern const GPIO_PIN pin_encoder;
-extern const GPIO_PIN pin_poz_zero_sensor;
-extern const GPIO_PIN pin_inout_ca1;
-extern const GPIO_PIN pin_inout_ca2;
-extern const GPIO_PIN pin_inout_crx;
-extern const GPIO_PIN pin_inout_ctx;
-extern const GPIO_PIN pin_sync_puls;
-extern const GPIO_PIN pin_sync_dir;
-extern const GPIO_PIN pin_temp_steper_board;
-extern const GPIO_PIN pin_temp_board;
-extern const GPIO_PIN pin_temp_motor;
-extern const GPIO_PIN pin_vsense;
-extern const GPIO_PIN pin_steper_direction;
-extern const GPIO_PIN pin_steper_enable ;
-extern const GPIO_PIN pin_steper_step ;
-extern const GPIO_PIN pin_boot_device;
+extern GPIO_PIN pin_user_led_1;
+extern GPIO_PIN pin_user_led_2;
+extern GPIO_PIN pin_user_btn_1;
+extern GPIO_PIN pin_tx_led;
+extern GPIO_PIN pin_rx_led;
+extern GPIO_PIN pin_encoder;
+extern GPIO_PIN pin_poz_zero_sensor;
+extern GPIO_PIN pin_inout_ca1;
+extern GPIO_PIN pin_inout_ca2;
+extern GPIO_PIN pin_inout_crx;
+extern GPIO_PIN pin_inout_ctx;
+extern GPIO_PIN pin_sync_puls;
+extern GPIO_PIN pin_sync_dir;
+extern GPIO_PIN pin_temp_steper_board;
+extern GPIO_PIN pin_temp_board;
+extern GPIO_PIN pin_temp_motor;
+extern GPIO_PIN pin_vsense;
+extern GPIO_PIN pin_steper_direction;
+extern GPIO_PIN pin_steper_enable ;
+extern GPIO_PIN pin_steper_step ;
+extern GPIO_PIN pin_boot_device;
 
 //to do
-extern const GPIO_PIN pin_cid_0;
-extern const GPIO_PIN pin_cid_1;
-extern const GPIO_PIN pin_cid_2;
+extern GPIO_PIN pin_cid_0;
+extern GPIO_PIN pin_cid_1;
+extern GPIO_PIN pin_cid_2;
 
 
 //**************************************************************************************************

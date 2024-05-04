@@ -24,13 +24,12 @@ private:
   GPIO_PinState direction_positive;
   GPIO_PinState direction_negative;
 
-public:
   float steps_per_revolution;
   float gear_ratio;
-  // float max_acceleration;
   float max_velocity;
   float min_velocity;
   bool reverse;
+public:
 
 
   SteperMotor(TIM_HandleTypeDef &htim,unsigned int timer_channel,const GPIO_PIN &direction_pin, const GPIO_PIN &enable_pin);
@@ -46,6 +45,21 @@ public:
   /// @brief enable or disable the SteperMotor, can be used as a break
   /// @param enable True to enable the SteperMotor, false to disable it
   void set_enable(bool enable);
+
+  /// @brief Set the steps per revolution of the SteperMotor
+  void set_steps_per_revolution(float steps_per_revolution){this->steps_per_revolution = steps_per_revolution;}
+
+  /// @brief Set the gear ratio of the SteperMotor
+  void set_gear_ratio(float gear_ratio){this->gear_ratio = gear_ratio;}
+
+  /// @brief Set the max velocity of the SteperMotor
+  void set_max_velocity(float max_velocity){this->max_velocity = max_velocity;}
+
+  /// @brief Set the min velocity of the SteperMotor
+  void set_min_velocity(float min_velocity){this->min_velocity = min_velocity;}
+
+  /// @brief Set the reverse of the SteperMotor
+  void set_reverse(bool reverse){this->reverse = reverse;}
 };
 }
 

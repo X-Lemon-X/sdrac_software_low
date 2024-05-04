@@ -74,14 +74,14 @@ In main.c
 
 ### TO DO:
  - simple arm control
- - CAN reciving data and and sending data
  - reading ADC
- - USB data reciving
  - saveing stuff to SRAM
  - reading data from SRAM
  - IO control
- - making deference between boards
 ### DONE:
+ - USB data reciving
+ - making deference between boards
+ - CAN reciving data and and sending data
  - steper motor interface
  - ADC interface
  - reading angles from encoder
