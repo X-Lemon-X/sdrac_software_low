@@ -10,7 +10,7 @@ ORANGE='\033[0;33m'
 NC='\033[0m' # No Color
 
 # get all fiels in /dev that contain the bus number
-devs=$(ls /dev | grep ttyA)
+devs=$(ls /dev | grep tty)
 
 device_path=""
 #iterate over all devices
