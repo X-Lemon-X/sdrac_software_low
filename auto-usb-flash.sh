@@ -2,12 +2,52 @@ vendor_id="0483"
 product_id="5740"
 vendor_enc="SDRACproject"
 
+bin_file="build/executable.bin"
+
 
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 BLUE='\033[0;34m'
 ORANGE='\033[0;33m'
 NC='\033[0m' # No Color
+
+
+function check_if_program_is_installed () {
+  if ! [ -x "$(command -v $1)" ]; then
+  echo -e "${RED}Error: $1 is not installed.${NC}"
+  exit 1
+else
+  echo -e "${BLUE}$1 is installed${NC}"
+fi
+}
+
+function check_if_file_exist () {
+  if [ ! -f $1 ]; then
+  echo -e "${RED}file: $1 not found.${NC}" >&2
+  echo 1
+else
+  echo -e "${BLUE}file found $1 ${NC}" >&2
+  echo 0
+fi
+}
+
+#check if required programs are installed
+check_if_program_is_installed "dfu-util"
+check_if_program_is_installed "udevadm"
+check_if_program_is_installed "stty"
+
+
+#check if arguments are provided
+if [ $# -eq 1 ]; then
+  echo -e "${ORANGE}given custom .bin file path${NC}"
+  bin_file=$1
+fi
+exist=$(check_if_file_exist $bin_file)
+
+if [ $exist -ne 0 ]; then
+  exit 1
+fi
+
 
 # get all fiels in /dev that contain the bus number
 devs=$(ls /dev | grep tty)
@@ -39,10 +79,10 @@ fi
 echo -e "${BLUE}Flashing USB device: $device_path${NC}"
 
 
-# open viryal com port and serite SB_enterdfu on boud rate 115200
-stty -F /dev/ttyACM0 115200 cs8 -cstopb -parenb raw && echo SB_enterdfu > /dev/ttyACM0
-sleep 2
-dfu-util -a 0 -i 0 -s 0x08000000:leave -D build/executable.bin 2> /dev/null
+# open viryal com port and write SB_enterdfu on boud rate 115200
+stty -F $device_path 115200 cs8 -cstopb -parenb raw && echo SB_enterdfu > $device_path
+sleep 2 #hive board some time to enter dfu mode
+dfu-util -a 0 -i 0 -s 0x08000000:leave -D $bin_file 2> /dev/null
 
 if [ $? -ne 0 ]; then
   echo -e "${RED}Error flashing the device${NC}"

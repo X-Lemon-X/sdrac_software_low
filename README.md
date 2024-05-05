@@ -1,5 +1,40 @@
-## SDRAC
-this is a repo for software for SDRACboards;
+# SDRAC
+This is a repo for software for SDRACboards;
+
+
+## TO DO:
+ - simple arm control alogrithm
+ - reading ADC
+ - reading/writing data to FRAM
+ - IO control from CAN ?
+## DONE:
+ - USB data reciving/sending
+ - distingushing between different baords
+ - CAN reciving/sending data
+ - steper motor interface
+ - ADC interface
+ - reading angles from encoder
+ - Timing and timers main system clock with microsecond precision
+
+## Starting CAN converter
+```bash
+ls /dev | grep ttyAC # to check on which port the converter is
+sudo slcand -o -c -s8 /dev/ttyACM0 can0 # dont forget to change the port
+sudo ip link set dev can0 up type can bitrate 1000000 
+```
+
+falg -s sets the speed of the transmission
+```bash
+  -s0 = 10k
+  -s1 = 20k
+  -s2 = 50k
+  -s3 = 100k
+  -s4 = 125k
+  -s5 = 250k
+  -s6 = 500k
+  -s7 = 750k
+  -s8 = 1M
+```
 
 
 ## Generating files in CubeMX
@@ -15,6 +50,8 @@ and in the main function add the following code
   main_prog(); // before the infinite loop
 ```
 then chnage the extension of the main.c to main.cpp
+
+
 ### Adding code to USB_DEVICE
 Open file usbd_cdc_if.c "USB_DEVICE/App/usbd_cdc_if.c"
  In function 
@@ -41,49 +78,9 @@ static int8_t CDC_Receive_FS(uint8_t* Buf, uint32_t *Len)
 }
 ```
 
-
-### Adding code to CMakefile
-Add all include direcotries and c files to  a Cmakefile.txt
-
+## Adding code to CMakeLists.txt
+Add all included directories and .c files to a CMakeLists.txt
 
 
-### Starting CAN converter
-```bash
-ls /dev | grep ttyAC # aby sprawdzić na którym porcie jest podpięty
-sudo slcand -o -c -s8 /dev/ttyACM0 can0 # nie zapominje o zmianie portu
-sudo ip link set dev can0 up type can bitrate 1000000 
-```
-
-parametr -s ustwia predekość transmisji
-```bash
-  -s0 = 10k
-  -s1 = 20k
-  -s2 = 50k
-  -s3 = 100k
-  -s4 = 125k
-  -s5 = 250k
-  -s6 = 500k
-  -s7 = 750k
-  -s8 = 1M
-```
 
 
-### Problems with MXCube genrations
-In main.c 
-- DMA for ADC should be initaied after ADC is initated not befor whitch couses th emain code not to be executed
-
-### TO DO:
- - simple arm control
- - reading ADC
- - saveing stuff to SRAM
- - reading data from SRAM
- - IO control
-### DONE:
- - USB data reciving
- - making deference between boards
- - CAN reciving data and and sending data
- - steper motor interface
- - ADC interface
- - reading angles from encoder
- - USB data sending
- - Timing and timers 
