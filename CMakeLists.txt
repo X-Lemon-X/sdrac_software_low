@@ -1,6 +1,27 @@
 cmake_minimum_required(VERSION 3.16)
 
-set(CMAKE_TOOLCHAIN_FILE "toolchain/arm-none-eabi.cmake")
+# ether use toolchain folder with arm-none-eabi.cmake file
+# set(CMAKE_TOOLCHAIN_FILE "toolchain/arm-none-eabi.cmake")
+
+# or just use this below
+set(CMAKE_SYSTEM_NAME Generic)
+set(CMAKE_SYSTEM_PROCESSOR arm)
+
+set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
+
+set(CMAKE_AR                        arm-none-eabi-ar)
+set(CMAKE_ASM_COMPILER              arm-none-eabi-gcc)
+set(CMAKE_C_COMPILER                arm-none-eabi-gcc)
+set(CMAKE_CXX_COMPILER              arm-none-eabi-g++)
+set(CMAKE_LINKER                    arm-none-eabi-ld)
+set(CMAKE_OBJCOPY                   arm-none-eabi-objcopy CACHE INTERNAL "")
+set(CMAKE_RANLIB                    arm-none-eabi-ranlib CACHE INTERNAL "")
+set(CMAKE_SIZE                      arm-none-eabi-size CACHE INTERNAL "")
+set(CMAKE_STRIP                     arm-none-eabi-strip CACHE INTERNAL "")
+
+set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
+set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
+set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
 
 project(executable)
 
@@ -16,6 +37,7 @@ set(CMAKE_CXX_STANDARD 17)
 
 
 add_executable(${TARGET}
+# All source files from Makefile
 "Core/Src/stm32f4xx_it.c"
 "Core/Src/stm32f4xx_hal_msp.c"
 "USB_DEVICE/App/usb_device.c"
@@ -53,9 +75,13 @@ add_executable(${TARGET}
 "Middlewares/ST/STM32_USB_Device_Library/Core/Src/usbd_ioreq.c"
 "Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc.c"
 
+# Change the main.c to main.cpp
 "Core/Src/main.cpp"
+
+# Add the startup file the name should be the same as the stm32 you are using
 "Drivers/CMSIS/Device/ST/STM32F4xx/Source/Templates/gcc/startup_stm32f412rx.s"
 
+# Add all your custom source files
 "app/main_prog_callbacks.cpp"
 "app/main_prog.cpp"
 "app/Encoder/src/encoder.cpp"
@@ -81,7 +107,10 @@ target_compile_definitions(${TARGET} PRIVATE
 	USE_HAL
 )
 
+# add include directories from Makefile 
+# then add all your costom directories
 target_include_directories(${TARGET} PRIVATE
+#from Makefile
 "USB_DEVICE/App"
 "USB_DEVICE/Target"
 "Core/Inc"
@@ -92,6 +121,7 @@ target_include_directories(${TARGET} PRIVATE
 "Drivers/CMSIS/Device/ST/STM32F4xx/Include"
 "Drivers/CMSIS/Include"
 
+#custom directories
 "app"
 "app/Encoder/inc"
 "app/Logger/inc"
@@ -170,7 +200,7 @@ $<$<COMPILE_LANGUAGE:CXX>:
 )
 
 
-
+# add linker options from Makefile
 target_link_options(${TARGET} PRIVATE
 	-T ${CMAKE_SOURCE_DIR}/STM32F412RGTx_FLASH.ld
 	-Wl,-Map=${CMAKE_PROJECT_NAME}.map

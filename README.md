@@ -49,15 +49,28 @@ fi
 4. Restart the pc
 
 # Flashing the board
-There are two ways to flash the board:
+There are three ways to flash the board:
 1. Using the ST-Link
-2. Using the USB (Preferred unless the board was never flashed before) 
-### Using the USB 
+2. Using the USB-flash-script (Preferred unless the board was never flashed before)
+3. Using the USB DFU-mode (can be used if the board supports it)
+### Using the USB-flash-script 
 To flash the board using the USB you just have to run the following command
 ```bash
 ./auto-usb-flash.sh
 ```
 if you don't have required programs installed the script will ask you if you want to install them automatically.
+
+### Using the USB
+To flash the board using the USB you need to have the dfu-util installed.
+You can download it by running the following command
+```bash
+sudo apt-get install dfu-util -y
+```
+Then after you connect the board to pc via usb you have to enter the dfu mode by pressing the BOOT0 button and then clicking the RESET button and releasing the BOOT0 button.
+Then you can flash the board by command
+```bash
+dfu-util -a 0 -i 0 -s 0x08000000:leave -D build/executable.bin
+```
 
 ### Using the ST-Link
 To flash the board using the ST-Link you need to have the ST-Link utility installed. 
@@ -94,9 +107,13 @@ and then you can start the debugging by pressing F5 or by clicking on the debug 
 
 
 ## Generating files in CubeMX
-### Adding code to main
+### seting up CubeMX
 Open file sdrac_cubemx.ioc in CubeMX
+In project menager set the Toolchain to Makefile, and the Toolchain/folder to the folder where the project is located.
 Set all the settings you want and generate code.
+
+### Adding code to main
+"For SDRAC project"
 in main.c add the following code
 ```c
 #include "main_prog.hpp"
@@ -109,6 +126,7 @@ then chnage the extension of the main.c to main.cpp
 
 
 ### Adding code to USB_DEVICE
+"For SDRAC project"
 Open file usbd_cdc_if.c "USB_DEVICE/App/usbd_cdc_if.c"
  In function 
  ```c
@@ -134,8 +152,12 @@ static int8_t CDC_Receive_FS(uint8_t* Buf, uint32_t *Len)
 }
 ```
 
-## Adding code to CMakeLists.txt
-Add all included directories and .c files to a CMakeLists.txt
+## Preparing CMakeLists.txt
+After generating the code in CubeMX all necessary files will be generated like Core, Drivers, ....
+Including the Makefile, STM32Fxxx.ld, stm32f4xxxx.s files.
+
+From Makefiel you have to copy all the source xx.c files, include directories, and most importantly add stm32f4xxxx.s to source files and set appropriate linker STM32Fxxx.ld in target_link_options in CMakeLists.txt.
+After that you shopuld be able to build the project using cmake.
 
 
 
