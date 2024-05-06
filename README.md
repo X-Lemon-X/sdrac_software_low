@@ -1,6 +1,6 @@
 # SDRAC
-This is a repo for software for SDRACboards;
-
+This is a a low level software for SDRACboards from SDRAC project (6DOF Manipulator). It is written in C++ and uses STM32CubeMX HAL library.
+The project is based on the STM32F412RGT6 microcontroller.
 
 ## TO DO:
  - simple arm control alogrithm
@@ -22,8 +22,7 @@ ls /dev | grep ttyAC # to check on which port the converter is
 sudo slcand -o -c -s8 /dev/ttyACM0 can0 # dont forget to change the port
 sudo ip link set dev can0 up type can bitrate 1000000 
 ```
-
-falg -s sets the speed of the transmission
+flag -s sets the speed of the transmission
 ```bash
   -s0 = 10k
   -s1 = 20k
@@ -35,6 +34,63 @@ falg -s sets the speed of the transmission
   -s7 = 750k
   -s8 = 1M
 ```
+
+# Building the project:
+Building the project requires GNU Arm Embedded Toolchain to be installed.
+1. Download it from this site https://developer.arm.com/downloads/-/gnu-rm 
+2. Move the extracted files in some directory for example "$HOME/.local/share/arm-none-aebi", 
+3. Add this in your .profile file 
+```bash
+# Add the arm-none-aebi to the path
+if [ -d "$HOME/.local/share/arm-none-aebi/bin" ]; then
+    PATH="$HOME/.local/share/arm-none-aebi/bin:$PATH" 
+fi
+```
+4. Restart the pc
+
+# Flashing the board
+There are two ways to flash the board:
+1. Using the ST-Link
+2. Using the USB (Preferred unless the board was never flashed before) 
+### Using the USB 
+To flash the board using the USB you just have to run the following command
+```bash
+./auto-usb-flash.sh
+```
+if you don't have required programs installed the script will ask you if you want to install them automatically.
+
+### Using the ST-Link
+To flash the board using the ST-Link you need to have the ST-Link utility installed. 
+You can download it by running the following command
+```bash
+sudo apt-get install stlink-tools -y
+```
+Then after you connect the board to pc via st-link you can flash the board by running the following command
+```bash
+./flash.sh
+```
+
+# Debugging
+To debug the baord you need cortex-debug extension for vscode.
+and st-link utility installed.
+the in vs code add in .vscode/launch.json the following code
+```json
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Cortex Debug",
+      "cwd": "${workspaceFolder}",
+      "executable": "./build/executable.elf",
+      "request": "launch",
+      "type": "cortex-debug",
+      "runToEntryPoint": "main",
+      "servertype": "stlink"
+    }
+  ]
+}
+```
+and then you can start the debugging by pressing F5 or by clicking on the debug icon in the debug tab.
 
 
 ## Generating files in CubeMX
