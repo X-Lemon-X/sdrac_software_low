@@ -80,7 +80,7 @@ sudo apt-get install stlink-tools -y
 ```
 Then after you connect the board to pc via st-link you can flash the board by running the following command
 ```bash
-./flash.sh
+st-flash --reset write build/executable.bin 0x08000000
 ```
 
 # Debugging
