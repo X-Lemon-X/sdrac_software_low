@@ -52,9 +52,6 @@ check_if_program_is_installed "dfu-util"
 check_if_program_is_installed "udevadm"
 check_if_program_is_installed "stty"
 
-exit 0
-
-
 #check if arguments are provided
 if [ $# -eq 1 ]; then
   echo -e "${ORANGE}given custom .bin file path${NC}"
