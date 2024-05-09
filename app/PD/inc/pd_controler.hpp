@@ -14,10 +14,9 @@ private:
 public:
   PdControler(TIMING::Ticker &ticker): MOVEMENT_CONTROLER::MovementEquation(ticker){};
   
-  
-  float calculate(float current_position, float target_position, float current_velocity, float target_velocity) override;
   void begin_state(float current_position, float current_velocity, float current_time) override;
-
+  float calculate(float current_position, float target_position, float current_velocity, float target_velocity) override;
+  
   void set_Kp(float Kp){this->Kp = Kp;};
   void set_Kd(float Kd){this->Kd = Kd;};
 };

@@ -15,14 +15,18 @@ protected:
   /// you can obatin the current time by calling ticker.get_seconds()
   TIMING::Ticker &ticker;
 public:
+  
   /// @brief Constructor for the MovementEquation class
-  MovementEquation(TIMING::Ticker &ticker): ticker(ticker){};
+  MovementEquation(TIMING::Ticker &ticker);
+
+  /// @brief  Destructor for the MovementEquation class
+  virtual ~MovementEquation(){};
 
   /// @brief initiates the begining state of the controler
   /// @param current_position current position of the arm in radians when the controler is initiated
   /// @param current_velocity current velocity of the arm in radians per second when the controler is initiated
   /// @param current_time current time in seconds when the controler is initiated
-  virtual void begin_state(float current_position, float current_velocity, float current_time);
+  virtual void begin_state(float current_position, float current_velocity, float current_time){};
 
   /// @brief This function should will be called in each pass of the MovementControler::handle() function
   /// @param current_position current position of the arm in radians
@@ -35,7 +39,7 @@ public:
 };
 
 class MovementControler{ 
-  protected:
+private:
   TIMING::Ticker *ticker;
   STEPER_MOTOR::SteperMotor *steper_motor;
   ENCODER::Encoder *encoder;
@@ -52,7 +56,7 @@ class MovementControler{
   float target_velocity;
   float current_velocity;
   bool enable;
-  public:
+public:
 
   /// @brief Arm controler interface
   MovementControler();
@@ -91,11 +95,11 @@ class MovementControler{
 
   /// @brief Get the current position of the arm
   /// @return Current position in rad
-  float get_current_position();
+  float get_current_position() const;
 
   /// @brief Get the current velocity of the arm
   /// @return Current velocity in rad/s
-  float get_current_velocity();
+  float get_current_velocity() const;
 
 };
 

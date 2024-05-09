@@ -7,6 +7,8 @@
 using namespace MOVEMENT_CONTROLER;
 
 
+MovementEquation::MovementEquation(TIMING::Ticker &_ticker): ticker(_ticker){}
+
 MovementControler::MovementControler(){
   initialized = false;
   target_position = 0;
@@ -46,6 +48,10 @@ void MovementControler::handle(){
     steper_motor->set_enable(false);
     new_velocity = 0.0;
   }
+
+  if (current_position < min_position || current_position > max_position)
+    new_velocity = 0.0;
+
   steper_motor->set_velocity(new_velocity);
 }
 
@@ -71,10 +77,10 @@ void MovementControler::set_max_velocity(float max_velocity){
 }
 
 
-float MovementControler::get_current_position(){
+float MovementControler::get_current_position()const{
   return current_position;
 }
 
-float MovementControler::get_current_velocity(){
+float MovementControler::get_current_velocity()const{
   return current_velocity;
 }

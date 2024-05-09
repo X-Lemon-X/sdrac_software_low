@@ -75,7 +75,7 @@ uint32_t CAN_KONARM_X_GET_POS_FRAME_ID;
 
 //**************************************************************************************************
 /// @brief This function is used to configure the periferals
-/// mostly stff that have to be configurated after CumeMX generation
+/// mostly stuff that have to be configurated after CumeMX generation
 void periferal_config();
 
 /// @brief This function is used to handle the can controll
@@ -313,7 +313,7 @@ void main_loop(){
   tim_encoder.set_behaviour(1000, true);
   tim_usb.set_behaviour(300000, true);
   tim_movement.set_behaviour(1000, true);
-  
+
   // Start the main loop
   while (1){
     handle_can_rx();
