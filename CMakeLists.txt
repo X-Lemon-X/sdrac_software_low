@@ -97,6 +97,7 @@ add_executable(${TARGET}
 "app/CanControl/src/CanDB.c"
 "app/CanControl/src/can_control.cpp"
 "app/BoardId/src/board_id.cpp"
+"app/PD/src/pd_controler.cpp"
 
 )
 
@@ -134,6 +135,7 @@ target_include_directories(${TARGET} PRIVATE
 "app/CanControl/inc"
 "app/MovementControl/inc"
 "app/BoardId/inc"
+"app/PD/inc"
 )
 
 

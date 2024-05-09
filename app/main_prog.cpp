@@ -12,6 +12,7 @@
 #include "board_id.hpp"
 #include "CanDB.h"
 #include "movement_controler.hpp"
+#include "pd_controler.hpp"
 
 #include <string>
 #include <charconv>
@@ -57,6 +58,7 @@ BOARD_ID::Board_id board_id(pin_cid_0, pin_cid_1, pin_cid_2);
 STEPER_MOTOR::SteperMotor stp_motor(htim3, TIM_CHANNEL_1, pin_steper_direction, pin_steper_enable);
 CAN_CONTROL::CanControl can_controler;
 MOVEMENT_CONTROLER::MovementControler movement_controler;
+MOVEMENT_CONTROLER::MovementEquation *movement_equation;
 ENCODER::Encoder encoder;
 USB_PROGRAMER::UsbProgramer usb_programer(pin_boot_device);
 
@@ -71,9 +73,7 @@ uint32_t CAN_KONARM_X_STATUS_FRAME_ID;
 uint32_t CAN_KONARM_X_SET_POS_FRAME_ID;
 uint32_t CAN_KONARM_X_GET_POS_FRAME_ID;
 
-
-
-
+//**************************************************************************************************
 /// @brief This function is used to configure the periferals
 /// mostly stff that have to be configurated after CumeMX generation
 void periferal_config();
@@ -105,7 +105,8 @@ void id_config(){
   log_debug("Board id: " + std::to_string(board_id.get_id()));
   switch (board_id.get_id())
   {
-  case SDRAC_ID_1:
+  case SDRAC_ID_1:{
+    //-------------------CAN CONFIGURATION-------------------
     CAN_KONARM_X_STATUS_FRAME_ID = CAN_KONARM_1_STATUS_FRAME_ID;
     CAN_KONARM_X_SET_POS_FRAME_ID = CAN_KONARM_1_SET_POS_FRAME_ID;
     CAN_KONARM_X_GET_POS_FRAME_ID = CAN_KONARM_1_GET_POS_FRAME_ID;
@@ -118,6 +119,12 @@ void id_config(){
     CAN_X_FILTER_MASK_HIGH = 0xff0<<5;
     CAN_X_FILTER_MASK_LOW = 0x000;
 
+    //-------------------MOVEMENT EQUATION CONFIGURATION-------------------
+    PDCONTROLER::PdControler *pdc = new PDCONTROLER::PdControler(main_clock);
+    pdc->set_Kp(1.0);
+    pdc->set_Kd(1.0);
+    movement_equation = (MOVEMENT_CONTROLER::MovementEquation*)pdc;
+    
     //-------------------STEPER MOTOR CONFIGURATION-------------------
     stp_motor.set_steps_per_revolution(400);
     stp_motor.set_gear_ratio(75);
@@ -132,11 +139,13 @@ void id_config(){
     encoder.set_enable_velocity(true);
 
     //-------------------MOVEMENT CONTROLER CONFIGURATION-------------------
-    movement_controler.set_limit_position(-PI/2, PI/2);
+    movement_controler.set_limit_position(-PI/2.0, PI/2.0);
     movement_controler.set_max_velocity(PI);
 
     break;
-  case SDRAC_ID_2:
+  }
+  case SDRAC_ID_2:{
+    //-------------------CAN CONFIGURATION-------------------
     CAN_KONARM_X_STATUS_FRAME_ID = CAN_KONARM_2_STATUS_FRAME_ID;
     CAN_KONARM_X_SET_POS_FRAME_ID = CAN_KONARM_2_SET_POS_FRAME_ID;
     CAN_KONARM_X_GET_POS_FRAME_ID = CAN_KONARM_2_GET_POS_FRAME_ID;
@@ -147,7 +156,9 @@ void id_config(){
     CAN_X_FILTER_MASK_HIGH = 0xff0<<5;
     CAN_X_FILTER_MASK_LOW = 0x000;
     break;
-  case SDRAC_ID_3:
+  }
+  case SDRAC_ID_3:{
+    //-------------------CAN CONFIGURATION-------------------
     CAN_KONARM_X_STATUS_FRAME_ID = CAN_KONARM_3_STATUS_FRAME_ID;
     CAN_KONARM_X_SET_POS_FRAME_ID = CAN_KONARM_3_SET_POS_FRAME_ID;
     CAN_KONARM_X_GET_POS_FRAME_ID = CAN_KONARM_3_GET_POS_FRAME_ID;
@@ -158,7 +169,9 @@ void id_config(){
     CAN_X_FILTER_MASK_HIGH = 0xff0<<5;
     CAN_X_FILTER_MASK_LOW = 0x000;
     break;
-  case SDRAC_ID_4:
+  }
+  case SDRAC_ID_4:{
+    //-------------------CAN CONFIGURATION-------------------
     CAN_KONARM_X_STATUS_FRAME_ID = CAN_KONARM_4_STATUS_FRAME_ID;
     CAN_KONARM_X_SET_POS_FRAME_ID = CAN_KONARM_4_SET_POS_FRAME_ID;
     CAN_KONARM_X_GET_POS_FRAME_ID = CAN_KONARM_4_GET_POS_FRAME_ID;
@@ -169,7 +182,9 @@ void id_config(){
     CAN_X_FILTER_MASK_HIGH = 0xff0<<5;
     CAN_X_FILTER_MASK_LOW = 0x000;
     break;
-  case SDRAC_ID_5:
+  }
+  case SDRAC_ID_5:{
+    //-------------------CAN CONFIGURATION-------------------
     CAN_KONARM_X_STATUS_FRAME_ID = CAN_KONARM_5_STATUS_FRAME_ID;
     CAN_KONARM_X_SET_POS_FRAME_ID = CAN_KONARM_5_SET_POS_FRAME_ID;
     CAN_KONARM_X_GET_POS_FRAME_ID = CAN_KONARM_5_GET_POS_FRAME_ID;
@@ -180,17 +195,19 @@ void id_config(){
     CAN_X_FILTER_MASK_HIGH = 0xff0<<5;
     CAN_X_FILTER_MASK_LOW = 0x000;
     break;
+  }
   // case SDRAC_ID_6:
+  //   //-------------------CAN CONFIGURATION-------------------
   //   CAN_KONARM_X_CLEAR_ERRORS_FRAME_ID = CAN_KONARM_6_CLEAR_ERRORS_FRAME_ID;
   //   CAN_KONARM_X_STATUS_FRAME_ID = CAN_KONARM_6_STATUS_FRAME_ID;
   //   CAN_KONARM_X_SET_POS_FRAME_ID = CAN_KONARM_6_SET_POS_FRAME_ID;
   //   CAN_KONARM_X_GET_POS_FRAME_ID = CAN_KONARM_6_GET_POS_FRAME_ID;
   //   break;
-  default:
+  default:{
+
     break;
   }
-
-  
+  }  
 }
 
 void periferal_config(){
@@ -277,10 +294,13 @@ void init_controls(){
   encoder.init(hi2c1,main_clock,fb,fb); 
   stp_motor.init();
   stp_motor.set_enable(false);
-  movement_controler.init(main_clock, stp_motor, encoder);
+
+  // init the movement controler should be done after the encoder and the steper motor are initialized
+  movement_controler.init(main_clock, stp_motor, encoder, *movement_equation);
   movement_controler.set_position(encoder.get_angle());
   movement_controler.set_velocity(0);
-  movement_controler.set_enable(false);
+  movement_controler.set_enable(true);
+  movement_controler.handle();
 }
 
 void main_loop(){
@@ -291,9 +311,9 @@ void main_loop(){
   TIMING::Timing tim_movement(main_clock);
   tim_blink.set_behaviour(500000, true);
   tim_encoder.set_behaviour(1000, true);
-  tim_usb.set_behaviour(500000, true);
+  tim_usb.set_behaviour(300000, true);
   tim_movement.set_behaviour(1000, true);
-
+  
   // Start the main loop
   while (1){
     handle_can_rx();

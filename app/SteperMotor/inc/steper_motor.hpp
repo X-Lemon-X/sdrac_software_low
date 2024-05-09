@@ -29,6 +29,7 @@ private:
   float max_velocity;
   float min_velocity;
   bool reverse;
+
 public:
 
 
@@ -40,7 +41,7 @@ public:
 
   /// @brief Set the current speed of the SteperMotor
   /// @param speed The speed in radians per second, can be negative or positive to change the direction
-  void set_speed(float speed);
+  void set_velocity(float speed);
 
   /// @brief enable or disable the SteperMotor, can be used as a break
   /// @param enable True to enable the SteperMotor, false to disable it

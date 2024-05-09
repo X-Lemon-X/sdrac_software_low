@@ -4,9 +4,13 @@
 #ifndef PIN_HPP
 #define PIN_HPP
 
+
 #define WRITE_GPIO(gpio_pin, value) HAL_GPIO_WritePin(gpio_pin.port, gpio_pin.pin, value)
 #define READ_GPIO(gpio_pin) (uint8_t)HAL_GPIO_ReadPin(gpio_pin.port, gpio_pin.pin)
 #define TOGGLE_GPIO(gpio_pin) HAL_GPIO_TogglePin(gpio_pin.port, gpio_pin.pin)
+
+
+
 struct GPIO_PIN {
   uint16_t pin;
   GPIO_TypeDef *port;

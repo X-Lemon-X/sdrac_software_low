@@ -7,14 +7,39 @@
 #ifndef MOVE_CONTROLER_HPP
 #define MOVE_CONTROLER_HPP
 
-namespace MOVEMENT_CONTROLER
-{
+namespace MOVEMENT_CONTROLER{
+
+class MovementEquation{
+protected:  
+  /// @brief  Ticker object for main clock time with microsecond resolution
+  /// you can obatin the current time by calling ticker.get_seconds()
+  TIMING::Ticker &ticker;
+public:
+  /// @brief Constructor for the MovementEquation class
+  MovementEquation(TIMING::Ticker &ticker): ticker(ticker){};
+
+  /// @brief initiates the begining state of the controler
+  /// @param current_position current position of the arm in radians when the controler is initiated
+  /// @param current_velocity current velocity of the arm in radians per second when the controler is initiated
+  /// @param current_time current time in seconds when the controler is initiated
+  virtual void begin_state(float current_position, float current_velocity, float current_time);
+
+  /// @brief This function should will be called in each pass of the MovementControler::handle() function
+  /// @param current_position current position of the arm in radians
+  /// @param target_position target position of the arm in radians
+  /// @param current_velocity current velocity of the arm in radians per second
+  /// @param target_velocity target angualar velocity of the arm in radians per second
+  /// @return the angualar velocity of the arm in radians per second. 
+  /// Can be positive or negative value (negative value obviously means reverse), 0 will stop the engine)
+  virtual float calculate(float current_position, float target_position, float current_velocity, float target_velocity) {return 0.0f;};
+};
 
 class MovementControler{ 
   protected:
   TIMING::Ticker *ticker;
   STEPER_MOTOR::SteperMotor *steper_motor;
   ENCODER::Encoder *encoder;
+  MovementEquation *movement_equation;
   bool initialized;
 
   float max_velocity;
@@ -29,16 +54,18 @@ class MovementControler{
   bool enable;
   public:
 
-  /// @brief Simple movement controler for an engine with simple PD algorithm
+  /// @brief Arm controler interface
   MovementControler();
+
+  ~MovementControler();
   
-  /// @brief Initialize the controler
+  /// @brief Initialize the controler/ shpuld be called after all the encoder, motor and ticker objects are initialized and ready to use
   /// @param ticker Ticker object for main system time wity microsecond resolution
   /// @param steper_motor Steper motor object
   /// @param encoder Encoder object
-  void init(TIMING::Ticker &ticker, STEPER_MOTOR::SteperMotor &steper_motor, ENCODER::Encoder &encoder);
+  void init(TIMING::Ticker &ticker, STEPER_MOTOR::SteperMotor &steper_motor, ENCODER::Encoder &encoder, MovementEquation &movement_equation);
   
-  /// @brief Handler for the controler this function should be called in the main loop as often as possible
+  /// @brief Handles all the caluclation and limits, this function should be called in the main loop as often as possible
   void handle();
 
   /// @brief Set the target velocity for the engine

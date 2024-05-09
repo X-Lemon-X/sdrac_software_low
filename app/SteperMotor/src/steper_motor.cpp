@@ -13,6 +13,7 @@ enable_pin(_enable_pin){
   this->steps_per_revolution = 400;
   this->gear_ratio = 1;
   this->max_velocity = 0;
+  this->min_velocity = 0;
   this->reverse = false;
   this->init();
 }
@@ -33,39 +34,35 @@ void SteperMotor::init(){
 
 }
 
-void SteperMotor::set_speed(float speed){
+void SteperMotor::set_velocity(float velocity){
 
-  if (speed > this->max_velocity)
-    speed = this->max_velocity;
+  if (velocity > this->max_velocity)
+    velocity = this->max_velocity;
 
-  if (speed < this->min_velocity){
+  if (velocity < this->min_velocity){
     htim.Instance->CCR1 = 0;
     return;
   }
 
-  if (speed >= 0)
+  if (velocity > 0)
     WRITE_GPIO(direction_pin,direction_positive);
   else {
     WRITE_GPIO(direction_pin,direction_negative);
-    speed = -speed;
+    velocity = -velocity;
   }
 
-  if(speed == 0){
+  if(velocity == 0){
     htim.Instance->CCR1 = 0;
     return;
   }
-  uint16_t counter = this->radians_to_frequency / speed;
+  uint16_t counter = (uint16_t)(this->radians_to_frequency / velocity);
   htim.Instance->ARR = counter;
   htim.Instance->CCR1 = counter/2;
 }
 
+
 void SteperMotor::set_enable(bool enable){
-  if (enable){
-    WRITE_GPIO(enable_pin,GPIO_PIN_SET);
-  }else{
-    WRITE_GPIO(enable_pin,GPIO_PIN_RESET);
-    htim.Instance->CCR1 = 0;
-  }
+  WRITE_GPIO(enable_pin, enable? GPIO_PIN_SET : GPIO_PIN_RESET);
 }
 
 

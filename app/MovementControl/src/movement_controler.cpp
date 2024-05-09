@@ -15,18 +15,38 @@ MovementControler::MovementControler(){
   current_velocity = 0;
 }
 
-void MovementControler::init(TIMING::Ticker &_ticker, STEPER_MOTOR::SteperMotor &_steper_motor, ENCODER::Encoder &_encoder){
+MovementControler::~MovementControler(){
+  if(initialized){
+    steper_motor->set_velocity(0.0);
+    steper_motor->set_enable(false);
+  }
+}
+
+void MovementControler::init(TIMING::Ticker &_ticker, STEPER_MOTOR::SteperMotor &_steper_motor, ENCODER::Encoder &_encoder, MovementEquation &_movement_equation){
   ticker = &_ticker;
   steper_motor = &_steper_motor;
   encoder = &_encoder;
+  movement_equation = &_movement_equation;
   initialized = true;
+  movement_equation->begin_state(encoder->read_angle(), encoder->get_velocity(), ticker->get_seconds());
 }
 
 void MovementControler::handle(){
-  if (!initialized)
-    return;
+  if (!initialized) return;
+  current_position = encoder->get_angle();
+  current_velocity = encoder->get_velocity();
+  float new_velocity = movement_equation->calculate(current_position, target_position, current_velocity, target_velocity);
+  
+  if (abs(new_velocity) > max_velocity)
+    new_velocity = max_velocity;
 
-  steper_motor->set_speed(target_velocity);
+  if(enable) {
+    steper_motor->set_enable(true);
+  } else {
+    steper_motor->set_enable(false);
+    new_velocity = 0.0;
+  }
+  steper_motor->set_velocity(new_velocity);
 }
 
 void MovementControler::set_velocity(float velocity){
