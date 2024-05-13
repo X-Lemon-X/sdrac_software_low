@@ -36,9 +36,9 @@ void SteperMotor::init(){
 
 void SteperMotor::set_velocity(float velocity){
 
-  if (velocity > this->max_velocity)
+  if (abs(velocity) > this->max_velocity)
     velocity = this->max_velocity;
-  else if (velocity < this->min_velocity){
+  else if (abs(velocity) < this->min_velocity){
     htim.Instance->CCR1 = 0;
     return;
   }

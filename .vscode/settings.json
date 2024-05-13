@@ -62,6 +62,7 @@
     "charconv": "cpp",
     "usbd_cdc_if.h": "c",
     "usbd_cdc.h": "c",
-    "list": "cpp"
+    "list": "cpp",
+    "cfloat": "cpp"
   }
 }

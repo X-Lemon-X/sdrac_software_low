@@ -8,11 +8,13 @@
 #include "steper_motor.hpp"
 #include "filter.hpp"
 #include "filter_alfa_beta.hpp"
+#include "filter_moving_avarage.hpp"
 #include "can_control.hpp"
 #include "board_id.hpp"
 #include "CanDB.h"
 #include "movement_controler.hpp"
 #include "pd_controler.hpp"
+#include <cfloat>
 
 #include <string>
 #include <charconv>
@@ -58,7 +60,6 @@ BOARD_ID::Board_id board_id(pin_cid_0, pin_cid_1, pin_cid_2);
 STEPER_MOTOR::SteperMotor stp_motor(htim3, TIM_CHANNEL_1, pin_steper_direction, pin_steper_enable);
 CAN_CONTROL::CanControl can_controler;
 MOVEMENT_CONTROLER::MovementControler movement_controler;
-MOVEMENT_CONTROLER::MovementEquation *movement_equation;
 ENCODER::Encoder encoder;
 USB_PROGRAMER::UsbProgramer usb_programer(pin_boot_device);
 
@@ -103,6 +104,12 @@ void main_prog()
 void id_config(){
   log_debug("Start id_config\n");
   log_debug("Board id: " + std::to_string(board_id.get_id()));
+
+  encoder.set_address(ENCODER_MT6701_I2C_ADDRESS);
+  encoder.set_resolution(ENCODER_MT6702_RESOLUTION);
+  encoder.set_angle_register(ENCODER_MEM_ADDR_ANNGLE);
+   
+
   switch (board_id.get_id())
   {
   case SDRAC_ID_1:{
@@ -119,30 +126,38 @@ void id_config(){
     CAN_X_FILTER_MASK_HIGH = 0xff0<<5;
     CAN_X_FILTER_MASK_LOW = 0x000;
 
-    //-------------------MOVEMENT EQUATION CONFIGURATION-------------------
-    PDCONTROLER::PdControler *pdc = new PDCONTROLER::PdControler(main_clock);
-    pdc->set_Kp(0.50);
-    pdc->set_Kd(0.1f);
-    movement_equation = (MOVEMENT_CONTROLER::MovementEquation*)pdc;
+
     
     //-------------------STEPER MOTOR CONFIGURATION-------------------
     stp_motor.set_steps_per_revolution(400);
     stp_motor.set_gear_ratio(75);
-    stp_motor.set_max_velocity(PI_d4);
+    stp_motor.set_max_velocity(PI);
     stp_motor.set_min_velocity(0.01);
-    stp_motor.set_reverse(false);
+    stp_motor.set_reverse(true);
+    stp_motor.init();
+    stp_motor.set_enable(false);
 
 
     //-------------------ENCODER CONFIGURATION-------------------
-    encoder.set_offset(-0.747049f);
+    FILTERS::Filter_moving_avarage *fv = new FILTERS::Filter_moving_avarage(main_clock);
+    fv->set_size(60); // 15 for smooth movement but delay with sampling to 50
+
+    encoder.set_offset(-0.194048f);
     encoder.set_reverse(true);
-    encoder.set_enable_filter(false);
+    encoder.set_enable_pos_filter(false);
     encoder.set_enable_velocity(true);
-    encoder.set_velocity_sample_amount(0);
+    encoder.set_enable_velocity_filter(true);
+    encoder.set_velocity_sample_amount(10);
+    encoder.init(hi2c1,main_clock,nullptr,fv);
+    
 
     //-------------------MOVEMENT CONTROLER CONFIGURATION-------------------
-    movement_controler.set_limit_position(-PI, PI);
+    PDCONTROLER::PdControler *pdc = new PDCONTROLER::PdControler(main_clock);
+    pdc->set_Kp(0.50);
+    pdc->set_Kd(0.1f);
+    movement_controler.set_limit_position(-1.089126f, 4.236856f);
     movement_controler.set_max_velocity(PI);
+    movement_controler.init(main_clock, stp_motor, encoder, *pdc);
 
     break;
   }
@@ -252,7 +267,7 @@ void handle_can_rx(){
   CAN_CONTROL::CAN_MSG recived_msg = {0};
   if(can_controler.get_message(&recived_msg)) return;
 
-  log_debug("Recived message: " + std::to_string(recived_msg.frame_id));
+  // log_debug("Recived message: " + std::to_string(recived_msg.frame_id));
   
   if(recived_msg.frame_id == CAN_KONARM_X_SET_POS_FRAME_ID){
     can_konarm_1_set_pos_t signals;
@@ -262,7 +277,7 @@ void handle_can_rx(){
     movement_controler.set_velocity(targetVelocity);
     movement_controler.set_position(targetPosition);
     movement_controler.set_enable(true);
-    log_debug("Set position: " + std::to_string(targetPosition) + " Set velocity: " + std::to_string(targetVelocity));
+    log_debug("sp:" + std::to_string(targetPosition) + " sv:" + std::to_string(targetVelocity));
   }
   else if (recived_msg.frame_id == CAN_KONARM_X_GET_POS_FRAME_ID && recived_msg.remote_request){
     CAN_CONTROL::CAN_MSG send_msg = {0};
@@ -291,16 +306,7 @@ void handle_can_rx(){
 void init_controls(){
   log_debug("Start init_interfaces\n");
 
-  FILTERS::FilterBase fb(main_clock);  
-  encoder.set_address(ENCODER_MT6701_I2C_ADDRESS);
-  encoder.set_resolution(ENCODER_MT6702_RESOLUTION);
-  encoder.set_angle_register(ENCODER_MEM_ADDR_ANNGLE);
-  encoder.init(hi2c1,main_clock,fb,fb); 
-  stp_motor.init();
-  stp_motor.set_enable(false);
-
   // init the movement controler should be done after the encoder and the steper motor are initialized
-  movement_controler.init(main_clock, stp_motor, encoder, *movement_equation);
   movement_controler.set_position(encoder.get_angle());
   movement_controler.set_velocity(0);
   movement_controler.set_enable(true);
@@ -314,37 +320,40 @@ void main_loop(){
   TIMING::Timing tim_usb(main_clock);
   TIMING::Timing tim_movement(main_clock);
   TIMING::Timing tim_send_pos(main_clock);
+
+  // TIMING::Timing accelerate(main_clock);
+  // accelerate.set_behaviour(3000000, true);
+
   tim_blink.set_behaviour(500000, true);
   tim_encoder.set_behaviour(1000, true);
   tim_usb.set_behaviour(300000, true);
   tim_movement.set_behaviour(1000, true);
-  tim_send_pos.set_behaviour(50000, true);
+  tim_send_pos.set_behaviour(100000, true);
   // Start the main loop
-  stp_motor.set_enable(true);
-  stp_motor.set_velocity(PI/12.0);
-
 
   movement_controler.set_enable(true);
-  movement_controler.set_velocity(PI/12.0);
+  // movement_controler.set_velocity(0);
+  // float velocity = 0,set_velocity = 0;
   while (1){
     handle_can_rx();
     can_controler.handle_led_blink();
     
     if(tim_encoder.triggered()){
       encoder.handle();
-      // log_deebug("Current angle: " + std::to_string(encoder.read_angle()));
     }
 
-
+    // if(accelerate.triggered()){
+    //   movement_controler.set_velocity(velocity);
+    //   set_velocity = velocity;
+    //   velocity += 0.05;
+    //   if(velocity > PI/10.0) velocity = 0;
+    // }
+    movement_controler.handle();
     if(tim_send_pos.triggered()){
-      movement_controler.handle();
-      // log_debug("pos:" + std::to_string(movement_controler.get_current_position()) + " vel:" + std::to_string(movement_controler.get_current_velocity()));
+      log_debug("cp:" + std::to_string(movement_controler.get_current_position()) + " cv:" + std::to_string(movement_controler.get_current_velocity()));
+      // log_debug( std::to_string(movement_controler.get_current_position()) + ";" + std::to_string(movement_controler.get_current_velocity()) + ";" + std::to_string(main_clock.get_seconds()) + ";" + std::to_string(set_velocity) );
     //  log_debug("Current velocity: " + std::to_string(movement_controler.get_current_velocity()));
     }
-
-    // if (tim_movement.triggered()){
-    //   movement_controler.handle();
-    // }
 
     if(tim_usb.triggered()){
       usb_programer.handler();

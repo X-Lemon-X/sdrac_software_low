@@ -18,17 +18,16 @@ this->enable_velocity = false;
 this->enable_velocity_filter = false;
 }
 
-void Encoder::init(I2C_HandleTypeDef &hi2c, TIMING::Ticker &ticker, FILTERS::FilterBase &filter_angle, FILTERS::FilterBase &filter_velocity){
+void Encoder::init(I2C_HandleTypeDef &hi2c, TIMING::Ticker &ticker, FILTERS::FilterBase *filter_angle, FILTERS::FilterBase *filter_velocity){
   this->hi2c = &hi2c;
   this->ticker = &ticker;
-  this->filter_angle = &filter_angle;
-  this->filter_velocity = &filter_velocity;
+  this->filter_angle = filter_angle;
+  this->filter_velocity = filter_velocity;
   this->last_time = ticker.get_seconds();
   this->prev_angle = read_angle();
   this->prev_angle_velocity = this->absoulte_angle;
   this->current_velocity = 0;
   this->over_drive_angle = 0;
-
 }
 
 bool Encoder::ping_encoder(){
@@ -48,10 +47,10 @@ float Encoder::calculate_velocity(float angle){
   const float dt = current_tiem - last_time;
   float current_velocity = (angle-prev_angle_velocity) / dt;
   last_time = current_tiem;
-  if(this->enable_velocity_filter)
-    current_velocity = filter_angle->calculate(current_velocity);
+  if(this->enable_velocity_filter && this->filter_velocity != nullptr)
+    current_velocity = filter_velocity->calculate(current_velocity);
 
-  log_debug(std::to_string(angle) + ";" + std::to_string(current_tiem));
+  // log_debug(std::to_string(angle) + ";" + std::to_string(current_tiem));
   prev_angle_velocity = angle;
   return current_velocity;
 }
@@ -63,14 +62,15 @@ float Encoder::read_angle(){
   if (angle > PI_m2) angle -= PI_m2;
   if (angle < 0) angle += PI_m2;
 
-  angle = filter_angle->calculate(angle);
-
   if(prev_angle - angle > ANGLE_MAX_DEFFERENCE)
     over_drive_angle += PI_m2;
   else if(angle - prev_angle > ANGLE_MAX_DEFFERENCE)
     over_drive_angle -= PI_m2;
   prev_angle = angle;
   absoulte_angle = angle + over_drive_angle;
+  
+  if(this->enable_filter && this->filter_angle != nullptr)
+    absoulte_angle = filter_angle->calculate(absoulte_angle);
 
   if(this->enable_velocity && ++velocity_sample_count >= velocity_samples_amount){
     this->current_velocity = calculate_velocity(absoulte_angle);
@@ -116,7 +116,7 @@ void Encoder::set_magnes_detection_register(uint8_t magnes_detection_register){
   this->magnes_detection_register = magnes_detection_register;
 }
   
-void Encoder::set_enable_filter(bool enable_filter){
+void Encoder::set_enable_pos_filter(bool enable_filter){
   this->enable_filter = enable_filter;
 }
 

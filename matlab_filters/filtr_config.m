@@ -5,7 +5,7 @@ close all;
 %T = 0.8;           % Total time duration of the chirp in seconds
 %t = 0:1/Fs:T-1/Fs; % Time vector
 
-T = readtable('measures\data_enc_pos_timc.csv');
+T = readtable('measures/data_enc_pos_timc.csv');
 arry=table2array(T);
 pos = arry(:,1);
 time = arry(:,2);

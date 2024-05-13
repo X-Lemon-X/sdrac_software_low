@@ -9,7 +9,7 @@
 #define ENCODERS_H
 
 #define VELOCITY_FILTER_SIZE 6
-#define ANGLE_MAX_DEFFERENCE 1.0 // 1 radian
+#define ANGLE_MAX_DEFFERENCE 2.0 // 1 radian
 
 namespace ENCODER {
   
@@ -53,7 +53,7 @@ public:
   Encoder();
   
   /// @brief Init fucnion of the encoder
-  void init(I2C_HandleTypeDef &hi2c,TIMING::Ticker &ticker , FILTERS::FilterBase &filter_angle,FILTERS::FilterBase &filter_velocity);
+  void init(I2C_HandleTypeDef &hi2c,TIMING::Ticker &ticker , FILTERS::FilterBase *filter_angle,FILTERS::FilterBase *filter_velocity);
 
   /// @brief Pings the encoder to check if it is connected
   /// @return true if the encoder is connected
@@ -104,7 +104,7 @@ public:
   
   /// @brief sets the enable filter of the encoder 
   /// @param enable_filter true if the filter is enabled
-  void set_enable_filter(bool enable_filter);
+  void set_enable_pos_filter(bool enable_filter);
   
   /// @brief sets the enable velocity of the encoder 
   /// @param enable_velocity true if the you wnat the velocity to be calculated
@@ -114,7 +114,8 @@ public:
   /// @param enable_velocity_filter true if the velocity filter is enabled
   void set_enable_velocity_filter(bool enable_velocity_filter);
 
-  /// @brief sets the velocity sample count of the encoder
+  /// @brief sets how many smaples will be skipped before calculating the velocity
+  /// fixes the problem of low velocity readings
   /// @param velocity_samples_amount the amount of samples to skip before calculating the velocity
   void set_velocity_sample_amount(uint16_t velocity_samples_amount);
 };

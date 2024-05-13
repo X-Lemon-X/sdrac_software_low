@@ -115,18 +115,24 @@ def main2():
 
   #calculate velocity
   calc_velocity = []
-  # filtr = FIRFilter([0.1,0.2,0.3,0.6])
+  default_vel = []
+  filtr = FIRFilter([0.1,0.6,0.2])
   # filtr = AlfaBetaFilter(0.2,0.01)
   # filtr = MedianFilter(5)
+  pref=0
   for i in range(1,len(read_angles)):
     x = read_angles[i]
     dt = read_time[i] - read_time[i-1]
     vel = (x - read_angles[i-1])/ dt
+    default_vel.append(vel)
+    vel = 0.1*vel + 0.9*pref
+    pref = vel
     # vel = filtr.filter(vel,dt)
     calc_velocity.append(vel)  
 
   #plot velocity
   plt.plot(read_time[1:], calc_velocity, label='calculated velocity', color='blue')
+  # plt.plot(read_time[1:], default_vel, label='default velocity', color='purple')
   # plt.plot(read_time, read_angles, label='encoder position', linestyle='dashed', color='red')
   # plot avarage velocity
   avg = sum(calc_velocity) / len(calc_velocity)
@@ -134,6 +140,58 @@ def main2():
   plt.legend()
   plt.show()
 
+def main3():
+  file = 'measures/data_pos_vel_tim.csv'
+  #read pos and time
+  file = open(file, 'r')
+  lines = file.readlines()
+  read_angles = []
+  read_vel = []
+  read_time = []
+  set_vel = []
+  for l in lines:
+    set_vel.append(float(l.split(';')[3]))
+    read_time.append(float(l.split(';')[2]))
+    read_vel.append(float(l.split(';')[1]))
+    read_angles.append(float(l.split(';')[0]))
+  file.close()
+
+  set_vel = set_vel[70:]
+  read_time = read_time[70:]
+  read_vel = read_vel[70:]
+  read_angles = read_angles[70:]
+
+
+
+  #calculate velocity
+  calc_velocity = []
+  ma = AverageFilter(60)
+  mf= AlfaBetaFilter(0.1,0.01)
+  # take every n point to the filter
+  n = 5
+  time_filter = [ read_time[i] for i in range(0,len(read_time),n)]
+  pos_filter = [ read_angles[i] for i in range(0,len(read_angles),n)]
+
+  for i in range(1,len(time_filter)):
+    x = pos_filter[i]
+    dt = time_filter[i] - time_filter[i-1]
+    vel = (x - pos_filter[i-1])/ dt
+    vel = ma.filter(vel,dt)
+    # vel =  mf.filter(vel,dt)
+    calc_velocity.append(vel)
+  time_filter = time_filter[1:]
+
+  #plot read_vel but only existing points
+  plt.plot(read_time, read_vel, label='read velocity', color='blue', marker='o')
+  #plot set velocity
+  plt.plot(read_time, set_vel, label='calculated mediana', color='red')
+  #plot calculated velocity
+  plt.plot(time_filter, calc_velocity, label='calculated filtered', color='green')
+  plt.legend()
+  plt.show()
+
+
+
 if __name__ == '__main__':
   # main()
-  main2()
+  main3()

@@ -91,6 +91,7 @@ add_executable(${TARGET}
 "app/SteperMotor/src/steper_motor.cpp"
 "app/Filter/src/filter.cpp"
 "app/Filter/src/filter_alfa_beta.cpp"
+"app/Filter/src/filter_moving_avarage.cpp"
 "app/Memory/src/fram_menager.cpp"
 "app/CanControl/src/can_control.cpp"
 "app/MovementControl/src/movement_controler.cpp"

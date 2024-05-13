@@ -11,7 +11,7 @@ protected:
   TIMING::Ticker &ticker;
 public:
   FilterBase(TIMING::Ticker &ticker);
-  float calculate(float calculate);
+  virtual float calculate(float calculate);
 };
 
 
