@@ -1,0 +1,498 @@
+VERSION ""
+
+
+NS_ : 
+	NS_DESC_
+	CM_
+	BA_DEF_
+	BA_
+	VAL_
+	CAT_DEF_
+	CAT_
+	FILTER
+	BA_DEF_DEF_
+	EV_DATA_
+	ENVVAR_DATA_
+	SGTYPE_
+	SGTYPE_VAL_
+	BA_DEF_SGTYPE_
+	BA_SGTYPE_
+	SIG_TYPE_REF_
+	VAL_TABLE_
+	SIG_GROUP_
+	SIG_VALTYPE_
+	SIGTYPE_VALTYPE_
+	BO_TX_BU_
+	BA_DEF_REL_
+	BA_REL_
+	BA_DEF_DEF_REL_
+	BU_SG_REL_
+	BU_EV_REL_
+	BU_BO_REL_
+	SG_MUL_VAL_
+
+BS_:
+
+BU_: 
+
+
+BO_ 193 actuators_status: 1 SensorBoard
+ SG_ servos : 7|1@1+ (1,0) [0|1] ""  Jetson
+ SG_ magnet : 6|1@1+ (1,0) [0|1] ""  Jetson
+ SG_ fan : 5|1@1+ (1,0) [0|1] ""  Jetson
+ SG_ horn : 4|1@1+ (1,0) [0|1] ""  Jetson
+ SG_ light4 : 3|1@1+ (1,0) [0|1] ""  Jetson
+ SG_ light3 : 2|1@1+ (1,0) [0|1] ""  Jetson
+ SG_ light2 : 1|1@1+ (1,0) [0|1] ""  Jetson
+ SG_ light1 : 0|1@1+ (1,0) [0|1] ""  Jetson
+
+BO_ 194 actuators_set: 1 Jetson
+ SG_ servos : 7|1@1+ (1,0) [0|1] ""  SensorBoard
+ SG_ magnet : 6|1@1+ (1,0) [0|1] ""  SensorBoard
+ SG_ fan : 5|1@1+ (1,0) [0|1] ""  SensorBoard
+ SG_ horn : 4|1@1+ (1,0) [0|1] ""  SensorBoard
+ SG_ light4 : 3|1@1+ (1,0) [0|1] ""  SensorBoard
+ SG_ light3 : 2|1@1+ (1,0) [0|1] ""  SensorBoard
+ SG_ light2 : 1|1@1+ (1,0) [0|1] ""  SensorBoard
+ SG_ light1 : 0|1@1+ (1,0) [0|1] ""  SensorBoard
+
+BO_ 195 actuators_reset: 1 Jetson
+ SG_ servos : 7|1@1+ (1,0) [0|1] ""  SensorBoard
+ SG_ magnet : 6|1@1+ (1,0) [0|1] ""  SensorBoard
+ SG_ fan : 5|1@1+ (1,0) [0|1] ""  SensorBoard
+ SG_ horn : 4|1@1+ (1,0) [0|1] ""  SensorBoard
+ SG_ light4 : 3|1@1+ (1,0) [0|1] ""  SensorBoard
+ SG_ light3 : 2|1@1+ (1,0) [0|1] ""  SensorBoard
+ SG_ light2 : 1|1@1+ (1,0) [0|1] ""  SensorBoard
+ SG_ light1 : 0|1@1+ (1,0) [0|1] ""  SensorBoard
+
+BO_ 545 battery_status: 1 PowerBoard
+ SG_ status : 0|8@1+ (1,0) [0|4] ""  Jetson
+
+BO_ 546 battery_estimates: 3 PowerBoard
+ SG_ fill_level : 16|8@1+ (1,0) [0|100] "%"  Jetson
+ SG_ voltage : 0|16@1+ (0.001,0) [0|0] "V"  Jetson
+
+BO_ 547 battery_overvoltage_warning: 2 PowerBoard
+ SG_ voltage : 0|16@1+ (0.001,0) [0|0] "V"  Jetson
+
+BO_ 548 battery_undervoltage_warning: 2 PowerBoard
+ SG_ voltage : 0|16@1+ (0.001,0) [0|0] "V"  Jetson
+
+BO_ 1793 buzzer_beep: 0 Jetson
+
+BO_ 1794 buzzer_play_note: 4 Jetson
+ SG_ duration : 16|16@1+ (1,0) [0|0] "ms"  PowerBoard
+ SG_ frequency : 0|16@1+ (1,0) [0|0] "Hz"  PowerBoard
+
+BO_ 1795 buzzer_start: 2 Jetson
+ SG_ frequency : 0|16@1+ (1,0) [0|0] "Hz"  PowerBoard
+
+BO_ 1796 buzzer_stop: 0 Jetson
+
+BO_ 513 control_mode: 1 SensorBoard
+ SG_ mode : 0|8@1+ (1,0) [0|2] ""  Jetson
+
+BO_ 1057 gps_status: 2 SensorBoard
+ SG_ signal : 8|8@1- (1,0) [-1|2] ""  Jetson
+ SG_ status : 0|8@1+ (1,0) [1|3] ""  Jetson
+
+BO_ 1058 gps_latitude: 8 SensorBoard
+ SG_ latitude : 0|64@1+ (1,0) [0|0] "deg"  Jetson
+
+BO_ 1059 gps_longitude: 8 SensorBoard
+ SG_ longitude : 0|64@1+ (1,0) [0|0] "deg"  Jetson
+
+BO_ 1060 gps_date: 6 SensorBoard
+ SG_ second : 40|8@1+ (1,0) [0|59] ""  Jetson
+ SG_ minute : 32|8@1+ (1,0) [0|59] ""  Jetson
+ SG_ hour : 24|8@1+ (1,0) [0|23] ""  Jetson
+ SG_ day : 16|8@1+ (1,0) [1|31] ""  Jetson
+ SG_ month : 8|8@1+ (1,0) [1|12] ""  Jetson
+ SG_ year : 0|8@1+ (1,0) [0|99] ""  Jetson
+
+BO_ 1025 imu_status: 1 SensorBoard
+ SG_ status : 0|8@1+ (1,0) [1|3] ""  Jetson
+
+BO_ 1026 imu_orientation: 8 SensorBoard
+ SG_ z : 48|16@1- (6.103515625e-05,0) [0|0] ""  Jetson
+ SG_ y : 32|16@1- (6.103515625e-05,0) [0|0] ""  Jetson
+ SG_ x : 16|16@1- (6.103515625e-05,0) [0|0] ""  Jetson
+ SG_ w : 0|16@1- (6.103515625e-05,0) [0|0] ""  Jetson
+
+BO_ 1027 imu_linear_acceleration: 6 SensorBoard
+ SG_ z : 32|16@1- (0.01,0) [0|0] "m/s^2"  Jetson
+ SG_ y : 16|16@1- (0.01,0) [0|0] "m/s^2"  Jetson
+ SG_ x : 0|16@1- (0.01,0) [0|0] "m/s^2"  Jetson
+
+BO_ 1028 imu_magnetic_field: 6 SensorBoard
+ SG_ z : 32|16@1- (0.0625,0) [0|0] "uT"  Jetson
+ SG_ y : 16|16@1- (0.0625,0) [0|0] "uT"  Jetson
+ SG_ x : 0|16@1- (0.0625,0) [0|0] "uT"  Jetson
+
+BO_ 1029 imu_gyration: 6 SensorBoard
+ SG_ z : 32|16@1- (0.0011111111111111111,0) [0|0] "rad/s"  Jetson
+ SG_ y : 16|16@1- (0.0011111111111111111,0) [0|0] "rad/s"  Jetson
+ SG_ x : 0|16@1- (0.0011111111111111111,0) [0|0] "rad/s"  Jetson
+
+BO_ 1089 metal_detector_status: 2 MetalDetectorBoard
+ SG_ channel_8 : 14|2@1+ (1,0) [1|3] ""  Jetson
+ SG_ channel_7 : 12|2@1+ (1,0) [1|3] ""  Jetson
+ SG_ channel_6 : 10|2@1+ (1,0) [1|3] ""  Jetson
+ SG_ channel_5 : 8|2@1+ (1,0) [1|3] ""  Jetson
+ SG_ channel_4 : 6|2@1+ (1,0) [1|3] ""  Jetson
+ SG_ channel_3 : 4|2@1+ (1,0) [1|3] ""  Jetson
+ SG_ channel_2 : 2|2@1+ (1,0) [1|3] ""  Jetson
+ SG_ channel_1 : 0|2@1+ (1,0) [1|3] ""  Jetson
+
+BO_ 1090 metal_detector_value_1234: 8 MetalDetectorBoard
+ SG_ channel_4 : 48|16@1+ (1,0) [0|4095] ""  Jetson
+ SG_ channel_3 : 32|16@1+ (1,0) [0|4095] ""  Jetson
+ SG_ channel_2 : 16|16@1+ (1,0) [0|4095] ""  Jetson
+ SG_ channel_1 : 0|16@1+ (1,0) [0|4095] ""  Jetson
+
+BO_ 1091 metal_detector_value_5678: 8 MetalDetectorBoard
+ SG_ channel_8 : 48|16@1+ (1,0) [0|4095] ""  Jetson
+ SG_ channel_7 : 32|16@1+ (1,0) [0|4095] ""  Jetson
+ SG_ channel_6 : 16|16@1+ (1,0) [0|4095] ""  Jetson
+ SG_ channel_5 : 0|16@1+ (1,0) [0|4095] ""  Jetson
+
+BO_ 1092 metal_detector_estimated_positio: 6 MetalDetectorBoard
+ SG_ z : 32|16@1- (0.001,0) [0|0] "m"  Jetson
+ SG_ y : 16|16@1- (0.001,0) [0|0] "m"  Jetson
+ SG_ x : 0|16@1- (0.001,0) [0|0] "m"  Jetson
+
+BO_ 33 odrive_left_heartbeat: 6 ODrive
+ SG_ controller_status : 40|8@1+ (1,0) [0|0] ""  Jetson,SensorBoard
+ SG_ axis_state : 32|8@1+ (1,0) [0|0] ""  Jetson,SensorBoard
+ SG_ axis_error : 0|32@1+ (1,0) [0|0] ""  Jetson,SensorBoard
+
+BO_ 34 odrive_left_estop: 0 Jetson
+
+BO_ 35 odrive_left_get_motor_error: 4 ODrive
+ SG_ motor_error : 0|32@1+ (1,0) [0|0] ""  Jetson,SensorBoard
+
+BO_ 36 odrive_left_get_encoder_error: 4 ODrive
+ SG_ encoder_error : 0|32@1+ (1,0) [0|0] ""  Jetson,SensorBoard
+
+BO_ 39 odrive_left_set_axis_state: 4 Jetson
+ SG_ axis_requested_state : 0|32@1+ (1,0) [0|0] ""  ODrive
+
+BO_ 41 odrive_left_get_encoder_estimate: 8 ODrive
+ SG_ vel_estimate : 32|32@1+ (6.283185307179586,0) [0|0] "rps"  Jetson,SensorBoard
+ SG_ pos_estimate : 0|32@1+ (6.283185307179586,0) [0|0] "r"  Jetson,SensorBoard
+
+BO_ 42 odrive_left_get_encoder_count: 8 ODrive
+ SG_ count_in_CPR : 32|32@1+ (1,0) [0|0] ""  Jetson,SensorBoard
+ SG_ shadow_count : 0|32@1+ (1,0) [0|0] ""  Jetson,SensorBoard
+
+BO_ 43 odrive_left_set_controller_mode: 8 Jetson
+ SG_ input_mode : 32|32@1+ (1,0) [0|0] ""  ODrive
+ SG_ control_mode : 0|32@1+ (1,0) [0|0] ""  ODrive
+
+BO_ 44 odrive_left_set_input_pos: 8 Jetson
+ SG_ torque_FF : 48|16@1- (0.001,0) [0|0] ""  ODrive
+ SG_ vel_FF : 32|16@1- (0.001,0) [0|0] ""  ODrive
+ SG_ input_pos : 0|32@1+ (1,0) [0|0] ""  ODrive
+
+BO_ 45 odrive_left_set_input_vel: 8 Jetson
+ SG_ input_torque_FF : 32|32@1+ (1,0) [0|0] ""  ODrive
+ SG_ input_vel : 0|32@1+ (6.283185307179586,0) [0|0] ""  ODrive
+
+BO_ 46 odrive_left_set_input_torque: 4 Jetson
+ SG_ imput_torque : 0|32@1+ (1,0) [0|0] ""  ODrive
+
+BO_ 47 odrive_left_set_limits: 8 Jetson
+ SG_ current_limit : 32|32@1+ (1,0) [0|0] ""  ODrive
+ SG_ velocity_limit : 0|32@1+ (1,0) [0|0] ""  ODrive
+
+BO_ 55 odrive_left_get_vbus_voltage: 4 ODrive
+ SG_ vbus_voltage : 0|32@1+ (1,0) [0|0] ""  Jetson,SensorBoard
+
+BO_ 56 odrive_left_clear_errors: 0 Jetson
+
+BO_ 97 odrive_right_heartbeat: 6 ODrive
+ SG_ controller_status : 40|8@1+ (1,0) [0|0] ""  Jetson,SensorBoard
+ SG_ axis_state : 32|8@1+ (1,0) [0|0] ""  Jetson,SensorBoard
+ SG_ axis_error : 0|32@1+ (1,0) [0|0] ""  Jetson,SensorBoard
+
+BO_ 98 odrive_right_estop: 0 Jetson
+
+BO_ 99 odrive_right_get_motor_error: 4 ODrive
+ SG_ motor_error : 0|32@1+ (1,0) [0|0] ""  Jetson,SensorBoard
+
+BO_ 100 odrive_right_get_encoder_error: 4 ODrive
+ SG_ encoder_error : 0|32@1+ (1,0) [0|0] ""  Jetson,SensorBoard
+
+BO_ 103 odrive_right_set_axis_state: 4 Jetson
+ SG_ axis_requested_state : 0|32@1+ (1,0) [0|0] ""  ODrive
+
+BO_ 105 odrive_right_get_encoder_estimat: 8 ODrive
+ SG_ vel_estimate : 32|32@1+ (6.283185307179586,0) [0|0] "rps"  Jetson,SensorBoard
+ SG_ pos_estimate : 0|32@1+ (6.283185307179586,0) [0|0] "r"  Jetson,SensorBoard
+
+BO_ 106 odrive_right_get_encoder_count: 8 ODrive
+ SG_ count_in_CPR : 32|32@1+ (1,0) [0|0] ""  Jetson,SensorBoard
+ SG_ shadow_count : 0|32@1+ (1,0) [0|0] ""  Jetson,SensorBoard
+
+BO_ 107 odrive_right_set_controller_mode: 8 Jetson
+ SG_ input_mode : 32|32@1+ (1,0) [0|0] ""  ODrive
+ SG_ control_mode : 0|32@1+ (1,0) [0|0] ""  ODrive
+
+BO_ 108 odrive_right_set_input_pos: 8 Jetson
+ SG_ torque_FF : 48|16@1- (0.001,0) [0|0] ""  ODrive
+ SG_ vel_FF : 32|16@1- (0.001,0) [0|0] ""  ODrive
+ SG_ input_pos : 0|32@1+ (1,0) [0|0] ""  ODrive
+
+BO_ 109 odrive_right_set_input_vel: 8 Jetson
+ SG_ input_torque_FF : 32|32@1+ (1,0) [0|0] ""  ODrive
+ SG_ input_vel : 0|32@1+ (6.283185307179586,0) [0|0] ""  ODrive
+
+BO_ 110 odrive_right_set_input_torque: 4 Jetson
+ SG_ imput_torque : 0|32@1+ (1,0) [0|0] ""  ODrive
+
+BO_ 111 odrive_right_set_limits: 8 Jetson
+ SG_ current_limit : 32|32@1+ (1,0) [0|0] ""  ODrive
+ SG_ velocity_limit : 0|32@1+ (1,0) [0|0] ""  ODrive
+
+BO_ 119 odrive_right_get_vbus_voltage: 4 ODrive
+ SG_ vbus_voltage : 0|32@1+ (1,0) [0|0] ""  Jetson,SensorBoard
+
+BO_ 120 odrive_right_clear_errors: 0 Jetson
+
+BO_ 577 temperature_imu_status: 1 SensorBoard
+ SG_ accelerometer : 0|8@1+ (1,0) [1|3] ""  Jetson
+
+BO_ 578 temperature_imu_temperature: 1 SensorBoard
+ SG_ accelerometer : 0|8@1- (1,0) [0|0] ""  Jetson
+
+BO_ 579 temperature_imu_warnings: 1 SensorBoard
+ SG_ accelerometer_critical_under : 3|1@1+ (1,0) [0|1] ""  Jetson
+ SG_ accelerometer_critical_over : 2|1@1+ (1,0) [0|1] ""  Jetson
+ SG_ accelerometer_under : 1|1@1+ (1,0) [0|1] ""  Jetson
+ SG_ accelerometer_over : 0|1@1+ (1,0) [0|1] ""  Jetson
+
+BO_ 609 temperature_external_status: 1 SensorBoard
+ SG_ external_4 : 6|2@1+ (1,0) [1|3] ""  Jetson
+ SG_ external_3 : 4|2@1+ (1,0) [1|3] ""  Jetson
+ SG_ external_2 : 2|2@1+ (1,0) [1|3] ""  Jetson
+ SG_ external_1 : 0|2@1+ (1,0) [1|3] ""  Jetson
+
+BO_ 610 temperature_external_temperature: 4 SensorBoard
+ SG_ external_4 : 24|8@1- (1,0) [0|0] ""  Jetson
+ SG_ external_3 : 16|8@1- (1,0) [0|0] ""  Jetson
+ SG_ external_2 : 8|8@1- (1,0) [0|0] ""  Jetson
+ SG_ external_1 : 0|8@1- (1,0) [0|0] ""  Jetson
+
+BO_ 611 temperature_external_warnings: 2 SensorBoard
+ SG_ external_4_critical_under : 15|1@1+ (1,0) [0|1] ""  Jetson
+ SG_ external_4_critical_over : 14|1@1+ (1,0) [0|1] ""  Jetson
+ SG_ external_4_under : 13|1@1+ (1,0) [0|1] ""  Jetson
+ SG_ external_4_over : 12|1@1+ (1,0) [0|1] ""  Jetson
+ SG_ external_3_critical_under : 11|1@1+ (1,0) [0|1] ""  Jetson
+ SG_ external_3_critical_over : 10|1@1+ (1,0) [0|1] ""  Jetson
+ SG_ external_3_under : 9|1@1+ (1,0) [0|1] ""  Jetson
+ SG_ external_3_over : 8|1@1+ (1,0) [0|1] ""  Jetson
+ SG_ external_2_critical_under : 7|1@1+ (1,0) [0|1] ""  Jetson
+ SG_ external_2_critical_over : 6|1@1+ (1,0) [0|1] ""  Jetson
+ SG_ external_2_under : 5|1@1+ (1,0) [0|1] ""  Jetson
+ SG_ external_2_over : 4|1@1+ (1,0) [0|1] ""  Jetson
+ SG_ external_1_critical_under : 3|1@1+ (1,0) [0|1] ""  Jetson
+ SG_ external_1_critical_over : 2|1@1+ (1,0) [0|1] ""  Jetson
+ SG_ external_1_under : 1|1@1+ (1,0) [0|1] ""  Jetson
+ SG_ external_1_over : 0|1@1+ (1,0) [0|1] ""  Jetson
+
+BO_ 641 temperature_sensor_board_status: 1 SensorBoard
+ SG_ ldo : 4|2@1+ (1,0) [1|3] ""  Jetson
+ SG_ ambient : 2|2@1+ (1,0) [1|3] ""  Jetson
+ SG_ ucontroller : 0|2@1+ (1,0) [1|3] ""  Jetson
+
+BO_ 642 temperature_sensor_board_tempera: 3 SensorBoard
+ SG_ ldo : 16|8@1- (1,0) [0|0] ""  Jetson
+ SG_ ambient : 8|8@1- (1,0) [0|0] ""  Jetson
+ SG_ ucontroller : 0|8@1- (1,0) [0|0] ""  Jetson
+
+BO_ 643 temperature_sensor_board_warning: 2 SensorBoard
+ SG_ ldo_critical_under : 11|1@1+ (1,0) [0|1] ""  Jetson
+ SG_ ldo_critical_over : 10|1@1+ (1,0) [0|1] ""  Jetson
+ SG_ ldo_under : 9|1@1+ (1,0) [0|1] ""  Jetson
+ SG_ ldo_over : 8|1@1+ (1,0) [0|1] ""  Jetson
+ SG_ ambient_critical_under : 7|1@1+ (1,0) [0|1] ""  Jetson
+ SG_ ambient_critical_over : 6|1@1+ (1,0) [0|1] ""  Jetson
+ SG_ ambient_under : 5|1@1+ (1,0) [0|1] ""  Jetson
+ SG_ ambient_over : 4|1@1+ (1,0) [0|1] ""  Jetson
+ SG_ ucontroller_critical_under : 3|1@1+ (1,0) [0|1] ""  Jetson
+ SG_ ucontroller_critical_over : 2|1@1+ (1,0) [0|1] ""  Jetson
+ SG_ ucontroller_under : 1|1@1+ (1,0) [0|1] ""  Jetson
+ SG_ ucontroller_over : 0|1@1+ (1,0) [0|1] ""  Jetson
+
+BO_ 673 temperature_power_board_status: 1 PowerBoard
+ SG_ mosfets : 4|2@1+ (1,0) [1|3] ""  Jetson
+ SG_ ambient : 2|2@1+ (1,0) [1|3] ""  Jetson
+ SG_ ucontroller : 0|2@1+ (1,0) [1|3] ""  Jetson
+
+BO_ 674 temperature_power_board_temperat: 3 PowerBoard
+ SG_ mosfets : 16|8@1- (1,0) [0|0] ""  Jetson
+ SG_ ambient : 8|8@1- (1,0) [0|0] ""  Jetson
+ SG_ ucontroller : 0|8@1- (1,0) [0|0] ""  Jetson
+
+BO_ 675 temperature_power_board_warnings: 2 PowerBoard
+ SG_ mosfets_critical_under : 11|1@1+ (1,0) [0|1] ""  Jetson
+ SG_ mosfets_critical_over : 10|1@1+ (1,0) [0|1] ""  Jetson
+ SG_ mosfets_under : 9|1@1+ (1,0) [0|1] ""  Jetson
+ SG_ mosfets_over : 8|1@1+ (1,0) [0|1] ""  Jetson
+ SG_ ambient_critical_under : 7|1@1+ (1,0) [0|1] ""  Jetson
+ SG_ ambient_critical_over : 6|1@1+ (1,0) [0|1] ""  Jetson
+ SG_ ambient_under : 5|1@1+ (1,0) [0|1] ""  Jetson
+ SG_ ambient_over : 4|1@1+ (1,0) [0|1] ""  Jetson
+ SG_ ucontroller_critical_under : 3|1@1+ (1,0) [0|1] ""  Jetson
+ SG_ ucontroller_critical_over : 2|1@1+ (1,0) [0|1] ""  Jetson
+ SG_ ucontroller_under : 1|1@1+ (1,0) [0|1] ""  Jetson
+ SG_ ucontroller_over : 0|1@1+ (1,0) [0|1] ""  Jetson
+
+BO_ 705 temperature_metal_detector_board: 1 MetalDetectorBoard
+ SG_ ucontroller : 0|2@1+ (1,0) [1|3] ""  Jetson
+
+BO_ 706 temperature_metal_detector__0000: 1 MetalDetectorBoard
+ SG_ ucontroller : 0|8@1- (1,0) [0|0] ""  Jetson
+
+BO_ 707 temperature_metal_detector__0001: 1 MetalDetectorBoard
+ SG_ ucontroller_critical_under : 3|1@1+ (1,0) [0|1] ""  Jetson
+ SG_ ucontroller_critical_over : 2|1@1+ (1,0) [0|1] ""  Jetson
+ SG_ ucontroller_under : 1|1@1+ (1,0) [0|1] ""  Jetson
+ SG_ ucontroller_over : 0|1@1+ (1,0) [0|1] ""  Jetson
+
+BO_ 1553 konarm_1_status: 1 KonARM
+ SG_ status : 0|8@1+ (1,0) [1|4] ""  Jetson
+
+BO_ 1554 konarm_1_set_pos: 8 Jetson
+ SG_ velocity : 32|32@1+ (1,0) [0|0] "rad/s"  KonARM
+ SG_ position : 0|32@1+ (1,0) [0|0] "rad"  KonARM
+
+BO_ 1555 konarm_1_get_pos: 8 KonARM
+ SG_ velocity : 32|32@1+ (1,0) [0|0] "rad/s"  Jetson
+ SG_ position : 0|32@1+ (1,0) [0|0] "rad"  Jetson
+
+BO_ 1556 konarm_1_clear_errors: 0 Jetson
+
+BO_ 1569 konarm_2_status: 1 KonARM
+ SG_ status : 0|8@1+ (1,0) [1|4] ""  Jetson
+
+BO_ 1570 konarm_2_set_pos: 8 Jetson
+ SG_ velocity : 32|32@1+ (1,0) [0|0] "rad/s"  KonARM
+ SG_ position : 0|32@1+ (1,0) [0|0] "rad"  KonARM
+
+BO_ 1571 konarm_2_get_pos: 8 KonARM
+ SG_ velocity : 32|32@1+ (1,0) [0|0] "rad/s"  Jetson
+ SG_ position : 0|32@1+ (1,0) [0|0] "rad"  Jetson
+
+BO_ 1572 konarm_2_clear_errors: 0 Jetson
+
+BO_ 1585 konarm_3_status: 1 KonARM
+ SG_ status : 0|8@1+ (1,0) [1|4] ""  Jetson
+
+BO_ 1586 konarm_3_set_pos: 8 Jetson
+ SG_ velocity : 32|32@1+ (1,0) [0|0] "rad/s"  KonARM
+ SG_ position : 0|32@1+ (1,0) [0|0] "rad"  KonARM
+
+BO_ 1587 konarm_3_get_pos: 8 KonARM
+ SG_ velocity : 32|32@1+ (1,0) [0|0] "rad/s"  Jetson
+ SG_ position : 0|32@1+ (1,0) [0|0] "rad"  Jetson
+
+BO_ 1588 konarm_3_clear_errors: 0 Jetson
+
+BO_TX_BU_ 34 : Jetson,SensorBoard;
+BO_TX_BU_ 39 : Jetson,SensorBoard;
+BO_TX_BU_ 43 : Jetson,SensorBoard;
+BO_TX_BU_ 44 : Jetson,SensorBoard;
+BO_TX_BU_ 45 : Jetson,SensorBoard;
+BO_TX_BU_ 46 : Jetson,SensorBoard;
+BO_TX_BU_ 47 : Jetson,SensorBoard;
+BO_TX_BU_ 56 : Jetson,SensorBoard;
+BO_TX_BU_ 98 : Jetson,SensorBoard;
+BO_TX_BU_ 103 : Jetson,SensorBoard;
+BO_TX_BU_ 107 : Jetson,SensorBoard;
+BO_TX_BU_ 108 : Jetson,SensorBoard;
+BO_TX_BU_ 109 : Jetson,SensorBoard;
+BO_TX_BU_ 110 : Jetson,SensorBoard;
+BO_TX_BU_ 111 : Jetson,SensorBoard;
+BO_TX_BU_ 120 : Jetson,SensorBoard;
+BO_TX_BU_ 1556 : Jetson,SensorBoard;
+BO_TX_BU_ 1572 : Jetson,SensorBoard;
+BO_TX_BU_ 1588 : Jetson,SensorBoard;
+
+
+
+BA_DEF_ BO_  "SystemMessageLongSymbol" STRING ;
+BA_DEF_ BO_  "GenMsgCycleTime" INT 0 65535;
+BA_DEF_DEF_  "SystemMessageLongSymbol" "";
+BA_DEF_DEF_  "GenMsgCycleTime" 0;
+BA_ "SystemMessageLongSymbol" BO_ 1092 "metal_detector_estimated_position";
+BA_ "SystemMessageLongSymbol" BO_ 41 "odrive_left_get_encoder_estimates";
+BA_ "SystemMessageLongSymbol" BO_ 105 "odrive_right_get_encoder_estimates";
+BA_ "SystemMessageLongSymbol" BO_ 642 "temperature_sensor_board_temperature";
+BA_ "SystemMessageLongSymbol" BO_ 643 "temperature_sensor_board_warnings";
+BA_ "SystemMessageLongSymbol" BO_ 674 "temperature_power_board_temperature";
+BA_ "SystemMessageLongSymbol" BO_ 705 "temperature_metal_detector_board_status";
+BA_ "SystemMessageLongSymbol" BO_ 706 "temperature_metal_detector_board_temperature";
+BA_ "SystemMessageLongSymbol" BO_ 707 "temperature_metal_detector_board_warnings";
+VAL_ 545 status 0 "unknown" 1 "charging" 2 "discharging" 3 "not_charging" 4 "full" ;
+VAL_ 513 mode 0 "unknown" 1 "manual" 2 "auto" ;
+VAL_ 1057 signal -1 "unable_to_fix_position" 0 "unaugmented_fix" 1 "satellite_based_augmentation" 2 "ground_based_augmentation" ;
+VAL_ 1057 status 1 "ok" 2 "disconnected" 3 "error" ;
+VAL_ 1025 status 1 "ok" 2 "disconnected" 3 "error" ;
+VAL_ 1089 channel_8 1 "ok" 2 "disconnected" 3 "error" ;
+VAL_ 1089 channel_7 1 "ok" 2 "disconnected" 3 "error" ;
+VAL_ 1089 channel_6 1 "ok" 2 "disconnected" 3 "error" ;
+VAL_ 1089 channel_5 1 "ok" 2 "disconnected" 3 "error" ;
+VAL_ 1089 channel_4 1 "ok" 2 "disconnected" 3 "error" ;
+VAL_ 1089 channel_3 1 "ok" 2 "disconnected" 3 "error" ;
+VAL_ 1089 channel_2 1 "ok" 2 "disconnected" 3 "error" ;
+VAL_ 1089 channel_1 1 "ok" 2 "disconnected" 3 "error" ;
+VAL_ 577 accelerometer 1 "ok" 2 "disconnected" 3 "error" ;
+VAL_ 609 external_4 1 "ok" 2 "disconnected" 3 "error" ;
+VAL_ 609 external_3 1 "ok" 2 "disconnected" 3 "error" ;
+VAL_ 609 external_2 1 "ok" 2 "disconnected" 3 "error" ;
+VAL_ 609 external_1 1 "ok" 2 "disconnected" 3 "error" ;
+VAL_ 641 ldo 1 "ok" 2 "disconnected" 3 "error" ;
+VAL_ 641 ambient 1 "ok" 2 "disconnected" 3 "error" ;
+VAL_ 641 ucontroller 1 "ok" 2 "disconnected" 3 "error" ;
+VAL_ 673 mosfets 1 "ok" 2 "disconnected" 3 "error" ;
+VAL_ 673 ambient 1 "ok" 2 "disconnected" 3 "error" ;
+VAL_ 673 ucontroller 1 "ok" 2 "disconnected" 3 "error" ;
+VAL_ 705 ucontroller 1 "ok" 2 "disconnected" 3 "error" ;
+VAL_ 1553 status 1 "ok" 2 "fault" 3 "overheat" 4 "emergency_stop" ;
+VAL_ 1569 status 1 "ok" 2 "fault" 3 "overheat" 4 "emergency_stop" ;
+VAL_ 1585 status 1 "ok" 2 "fault" 3 "overheat" 4 "emergency_stop" ;
+SIG_VALTYPE_ 1058 latitude : 2;
+SIG_VALTYPE_ 1059 longitude : 2;
+SIG_VALTYPE_ 41 pos_estimate : 1;
+SIG_VALTYPE_ 41 vel_estimate : 1;
+SIG_VALTYPE_ 44 input_pos : 1;
+SIG_VALTYPE_ 45 input_vel : 1;
+SIG_VALTYPE_ 46 imput_torque : 1;
+SIG_VALTYPE_ 47 velocity_limit : 1;
+SIG_VALTYPE_ 47 current_limit : 1;
+SIG_VALTYPE_ 55 vbus_voltage : 1;
+SIG_VALTYPE_ 105 pos_estimate : 1;
+SIG_VALTYPE_ 105 vel_estimate : 1;
+SIG_VALTYPE_ 108 input_pos : 1;
+SIG_VALTYPE_ 109 input_vel : 1;
+SIG_VALTYPE_ 110 imput_torque : 1;
+SIG_VALTYPE_ 111 velocity_limit : 1;
+SIG_VALTYPE_ 111 current_limit : 1;
+SIG_VALTYPE_ 119 vbus_voltage : 1;
+SIG_VALTYPE_ 1554 position : 1;
+SIG_VALTYPE_ 1554 velocity : 1;
+SIG_VALTYPE_ 1555 position : 1;
+SIG_VALTYPE_ 1555 velocity : 1;
+SIG_VALTYPE_ 1570 position : 1;
+SIG_VALTYPE_ 1570 velocity : 1;
+SIG_VALTYPE_ 1571 position : 1;
+SIG_VALTYPE_ 1571 velocity : 1;
+SIG_VALTYPE_ 1586 position : 1;
+SIG_VALTYPE_ 1586 velocity : 1;
+SIG_VALTYPE_ 1587 position : 1;
+SIG_VALTYPE_ 1587 velocity : 1;
+
+

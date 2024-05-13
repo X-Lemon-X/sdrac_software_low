@@ -121,25 +121,27 @@ void id_config(){
 
     //-------------------MOVEMENT EQUATION CONFIGURATION-------------------
     PDCONTROLER::PdControler *pdc = new PDCONTROLER::PdControler(main_clock);
-    pdc->set_Kp(1.0);
-    pdc->set_Kd(1.0);
+    pdc->set_Kp(0.50);
+    pdc->set_Kd(0.1f);
     movement_equation = (MOVEMENT_CONTROLER::MovementEquation*)pdc;
     
     //-------------------STEPER MOTOR CONFIGURATION-------------------
     stp_motor.set_steps_per_revolution(400);
     stp_motor.set_gear_ratio(75);
-    stp_motor.set_max_velocity(10);
-    stp_motor.set_min_velocity(0.1);
+    stp_motor.set_max_velocity(PI_d4);
+    stp_motor.set_min_velocity(0.01);
     stp_motor.set_reverse(false);
 
+
     //-------------------ENCODER CONFIGURATION-------------------
-    encoder.set_offset(0.0);
-    encoder.set_reverse(false);
+    encoder.set_offset(-0.747049f);
+    encoder.set_reverse(true);
     encoder.set_enable_filter(false);
     encoder.set_enable_velocity(true);
+    encoder.set_velocity_sample_amount(0);
 
     //-------------------MOVEMENT CONTROLER CONFIGURATION-------------------
-    movement_controler.set_limit_position(-PI/2.0, PI/2.0);
+    movement_controler.set_limit_position(-PI, PI);
     movement_controler.set_max_velocity(PI);
 
     break;
@@ -259,6 +261,8 @@ void handle_can_rx(){
     float targetVelocity = can_konarm_1_set_pos_velocity_decode(signals.velocity);
     movement_controler.set_velocity(targetVelocity);
     movement_controler.set_position(targetPosition);
+    movement_controler.set_enable(true);
+    log_debug("Set position: " + std::to_string(targetPosition) + " Set velocity: " + std::to_string(targetVelocity));
   }
   else if (recived_msg.frame_id == CAN_KONARM_X_GET_POS_FRAME_ID && recived_msg.remote_request){
     CAN_CONTROL::CAN_MSG send_msg = {0};
@@ -309,21 +313,34 @@ void main_loop(){
   TIMING::Timing tim_encoder(main_clock);
   TIMING::Timing tim_usb(main_clock);
   TIMING::Timing tim_movement(main_clock);
+  TIMING::Timing tim_send_pos(main_clock);
   tim_blink.set_behaviour(500000, true);
   tim_encoder.set_behaviour(1000, true);
   tim_usb.set_behaviour(300000, true);
   tim_movement.set_behaviour(1000, true);
-
+  tim_send_pos.set_behaviour(50000, true);
   // Start the main loop
+  stp_motor.set_enable(true);
+  stp_motor.set_velocity(PI/12.0);
+
+
+  movement_controler.set_enable(true);
+  movement_controler.set_velocity(PI/12.0);
   while (1){
     handle_can_rx();
     can_controler.handle_led_blink();
     
     if(tim_encoder.triggered()){
       encoder.handle();
+      // log_deebug("Current angle: " + std::to_string(encoder.read_angle()));
     }
 
-    movement_controler.handle();
+
+    if(tim_send_pos.triggered()){
+      movement_controler.handle();
+      // log_debug("pos:" + std::to_string(movement_controler.get_current_position()) + " vel:" + std::to_string(movement_controler.get_current_velocity()));
+    //  log_debug("Current velocity: " + std::to_string(movement_controler.get_current_velocity()));
+    }
 
     // if (tim_movement.triggered()){
     //   movement_controler.handle();

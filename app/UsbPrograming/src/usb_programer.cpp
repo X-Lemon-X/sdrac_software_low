@@ -46,6 +46,6 @@ void UsbProgramer::handler(){
     enter_dfu_mode();
   }
   else{
-    log_debug("UsbProgramer:Unknown command");
+    // log_debug("UsbProgramer:Unknown command");
   }
 }

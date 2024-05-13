@@ -45,7 +45,7 @@ void CanControl::irq_handle_rx(){
   blink_rx_led();
   if (HAL_CAN_GetRxMessage(can_interface, can_fifo, &header, data) != HAL_OK)
     return;
-  CAN_MSG msg = {0};
+  CAN_MSG msg;
   msg.frame_id = header.StdId;
   msg.remote_request = header.RTR == CAN_RTR_REMOTE;
   msg.data_size = header.DLC;
@@ -68,7 +68,7 @@ void CanControl::handle_led_blink(){
 }
 
 void CanControl::send_message(CAN_MSG &msg){
-  CAN_TxHeaderTypeDef tx_header = {0};
+  CAN_TxHeaderTypeDef tx_header;
   tx_header.StdId = msg.frame_id;
   tx_header.DLC = msg.data_size;
   tx_header.RTR = CAN_RTR_DATA;

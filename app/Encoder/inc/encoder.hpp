@@ -9,6 +9,7 @@
 #define ENCODERS_H
 
 #define VELOCITY_FILTER_SIZE 6
+#define ANGLE_MAX_DEFFERENCE 1.0 // 1 radian
 
 namespace ENCODER {
   
@@ -19,12 +20,14 @@ private:
   FILTERS::FilterBase *filter_angle;
   FILTERS::FilterBase *filter_velocity;
 
-  uint16_t raw_angle;
   uint8_t data[2];
   float last_time;
   float prev_angle;
   float current_velocity;
-  float current_angle;
+
+  float prev_angle_velocity;
+  float over_drive_angle;
+  float absoulte_angle;
 
   uint16_t resolution;
   float offset;
@@ -35,6 +38,8 @@ private:
   bool enable_filter;
   bool enable_velocity;
   bool enable_velocity_filter;
+  uint16_t velocity_sample_count;
+  uint16_t velocity_samples_amount;
   
   /// @brief Calucaltes velcoicty, and passes it thoroung a filter
   /// @param angle current angle
@@ -75,40 +80,43 @@ public:
 
   /// @brief sets the resolution of the encoder
   /// @param resolution the resolution of the encoder 
-  void set_resolution(uint16_t resolution){this->resolution = resolution;};
+  void set_resolution(uint16_t resolution);
   
   /// @brief sets the offset of the encoder
   /// @param offset the offset in radians
-  void set_offset(float offset){this->offset = offset;};
+  void set_offset(float offset);
   
   /// @brief sets the reverse of the encoder
   /// @param reverse true if the encoder is reversed
-  void set_reverse(bool reverse){this->reverse = reverse;};
+  void set_reverse(bool reverse);
   
   /// @brief sets the address of the encoder 
   /// @param address the address of the encoder
-  void set_address(uint8_t address){this->address = address;};
+  void set_address(uint8_t address);
   
   /// @brief sets the angle register of the encoder
   /// @param angle_register the angle register of the encoder
-  void set_angle_register(uint8_t angle_register){this->angle_register = angle_register;};
+  void set_angle_register(uint8_t angle_register);
   
   /// @brief sets the magnes detection register of the encoder
   /// @param magnes_detection_register the magnes detection register of the encoder 
-  void set_magnes_detection_register(uint8_t magnes_detection_register){this->magnes_detection_register = magnes_detection_register;};
+  void set_magnes_detection_register(uint8_t magnes_detection_register);
   
   /// @brief sets the enable filter of the encoder 
   /// @param enable_filter true if the filter is enabled
-  void set_enable_filter(bool enable_filter){this->enable_filter = enable_filter;};
+  void set_enable_filter(bool enable_filter);
   
   /// @brief sets the enable velocity of the encoder 
   /// @param enable_velocity true if the you wnat the velocity to be calculated
-  void set_enable_velocity(bool enable_velocity){this->enable_velocity = enable_velocity;};
+  void set_enable_velocity(bool enable_velocity);
   
   /// @brief sets the enable velocity filter of the encoder 
   /// @param enable_velocity_filter true if the velocity filter is enabled
-  void set_enable_velocity_filter(bool enable_velocity_filter){this->enable_velocity_filter = enable_velocity_filter;};
+  void set_enable_velocity_filter(bool enable_velocity_filter);
 
+  /// @brief sets the velocity sample count of the encoder
+  /// @param velocity_samples_amount the amount of samples to skip before calculating the velocity
+  void set_velocity_sample_amount(uint16_t velocity_samples_amount);
 };
 
 }

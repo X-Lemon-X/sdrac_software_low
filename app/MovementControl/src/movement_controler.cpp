@@ -2,6 +2,8 @@
 #include "main.h"
 #include "stm32f4xx_hal.h"
 #include "movement_controler.hpp"
+#include "logger.hpp"
+#include "main_prog.hpp"
 
 
 using namespace MOVEMENT_CONTROLER;
@@ -37,21 +39,18 @@ void MovementControler::handle(){
   if (!initialized) return;
   current_position = encoder->get_angle();
   current_velocity = encoder->get_velocity();
+
   float new_velocity = movement_equation->calculate(current_position, target_position, current_velocity, target_velocity);
-  
+
+  // log_debug(std::to_string(new_velocity));
+
   if (abs(new_velocity) > max_velocity)
     new_velocity = max_velocity;
-
-  if(enable) {
-    steper_motor->set_enable(true);
-  } else {
-    steper_motor->set_enable(false);
-    new_velocity = 0.0;
-  }
 
   if (current_position < min_position || current_position > max_position)
     new_velocity = 0.0;
 
+  steper_motor->set_enable(enable);
   steper_motor->set_velocity(new_velocity);
 }
 

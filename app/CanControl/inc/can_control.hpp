@@ -30,7 +30,7 @@ private:
   TIMING::Timing *timing_led_rx;
   TIMING::Timing *timing_led_tx;
   uint8_t data[CAN_DATA_FRAME_MAX_SIZE];
-  CAN_RxHeaderTypeDef header = {0};
+  CAN_RxHeaderTypeDef header;
   std::list<CAN_MSG> rx_msg_buffer;
   const GPIO_PIN *pin_tx_led;
   const GPIO_PIN *pin_rx_led;
