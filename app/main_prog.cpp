@@ -24,17 +24,17 @@
 // Gpio assigments
 GPIO_PIN pin_user_led_1 = {GPIO_PIN_6, GPIOC};
 GPIO_PIN pin_user_led_2 = {GPIO_PIN_7, GPIOC};
-GPIO_PIN pin_user_btn_1 = {GPIO_PIN_9, GPIOC};
-GPIO_PIN pin_tx_led = {GPIO_PIN_12, GPIOB};
+GPIO_PIN pin_user_btn_1 = {GPIO_PIN_9, GPIOC}; // GPIO_PIN_9, GPIOA
+GPIO_PIN pin_tx_led = {GPIO_PIN_12, GPIOB}; 
 GPIO_PIN pin_rx_led = {GPIO_PIN_13, GPIOB};
-GPIO_PIN pin_encoder = {GPIO_PIN_3, GPIOB};
-GPIO_PIN pin_poz_zero_sensor = {GPIO_PIN_4, GPIOA};
-GPIO_PIN pin_inout_ca1 = {GPIO_PIN_5, GPIOA};
+GPIO_PIN pin_encoder = {GPIO_PIN_3, GPIOB};  
+GPIO_PIN pin_poz_zero_sensor = {GPIO_PIN_4, GPIOA}; 
+GPIO_PIN pin_inout_ca1 = {GPIO_PIN_5, GPIOA}; 
 GPIO_PIN pin_inout_ca2 = {GPIO_PIN_7, GPIOA};
-GPIO_PIN pin_inout_crx = {GPIO_PIN_10, GPIOB};
-GPIO_PIN pin_inout_ctx = {GPIO_PIN_4, GPIOC};
-GPIO_PIN pin_sync_puls = {GPIO_PIN_8, GPIOA};
-GPIO_PIN pin_sync_dir = {GPIO_PIN_9, GPIOA};
+GPIO_PIN pin_inout_crx = {GPIO_PIN_4, GPIOC};
+GPIO_PIN pin_inout_ctx = {GPIO_PIN_10, GPIOB};
+GPIO_PIN pin_sync_sda = {GPIO_PIN_9, GPIOC}; 
+GPIO_PIN pin_sync_scl = {GPIO_PIN_8, GPIOA};
 GPIO_PIN pin_temp_steper_board = {GPIO_PIN_0, GPIOA};
 GPIO_PIN pin_temp_board = {GPIO_PIN_1, GPIOA};
 GPIO_PIN pin_temp_motor = {GPIO_PIN_2, GPIOA};
@@ -45,9 +45,9 @@ GPIO_PIN pin_steper_step = {GPIO_PIN_6, GPIOA};
 GPIO_PIN pin_boot_device = {GPIO_PIN_8, GPIOC};
 
 // to do
- GPIO_PIN pin_cid_0 = {GPIO_PIN_0, GPIOC};
- GPIO_PIN pin_cid_1 = {GPIO_PIN_1, GPIOC};
- GPIO_PIN pin_cid_2 = {GPIO_PIN_2, GPIOC};
+ GPIO_PIN pin_cid_0 = {GPIO_PIN_10, GPIOC};
+ GPIO_PIN pin_cid_1 = {GPIO_PIN_11, GPIOC};
+ GPIO_PIN pin_cid_2 = {GPIO_PIN_12, GPIOC};
 
 //**************************************************************************************************
 // Global stuff
@@ -92,8 +92,7 @@ void id_config();
 void init_controls();
 
 //**************************************************************************************************
-void main_prog()
-{
+void main_prog(){
   log_debug("Start main_prog\n");
   id_config();
   periferal_config();
