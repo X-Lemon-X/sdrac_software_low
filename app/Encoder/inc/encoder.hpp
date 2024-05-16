@@ -9,7 +9,7 @@
 #define ENCODERS_H
 
 #define VELOCITY_FILTER_SIZE 6
-#define ANGLE_MAX_DEFFERENCE 2.0 // 1 radian
+#define ANGLE_MAX_DEFFERENCE 2.0f // 1 radian
 
 namespace ENCODER {
   

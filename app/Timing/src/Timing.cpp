@@ -5,6 +5,10 @@
 
 using namespace TIMING;
 
+uint32_t TIMING::frequency_to_period(uint32_t frequency){
+  return 1000000/frequency;
+}
+
 Ticker::Ticker(){
   tick_millis = 0;
   tick_micros = 0;

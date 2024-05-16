@@ -3,8 +3,8 @@ This is a a low level software for SDRACboards from SDRAC project (6DOF Manipula
 The project is based on the STM32F412RGT6 microcontroller.
 
 ## TO DO:
- - simple arm control alogrithm
- - reading ADC
+ - simple arm control alogrithm ( PID ?  P is working for velocity control)
+ - reading ADC (sort of working)
  - reading/writing data to FRAM
  - IO control from CAN ?
 ## DONE:

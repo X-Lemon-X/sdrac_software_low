@@ -62,7 +62,7 @@ BOARD_ID::Board_id board_id(pin_cid_0, pin_cid_1, pin_cid_2);
 STEPER_MOTOR::SteperMotor stp_motor(htim3, TIM_CHANNEL_1, pin_steper_direction, pin_steper_enable);
 CAN_CONTROL::CanControl can_controler;
 MOVEMENT_CONTROLER::MovementControler movement_controler;
-ENCODER::Encoder encoder;
+ENCODER::Encoder encoder_arm;
 USB_PROGRAMER::UsbProgramer usb_programer(pin_boot_device);
 TIMING::Timing tim_can_disconnected(main_clock);
 
@@ -107,9 +107,9 @@ void id_config(){
   log_debug("Start id_config\n");
   log_debug("Board id: " + std::to_string(board_id.get_id()));
 
-  encoder.set_address(ENCODER_MT6701_I2C_ADDRESS);
-  encoder.set_resolution(ENCODER_MT6702_RESOLUTION);
-  encoder.set_angle_register(ENCODER_MEM_ADDR_ANNGLE);
+  encoder_arm.set_address(ENCODER_MT6701_I2C_ADDRESS);
+  encoder_arm.set_resolution(ENCODER_MT6702_RESOLUTION);
+  encoder_arm.set_angle_register(ENCODER_MEM_ADDR_ANNGLE);
    
 
   switch (board_id.get_id())
@@ -143,14 +143,14 @@ void id_config(){
     FILTERS::Filter_moving_avarage *fv = new FILTERS::Filter_moving_avarage(main_clock);
     fv->set_size(60); // 15 for smooth movement but delay with sampling to 50
 
-    encoder.set_offset(-0.194048f);
-    encoder.set_reverse(true);
-    encoder.set_enable_pos_filter(false);
-    encoder.set_enable_velocity(true);
-    encoder.set_enable_velocity_filter(true);
-    encoder.set_velocity_sample_amount(10);
-    encoder.set_dead_zone_correction_angle(PI_d2*3);
-    encoder.init(hi2c1,main_clock,nullptr,fv);
+    encoder_arm.set_offset(-0.194048f);
+    encoder_arm.set_reverse(true);
+    encoder_arm.set_enable_pos_filter(false);
+    encoder_arm.set_enable_velocity(true);
+    encoder_arm.set_enable_velocity_filter(true);
+    encoder_arm.set_velocity_sample_amount(10);
+    encoder_arm.set_dead_zone_correction_angle(PI_d2*3);
+    encoder_arm.init(hi2c1,main_clock,nullptr,fv);
     
 
     //-------------------MOVEMENT CONTROLER CONFIGURATION-------------------
@@ -159,7 +159,7 @@ void id_config(){
     pdc->set_Kd(0.01f);
     movement_controler.set_limit_position(-1.089126f, 4.236856f);
     movement_controler.set_max_velocity(PI);
-    movement_controler.init(main_clock, stp_motor, encoder, *pdc);
+    movement_controler.init(main_clock, stp_motor, encoder_arm, *pdc);
 
     break;
   }
@@ -213,7 +213,7 @@ void id_config(){
     CAN_X_FILTER_ID_LOW = 0x000;
     CAN_X_FILTER_MASK_HIGH = 0xff0<<5;
     CAN_X_FILTER_MASK_LOW = 0x000;
-    break;
+    break;          
   }
   // case SDRAC_ID_6:
   //   //-------------------CAN CONFIGURATION-------------------
@@ -232,7 +232,7 @@ void id_config(){
 void periferal_config(){
   log_debug("Start periferal_config\n");
   // dma adc1 settings
-  // HAL_ADC_Start_DMA(&hadc1, adc_dma_buffer, ADC_DMA_BUFFER_SIZE);
+  HAL_ADC_Start_DMA(&hadc1, adc_dma_buffer, ADC_DMA_BUFFER_SIZE);
 
   // timer 10 settings
   HAL_NVIC_SetPriority(TIM1_TRG_COM_TIM11_IRQn,6,0);
@@ -310,7 +310,7 @@ void init_controls(){
   log_debug("Start init_interfaces\n");
 
   // init the movement controler should be done after the encoder and the steper motor are initialized
-  movement_controler.set_position(encoder.get_angle());
+  movement_controler.set_position(encoder_arm.get_angle());
   movement_controler.set_velocity(0);
   movement_controler.set_enable(false);
   movement_controler.handle();
@@ -322,19 +322,19 @@ void main_loop(){
   TIMING::Timing tim_encoder(main_clock);
   TIMING::Timing tim_usb(main_clock);
   TIMING::Timing tim_movement(main_clock);
-  tim_blink.set_behaviour(250000, true);
-  tim_encoder.set_behaviour(1000, true);
-  tim_usb.set_behaviour(300000, true);
-  tim_movement.set_behaviour(1000, true);
+  TIMING::Timing tim_data_usb_send(main_clock);
+  tim_blink.set_behaviour(TIMING::frequency_to_period(4), true);
+  tim_encoder.set_behaviour(TIMING::frequency_to_period(1000), true);
+  tim_usb.set_behaviour(TIMING::frequency_to_period(4), true);
+  tim_movement.set_behaviour(TIMING::frequency_to_period(1000), true);
+  tim_data_usb_send.set_behaviour(TIMING::frequency_to_period(100), true);
   tim_can_disconnected.set_behaviour(1000000, false);
-  tim_can_disconnected.reset();
-
   while (1){
     handle_can_rx();
     can_controler.handle();
     
     if(tim_encoder.triggered()){
-      encoder.handle();
+      encoder_arm.handle();
     }
     
     if(tim_can_disconnected.triggered()){
