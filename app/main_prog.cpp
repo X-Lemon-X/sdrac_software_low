@@ -35,10 +35,12 @@ GPIO_PIN pin_inout_crx = {GPIO_PIN_4, GPIOC};
 GPIO_PIN pin_inout_ctx = {GPIO_PIN_10, GPIOB};
 GPIO_PIN pin_sync_sda = {GPIO_PIN_9, GPIOC}; 
 GPIO_PIN pin_sync_scl = {GPIO_PIN_8, GPIOA};
+
 GPIO_PIN pin_temp_steper_board = {GPIO_PIN_0, GPIOA};
 GPIO_PIN pin_temp_board = {GPIO_PIN_1, GPIOA};
 GPIO_PIN pin_temp_motor = {GPIO_PIN_2, GPIOA};
 GPIO_PIN pin_vsense = {GPIO_PIN_3, GPIOA};
+
 GPIO_PIN pin_steper_direction = {GPIO_PIN_0, GPIOB};
 GPIO_PIN pin_steper_enable = {GPIO_PIN_1, GPIOB};
 GPIO_PIN pin_steper_step = {GPIO_PIN_6, GPIOA};
@@ -62,6 +64,7 @@ CAN_CONTROL::CanControl can_controler;
 MOVEMENT_CONTROLER::MovementControler movement_controler;
 ENCODER::Encoder encoder;
 USB_PROGRAMER::UsbProgramer usb_programer(pin_boot_device);
+TIMING::Timing tim_can_disconnected(main_clock);
 
 //**************************************************************************************************
 // Id dependable configuration 
@@ -126,7 +129,6 @@ void id_config(){
     CAN_X_FILTER_MASK_LOW = 0x000;
 
 
-    
     //-------------------STEPER MOTOR CONFIGURATION-------------------
     stp_motor.set_steps_per_revolution(400);
     stp_motor.set_gear_ratio(75);
@@ -147,13 +149,14 @@ void id_config(){
     encoder.set_enable_velocity(true);
     encoder.set_enable_velocity_filter(true);
     encoder.set_velocity_sample_amount(10);
+    encoder.set_dead_zone_correction_angle(PI_d2*3);
     encoder.init(hi2c1,main_clock,nullptr,fv);
     
 
     //-------------------MOVEMENT CONTROLER CONFIGURATION-------------------
     PDCONTROLER::PdControler *pdc = new PDCONTROLER::PdControler(main_clock);
-    pdc->set_Kp(0.50);
-    pdc->set_Kd(0.1f);
+    pdc->set_Kp(0.90);
+    pdc->set_Kd(0.01f);
     movement_controler.set_limit_position(-1.089126f, 4.236856f);
     movement_controler.set_max_velocity(PI);
     movement_controler.init(main_clock, stp_motor, encoder, *pdc);
@@ -229,7 +232,7 @@ void id_config(){
 void periferal_config(){
   log_debug("Start periferal_config\n");
   // dma adc1 settings
-  // HAL_ADC_Start_DMA(&hadc1, (uint32_t*)adc_dma_buffer, 3);
+  // HAL_ADC_Start_DMA(&hadc1, adc_dma_buffer, ADC_DMA_BUFFER_SIZE);
 
   // timer 10 settings
   HAL_NVIC_SetPriority(TIM1_TRG_COM_TIM11_IRQn,6,0);
@@ -265,6 +268,7 @@ void periferal_config(){
 void handle_can_rx(){
   CAN_CONTROL::CAN_MSG recived_msg = {0};
   if(can_controler.get_message(&recived_msg)) return;
+  tim_can_disconnected.reset();
 
   // log_debug("Recived message: " + std::to_string(recived_msg.frame_id));
   
@@ -276,7 +280,7 @@ void handle_can_rx(){
     movement_controler.set_velocity(targetVelocity);
     movement_controler.set_position(targetPosition);
     movement_controler.set_enable(true);
-    log_debug("sp:" + std::to_string(targetPosition) + " sv:" + std::to_string(targetVelocity));
+    // log_debug("sp:" + std::to_string(targetPosition) + " sv:" + std::to_string(targetVelocity));
   }
   else if (recived_msg.frame_id == CAN_KONARM_X_GET_POS_FRAME_ID && recived_msg.remote_request){
     CAN_CONTROL::CAN_MSG send_msg = {0};
@@ -308,7 +312,7 @@ void init_controls(){
   // init the movement controler should be done after the encoder and the steper motor are initialized
   movement_controler.set_position(encoder.get_angle());
   movement_controler.set_velocity(0);
-  movement_controler.set_enable(true);
+  movement_controler.set_enable(false);
   movement_controler.handle();
 }
 
@@ -318,49 +322,37 @@ void main_loop(){
   TIMING::Timing tim_encoder(main_clock);
   TIMING::Timing tim_usb(main_clock);
   TIMING::Timing tim_movement(main_clock);
-  TIMING::Timing tim_send_pos(main_clock);
-
-  // TIMING::Timing accelerate(main_clock);
-  // accelerate.set_behaviour(3000000, true);
-
-  tim_blink.set_behaviour(500000, true);
+  tim_blink.set_behaviour(250000, true);
   tim_encoder.set_behaviour(1000, true);
   tim_usb.set_behaviour(300000, true);
   tim_movement.set_behaviour(1000, true);
-  tim_send_pos.set_behaviour(100000, true);
-  // Start the main loop
+  tim_can_disconnected.set_behaviour(1000000, false);
+  tim_can_disconnected.reset();
 
-  movement_controler.set_enable(true);
-  // movement_controler.set_velocity(0);
-  // float velocity = 0,set_velocity = 0;
   while (1){
     handle_can_rx();
-    can_controler.handle_led_blink();
+    can_controler.handle();
     
     if(tim_encoder.triggered()){
       encoder.handle();
     }
-
-    // if(accelerate.triggered()){
-    //   movement_controler.set_velocity(velocity);
-    //   set_velocity = velocity;
-    //   velocity += 0.05;
-    //   if(velocity > PI/10.0) velocity = 0;
-    // }
-    movement_controler.handle();
-    if(tim_send_pos.triggered()){
-      log_debug("cp:" + std::to_string(movement_controler.get_current_position()) + " cv:" + std::to_string(movement_controler.get_current_velocity()));
-      // log_debug( std::to_string(movement_controler.get_current_position()) + ";" + std::to_string(movement_controler.get_current_velocity()) + ";" + std::to_string(main_clock.get_seconds()) + ";" + std::to_string(set_velocity) );
-    //  log_debug("Current velocity: " + std::to_string(movement_controler.get_current_velocity()));
+    
+    if(tim_can_disconnected.triggered()){
+      movement_controler.set_enable(false);
+      movement_controler.set_velocity(0);
+      movement_controler.set_position(movement_controler.get_current_position());
     }
+    
+    movement_controler.handle();
 
     if(tim_usb.triggered()){
       usb_programer.handler();
     }
 
-    if(tim_blink.triggered()){
+    if(tim_blink.triggered()) {
       TOGGLE_GPIO(pin_user_led_1);
     }
+    
 
   }
 }

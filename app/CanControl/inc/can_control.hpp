@@ -65,8 +65,9 @@ public:
   /// @brief  Handle the TX interrupt
   void irq_handle_tx();
 
-  /// @brief  Handle the LED blink this function should be called in the main loop
-  void handle_led_blink();
+  /// @brief  This function should be called in the main loop of the uc program
+  ///         It will handle the RX and TX leds and other tasks that require some updates
+  void handle();
 
   /// @brief  Send a message over CAN bus
   void send_message(CAN_MSG &msg);

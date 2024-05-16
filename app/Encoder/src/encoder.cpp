@@ -2,6 +2,7 @@
 #include "main.h"
 #include "encoder.hpp"
 #include <stdexcept>
+#include <cmath>
 // #include "main_prog.hpp"
 
 using namespace ENCODER;
@@ -16,6 +17,7 @@ this->data[1] = 0;
 this->enable_filter = false;
 this->enable_velocity = false;
 this->enable_velocity_filter = false;
+this->dead_zone_correction_angle=0;
 }
 
 void Encoder::init(I2C_HandleTypeDef &hi2c, TIMING::Ticker &ticker, FILTERS::FilterBase *filter_angle, FILTERS::FilterBase *filter_velocity){
@@ -24,10 +26,17 @@ void Encoder::init(I2C_HandleTypeDef &hi2c, TIMING::Ticker &ticker, FILTERS::Fil
   this->filter_angle = filter_angle;
   this->filter_velocity = filter_velocity;
   this->last_time = ticker.get_seconds();
-  this->prev_angle = read_angle();
-  this->prev_angle_velocity = this->absoulte_angle;
   this->current_velocity = 0;
   this->over_drive_angle = 0;
+
+  float angle = read_angle_rads();
+  // correct the angle begin value to avoid false rotation dircetion 
+  // after first starting after power down
+  if(dead_zone_correction_angle != 0)
+    this->over_drive_angle = angle > this->dead_zone_correction_angle ? -PI_m2 : 0; 
+  this->prev_angle =  angle;
+  read_angle();
+  this->prev_angle_velocity = this->absolute_angle;
 }
 
 bool Encoder::ping_encoder(){
@@ -55,25 +64,30 @@ float Encoder::calculate_velocity(float angle){
   return current_velocity;
 }
 
-float Encoder::read_angle(){
-  float angle = (float)read_raw_angle()*PI_m2 / (float)this->resolution;
+float Encoder::read_angle_rads(){
+  float angle =  (float)read_raw_angle()*PI_m2 / (float)this->resolution;
   if(this->reverse) angle = PI_m2 - angle;
   angle += this->offset;
   if (angle > PI_m2) angle -= PI_m2;
   if (angle < 0) angle += PI_m2;
+  return angle;
+}
+
+float Encoder::read_angle(){
+  float angle = read_angle_rads();
 
   if(prev_angle - angle > ANGLE_MAX_DEFFERENCE)
     over_drive_angle += PI_m2;
   else if(angle - prev_angle > ANGLE_MAX_DEFFERENCE)
     over_drive_angle -= PI_m2;
   prev_angle = angle;
-  absoulte_angle = angle + over_drive_angle;
+  absolute_angle = angle + over_drive_angle;
   
   if(this->enable_filter && this->filter_angle != nullptr)
-    absoulte_angle = filter_angle->calculate(absoulte_angle);
+    absolute_angle = filter_angle->calculate(absolute_angle);
 
   if(this->enable_velocity && ++velocity_sample_count >= velocity_samples_amount){
-    this->current_velocity = calculate_velocity(absoulte_angle);
+    this->current_velocity = calculate_velocity(absolute_angle);
     velocity_sample_count = 0;
   }
   return angle;
@@ -84,12 +98,16 @@ void Encoder::handle(){
 }
 
 
-float Encoder::get_velocity(){
+float Encoder::get_velocity() const{
   return this->current_velocity;
 }
 
-float Encoder::get_angle(){
-  return this->absoulte_angle;
+float Encoder::get_angle() const{
+  return this->prev_angle;
+}
+
+float Encoder::get_absoulte_angle() const{
+  return this->absolute_angle;
 }
 
 void Encoder::set_resolution(uint16_t resolution){
@@ -130,4 +148,8 @@ void Encoder::set_enable_velocity_filter(bool enable_velocity_filter){
 
 void Encoder::set_velocity_sample_amount(uint16_t velocity_samples_amount){
   this->velocity_samples_amount = velocity_samples_amount;
+}
+
+void Encoder::set_dead_zone_correction_angle(float dead_zone_correction_angle){
+  this->dead_zone_correction_angle = abs(dead_zone_correction_angle);
 }

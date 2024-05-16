@@ -93,7 +93,7 @@ extern GPIO_PIN pin_cid_2;
 //**************************************************************************************************
 // all the global variables, peripherals, and buffors are declared here
 
-#define ADC_DMA_BUFFER_SIZE 16
+#define ADC_DMA_BUFFER_SIZE 8000
 extern uint32_t adc_dma_buffer[ADC_DMA_BUFFER_SIZE];
 
 extern ADC_HandleTypeDef hadc1;

@@ -27,10 +27,11 @@ private:
 
   float prev_angle_velocity;
   float over_drive_angle;
-  float absoulte_angle;
+  float absolute_angle;
 
   uint16_t resolution;
   float offset;
+  float dead_zone_correction_angle;
   bool reverse;
   uint8_t address;
   uint8_t angle_register;
@@ -47,12 +48,18 @@ private:
   /// @return returns the filtered velocity
   float calculate_velocity(float angle);
 
+
+  /// @brief reads the angle from the encoder and converts it to radians
+  /// applays the offset and the reverse
+  float read_angle_rads();
+
 public:
   
   /// @brief Init fucnion of the encoder
   Encoder();
   
-  /// @brief Init fucnion of the encoder
+  /// @brief Initiates the encoder
+  /// should be called after all the settings are set  especially the dead zone correction angle if used
   void init(I2C_HandleTypeDef &hi2c,TIMING::Ticker &ticker , FILTERS::FilterBase *filter_angle,FILTERS::FilterBase *filter_velocity);
 
   /// @brief Pings the encoder to check if it is connected
@@ -72,11 +79,17 @@ public:
 
   /// @brief reads the last calculated velocity
   /// @return the velocity in radians per second 
-  float get_velocity();
+  float get_velocity() const;
 
-  /// @brief gets the last calcualted angle
+  /// @brief gets the last calcualted angle with offset and reverse
   /// @return the angle in radians
-  float get_angle();
+  float get_angle() const;
+
+  /// @brief gets the latest cacualted absolute angle 
+  /// absoulte angle includes information how many times the encoder has rotated
+  /// for example if the encoder has rotated 3 times the angle will be 6pi + the current angle
+  /// @return the absoulte angle in radians
+  float get_absoulte_angle() const;
 
   /// @brief sets the resolution of the encoder
   /// @param resolution the resolution of the encoder 
@@ -98,7 +111,7 @@ public:
   /// @param angle_register the angle register of the encoder
   void set_angle_register(uint8_t angle_register);
   
-  /// @brief sets the magnes detection register of the encoder
+  /// @brief sets the magnes detection register of the encoder (unsuported feature in MT6701)
   /// @param magnes_detection_register the magnes detection register of the encoder 
   void set_magnes_detection_register(uint8_t magnes_detection_register);
   
@@ -117,7 +130,15 @@ public:
   /// @brief sets how many smaples will be skipped before calculating the velocity
   /// fixes the problem of low velocity readings
   /// @param velocity_samples_amount the amount of samples to skip before calculating the velocity
-  void set_velocity_sample_amount(uint16_t velocity_samples_amount);
+  void set_velocity_sample_amount(uint16_t velocity_samples_amount);\
+
+  /// @brief sets the begin roation dead zone correction angle
+  /// the dead zone angle is used to correct initial value of the angle to be etehr positive or negative
+  /// since the same angle can be read as either positive or negative value -pi/2 or 3pi/2
+  /// the dead zone angle is used to correct this by making the angle 
+  /// on the left side of the dead zone angle negative and on the right side positive
+  /// @param begin_roation_dead_zone_correction_angle the angle in radians, can be set to 0 if not used
+  void set_dead_zone_correction_angle(float begin_roation_dead_zone_correction_angle);
 };
 
 }

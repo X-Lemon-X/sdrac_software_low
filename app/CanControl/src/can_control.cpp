@@ -49,17 +49,15 @@ void CanControl::irq_handle_rx(){
   msg.frame_id = header.StdId;
   msg.remote_request = header.RTR == CAN_RTR_REMOTE;
   msg.data_size = header.DLC;
-  // memcpy(data,msg.data,msg.data_size);
-  // std::copy(data,data+msg.data_size,msg.data);
   memcpy(msg.data,data,msg.data_size);
   push_to_queue(msg);
 }
 
 void CanControl::irq_handle_tx(){
-  
+  return;
 }
 
-void CanControl::handle_led_blink(){
+void CanControl::handle(){
   if(this->timing_led_rx->triggered())
     WRITE_GPIO((*pin_rx_led),GPIO_PIN_RESET);
   
