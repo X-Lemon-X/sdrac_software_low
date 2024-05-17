@@ -3,8 +3,10 @@
 #include "CanDB.h"
 #include "stm32f4xx_hal.h"
 #include "main.h"
+#include "main_prog.hpp"
 #include <string.h>
 #include "stdlib.h"
+#include "list.hpp"
 
 
 using namespace CAN_CONTROL;
@@ -36,6 +38,13 @@ void CanControl::push_to_queue(CAN_MSG *msg){
     return;
   }
   rx_msg_buffer.push_back(msg);
+
+  // if(rx_msg_buffer_2.size() == CAN_QUEUE_SIZE){
+  //   free(msg);
+  //   return;
+  // }
+  // rx_msg_buffer_2.push_back(msg);
+
 }
 
 void CanControl::blink_tx_led(){
@@ -53,6 +62,8 @@ void CanControl::irq_handle_rx(){
   if (HAL_CAN_GetRxMessage(can_interface, can_fifo, &header, data) != HAL_OK)
     return;
   CAN_MSG *msg = (CAN_MSG*)malloc(sizeof(CAN_MSG));
+  if(msg == nullptr)
+    return;
   msg->frame_id = header.StdId;
   msg->remote_request = header.RTR == CAN_RTR_REMOTE;
   msg->data_size = header.DLC;
@@ -62,7 +73,7 @@ void CanControl::irq_handle_rx(){
 }
 
 void CanControl::irq_handle_tx(){
-  return;
+  __NOP();
 }
 
 void CanControl::handle(){
@@ -74,17 +85,29 @@ void CanControl::handle(){
 }
 
 void CanControl::send_message(CAN_MSG &msg){
+
+  while(HAL_CAN_GetTxMailboxesFreeLevel(can_interface)==0){__NOP();}
+
   CAN_TxHeaderTypeDef tx_header;
   tx_header.StdId = msg.frame_id;
   tx_header.DLC = msg.data_size;
   tx_header.RTR = CAN_RTR_DATA;
   tx_header.IDE = CAN_ID_STD;
   tx_header.TransmitGlobalTime = DISABLE;
-  HAL_CAN_AddTxMessage(can_interface,&tx_header,msg.data,&last_tx_mailbox);
+  HAL_StatusTypeDef status =HAL_CAN_AddTxMessage(can_interface,&tx_header,msg.data,&last_tx_mailbox);
+  if(status != HAL_OK)
+    log_debug("CAN TX error");
   blink_tx_led();
 }
 
-uint8_t CanControl::get_message(CAN_MSG **msg){
+int CanControl::get_message(CAN_MSG **msg){
+  // if(rx_msg_buffer_2.size() == 0)
+  //   return 0;
+  // CAN_MSG *ms = rx_msg_buffer_2.get_front();
+  // *msg = ms;
+  // rx_msg_buffer_2.pop_front();
+  // return rx_msg_buffer_2.size();
+  
   if(rx_msg_buffer.empty())
     return 1;
   if(msg == nullptr)

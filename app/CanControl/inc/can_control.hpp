@@ -4,13 +4,14 @@
 #include "CanDB.h"  
 #include "Timing.hpp"
 #include <list>
+#include "list.hpp"
 
 #ifndef CAN_CONTROL_HPP
 #define CAN_CONTROL_HPP
 
 #define CAN_DATA_FRAME_MAX_SIZE 8
-#define CAN_QUEUE_SIZE 40
-#define CAN_LED_BLINK_PERIOD_US 1000
+#define CAN_QUEUE_SIZE 128
+#define CAN_LED_BLINK_PERIOD_US 100
 
 namespace CAN_CONTROL {
 
@@ -32,6 +33,7 @@ private:
   uint8_t data[CAN_DATA_FRAME_MAX_SIZE];
   CAN_RxHeaderTypeDef header;
   std::list<CAN_MSG*> rx_msg_buffer;
+  LIST_EMB::List<CAN_MSG*> rx_msg_buffer_2;
   const GPIO_PIN *pin_tx_led;
   const GPIO_PIN *pin_rx_led;
   uint32_t last_tx_mailbox;
@@ -76,8 +78,8 @@ public:
   
   /// @brief  Get the message from the RX buffer
   /// @param msg  pointer to the CAN_MSG object
-  /// @return 0 if the message was received, 1 if the buffer is empty
-  uint8_t get_message(CAN_MSG **msg);
+  /// @return amount of messages in the buffer
+  int get_message(CAN_MSG **msg);
 };
 
 } // namespace CAN_CONTROL

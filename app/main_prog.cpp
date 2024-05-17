@@ -56,7 +56,7 @@ GPIO_PIN pin_boot_device = {GPIO_PIN_8, GPIOC};
 //**************************************************************************************************
 // Global stuff
 
-uint32_t adc_dma_buffer[ADC_DMA_BUFFER_SIZE];
+uint32_t adc_dma_buffer[ADC_DMA_BUFFER_SIZE+1];
 
 TIMING::Ticker main_clock;
 LOGGER::Logger loger(LOGGER::LOG_LEVEL::LOG_LEVEL_DEBUG,false);
@@ -284,10 +284,15 @@ void periferal_config(){
 void handle_can_rx(){
   CAN_CONTROL::CAN_MSG *recived_msg= nullptr;
   __disable_irq();
-  uint8_t status = can_controler.get_message(&recived_msg);
+  int status = can_controler.get_message(&recived_msg);
   __enable_irq();
-  if(status || recived_msg == nullptr) return;
+  // log_debug("RX: " + std::to_string(status));
+  if(status==0 || recived_msg == nullptr) return;
   tim_can_disconnected.reset();
+  log_debug("RX: " + std::to_string(recived_msg->frame_id) + " " + std::to_string(status));
+  free(recived_msg);
+  return;
+
   
   if(recived_msg->frame_id == CAN_KONARM_X_SET_POS_FRAME_ID){
     can_konarm_1_set_pos_t signals;
@@ -297,7 +302,7 @@ void handle_can_rx(){
     movement_controler.set_velocity(targetVelocity);
     movement_controler.set_position(targetPosition);
     movement_controler.set_enable(true);
-    // log_debug("sp:" + std::to_string(targetPosition) + " sv:" + std::to_string(targetVelocity));
+    log_debug("sp:" + std::to_string(targetPosition) + " sv:" + std::to_string(targetVelocity));
   }
   else if (recived_msg->frame_id == CAN_KONARM_X_GET_POS_FRAME_ID && recived_msg->remote_request){
     CAN_CONTROL::CAN_MSG send_msg = {0};
@@ -308,6 +313,7 @@ void handle_can_rx(){
     send_msg.data_size = CAN_KONARM_1_GET_POS_LENGTH;
     can_konarm_1_get_pos_pack(send_msg.data, &src_p, send_msg.data_size);
     can_controler.send_message(send_msg);
+    log_debug("get pos");
   }
   else if (recived_msg->frame_id == CAN_KONARM_X_STATUS_FRAME_ID && recived_msg->remote_request){
     CAN_CONTROL::CAN_MSG send_msg = {0};
@@ -375,14 +381,14 @@ void main_loop(){
     movement_controler.handle();
 
     if(tim_data_usb_send.triggered()){
-      log_info("V:" + std::to_string(voltage_vcc) +
-         " Tste:" + std::to_string(temoperature_steper_motor) + 
-         " Tbor:" + std::to_string(temoperature_board) + 
-         " Tmot:" + std::to_string(temoperature_steper_driver) + 
-         " E:" + std::to_string(encoder_arm.get_angle()) + 
-         " V:" + std::to_string(encoder_arm.get_velocity()) + 
-         " P:" + std::to_string(movement_controler.get_current_position()) + 
-         " V:" + std::to_string(movement_controler.get_current_velocity()));
+      // log_info("V:" + std::to_string(voltage_vcc) +
+      //    " Tste:" + std::to_string(temoperature_steper_motor) + 
+      //    " Tbor:" + std::to_string(temoperature_board) + 
+      //    " Tmot:" + std::to_string(temoperature_steper_driver) + 
+      //    " E:" + std::to_string(encoder_arm.get_angle()) + 
+      //    " V:" + std::to_string(encoder_arm.get_velocity()) + 
+      //    " P:" + std::to_string(movement_controler.get_current_position()) + 
+      //    " V:" + std::to_string(movement_controler.get_current_velocity()));
     }
 
     if(tim_usb.triggered()){

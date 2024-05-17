@@ -139,6 +139,7 @@ target_include_directories(${TARGET} PRIVATE
 "app/BoardId/inc"
 "app/PD/inc"
 "app/NtcTemperature_sensors/inc"
+"app/list/inc"
 )
 
 
