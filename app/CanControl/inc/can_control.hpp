@@ -9,7 +9,7 @@
 #define CAN_CONTROL_HPP
 
 #define CAN_DATA_FRAME_MAX_SIZE 8
-#define CAN_QUEUE_SIZE 128
+#define CAN_QUEUE_SIZE 40
 #define CAN_LED_BLINK_PERIOD_US 1000
 
 namespace CAN_CONTROL {
@@ -31,7 +31,7 @@ private:
   TIMING::Timing *timing_led_tx;
   uint8_t data[CAN_DATA_FRAME_MAX_SIZE];
   CAN_RxHeaderTypeDef header;
-  std::list<CAN_MSG> rx_msg_buffer;
+  std::list<CAN_MSG*> rx_msg_buffer;
   const GPIO_PIN *pin_tx_led;
   const GPIO_PIN *pin_rx_led;
   uint32_t last_tx_mailbox;
@@ -44,11 +44,13 @@ private:
 
   /// @brief  push a message to the RX buffer
   /// @param msg  CAN_MSG to be pushed to the buffer
-  void push_to_queue(CAN_MSG &msg);
+  void push_to_queue(CAN_MSG *msg);
 public:
   
   /// @brief  Construct a new Can Control object
   CanControl();
+
+  ~CanControl();
 
   /// @brief  init the CanControl object
   /// @param can_interface  CAN interface
@@ -75,7 +77,7 @@ public:
   /// @brief  Get the message from the RX buffer
   /// @param msg  pointer to the CAN_MSG object
   /// @return 0 if the message was received, 1 if the buffer is empty
-  uint8_t get_message(CAN_MSG *msg);
+  uint8_t get_message(CAN_MSG **msg);
 };
 
 } // namespace CAN_CONTROL

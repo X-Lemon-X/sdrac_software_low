@@ -14,6 +14,8 @@
 #include "CanDB.h"
 #include "movement_controler.hpp"
 #include "pd_controler.hpp"
+#include "pin.hpp"
+#include "ntc_termistors.hpp"
 #include <cfloat>
 
 #include <string>
@@ -65,6 +67,10 @@ MOVEMENT_CONTROLER::MovementControler movement_controler;
 ENCODER::Encoder encoder_arm;
 USB_PROGRAMER::UsbProgramer usb_programer(pin_boot_device);
 TIMING::Timing tim_can_disconnected(main_clock);
+float temoperature_board = 0;
+float temoperature_steper_driver = 0;
+float temoperature_steper_motor = 0; 
+float voltage_vcc = 0;
 
 //**************************************************************************************************
 // Id dependable configuration 
@@ -78,6 +84,10 @@ uint32_t CAN_KONARM_X_SET_POS_FRAME_ID;
 uint32_t CAN_KONARM_X_GET_POS_FRAME_ID;
 
 //**************************************************************************************************
+
+/// @brief This function is used to configure things that have to be configurated before all the periferals
+void pre_periferal_config();
+
 /// @brief This function is used to configure the periferals
 /// mostly stuff that have to be configurated after CumeMX generation
 void periferal_config();
@@ -97,10 +107,17 @@ void init_controls();
 //**************************************************************************************************
 void main_prog(){
   log_debug("Start main_prog\n");
-  id_config();
+  pre_periferal_config();
   periferal_config();
+  id_config();
   init_controls();
   main_loop();
+}
+
+void pre_periferal_config(){
+  NTCTERMISTORS::termistor_supply_voltage = 3.3;
+  NTCTERMISTORS::termistor_divider_resisitor = 100000;
+  NTCTERMISTORS::termistor_default_resistance = 100000;
 }
 
 void id_config(){
@@ -110,7 +127,6 @@ void id_config(){
   encoder_arm.set_address(ENCODER_MT6701_I2C_ADDRESS);
   encoder_arm.set_resolution(ENCODER_MT6702_RESOLUTION);
   encoder_arm.set_angle_register(ENCODER_MEM_ADDR_ANNGLE);
-   
 
   switch (board_id.get_id())
   {
@@ -232,7 +248,7 @@ void id_config(){
 void periferal_config(){
   log_debug("Start periferal_config\n");
   // dma adc1 settings
-  HAL_ADC_Start_DMA(&hadc1, adc_dma_buffer, ADC_DMA_BUFFER_SIZE);
+  // HAL_ADC_Start_DMA(&hadc1, adc_dma_buffer, ADC_DMA_BUFFER_SIZE);
 
   // timer 10 settings
   HAL_NVIC_SetPriority(TIM1_TRG_COM_TIM11_IRQn,6,0);
@@ -266,15 +282,16 @@ void periferal_config(){
 }
 
 void handle_can_rx(){
-  CAN_CONTROL::CAN_MSG recived_msg = {0};
-  if(can_controler.get_message(&recived_msg)) return;
+  CAN_CONTROL::CAN_MSG *recived_msg= nullptr;
+  __disable_irq();
+  uint8_t status = can_controler.get_message(&recived_msg);
+  __enable_irq();
+  if(status || recived_msg == nullptr) return;
   tim_can_disconnected.reset();
-
-  // log_debug("Recived message: " + std::to_string(recived_msg.frame_id));
   
-  if(recived_msg.frame_id == CAN_KONARM_X_SET_POS_FRAME_ID){
+  if(recived_msg->frame_id == CAN_KONARM_X_SET_POS_FRAME_ID){
     can_konarm_1_set_pos_t signals;
-    can_konarm_1_set_pos_unpack(&signals, recived_msg.data, recived_msg.data_size);
+    can_konarm_1_set_pos_unpack(&signals, recived_msg->data, recived_msg->data_size);
     float targetPosition = can_konarm_1_set_pos_position_decode(signals.position);
     float targetVelocity = can_konarm_1_set_pos_velocity_decode(signals.velocity);
     movement_controler.set_velocity(targetVelocity);
@@ -282,7 +299,7 @@ void handle_can_rx(){
     movement_controler.set_enable(true);
     // log_debug("sp:" + std::to_string(targetPosition) + " sv:" + std::to_string(targetVelocity));
   }
-  else if (recived_msg.frame_id == CAN_KONARM_X_GET_POS_FRAME_ID && recived_msg.remote_request){
+  else if (recived_msg->frame_id == CAN_KONARM_X_GET_POS_FRAME_ID && recived_msg->remote_request){
     CAN_CONTROL::CAN_MSG send_msg = {0};
     can_konarm_1_get_pos_t src_p;
     send_msg.frame_id = CAN_KONARM_X_GET_POS_FRAME_ID;
@@ -292,7 +309,7 @@ void handle_can_rx(){
     can_konarm_1_get_pos_pack(send_msg.data, &src_p, send_msg.data_size);
     can_controler.send_message(send_msg);
   }
-  else if (recived_msg.frame_id == CAN_KONARM_X_STATUS_FRAME_ID && recived_msg.remote_request){
+  else if (recived_msg->frame_id == CAN_KONARM_X_STATUS_FRAME_ID && recived_msg->remote_request){
     CAN_CONTROL::CAN_MSG send_msg = {0};
     can_konarm_1_status_t src_p;
     send_msg.frame_id = CAN_KONARM_X_STATUS_FRAME_ID;
@@ -301,9 +318,17 @@ void handle_can_rx(){
     can_konarm_1_status_pack(send_msg.data, &src_p, send_msg.data_size);
     can_controler.send_message(send_msg);
   }
-  else if (recived_msg.frame_id == CAN_KONARM_X_CLEAR_ERRORS_FRAME_ID){
+  else if (recived_msg->frame_id == CAN_KONARM_X_CLEAR_ERRORS_FRAME_ID){
   }
-  
+
+  free(recived_msg);
+}
+
+void analog_values_assigning(){
+  temoperature_board = pin_temp_board.analog_value;
+  temoperature_steper_driver = NTCTERMISTORS::get_temperature(pin_temp_steper_board.analog_value);
+  temoperature_steper_motor = NTCTERMISTORS::get_temperature(pin_temp_motor.analog_value);
+  voltage_vcc = (float)pin_vsense.analog_value/ 4096.0f * 36.3f ;
 }
 
 void init_controls(){
@@ -323,15 +348,19 @@ void main_loop(){
   TIMING::Timing tim_usb(main_clock);
   TIMING::Timing tim_movement(main_clock);
   TIMING::Timing tim_data_usb_send(main_clock);
+  TIMING::Timing tim_caculate_temp(main_clock);
   tim_blink.set_behaviour(TIMING::frequency_to_period(4), true);
   tim_encoder.set_behaviour(TIMING::frequency_to_period(1000), true);
   tim_usb.set_behaviour(TIMING::frequency_to_period(4), true);
   tim_movement.set_behaviour(TIMING::frequency_to_period(1000), true);
-  tim_data_usb_send.set_behaviour(TIMING::frequency_to_period(100), true);
+  tim_data_usb_send.set_behaviour(TIMING::frequency_to_period(50), true);
   tim_can_disconnected.set_behaviour(1000000, false);
+  tim_caculate_temp.set_behaviour(TIMING::frequency_to_period(20), true);
+
   while (1){
     handle_can_rx();
     can_controler.handle();
+
     
     if(tim_encoder.triggered()){
       encoder_arm.handle();
@@ -345,6 +374,17 @@ void main_loop(){
     
     movement_controler.handle();
 
+    if(tim_data_usb_send.triggered()){
+      log_info("V:" + std::to_string(voltage_vcc) +
+         " Tste:" + std::to_string(temoperature_steper_motor) + 
+         " Tbor:" + std::to_string(temoperature_board) + 
+         " Tmot:" + std::to_string(temoperature_steper_driver) + 
+         " E:" + std::to_string(encoder_arm.get_angle()) + 
+         " V:" + std::to_string(encoder_arm.get_velocity()) + 
+         " P:" + std::to_string(movement_controler.get_current_position()) + 
+         " V:" + std::to_string(movement_controler.get_current_velocity()));
+    }
+
     if(tim_usb.triggered()){
       usb_programer.handler();
     }
@@ -353,6 +393,9 @@ void main_loop(){
       TOGGLE_GPIO(pin_user_led_1);
     }
     
+    if(tim_caculate_temp.triggered()){
+      analog_values_assigning();
+    }
 
   }
 }

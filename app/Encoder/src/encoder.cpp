@@ -45,7 +45,7 @@ bool Encoder::ping_encoder(){
 
 uint16_t Encoder::read_raw_angle(){
   HAL_StatusTypeDef status = HAL_I2C_Mem_Read(hi2c, address, angle_register, 1, this->data, 2, 5);
-  if(status != HAL_OK) return -2;
+  if(status != HAL_OK) return 0;
   uint16_t reg = (uint16_t)this->data[0] << 6;
   reg |= (uint16_t)(this->data[1] & 0xfc) >> 2;
   return reg;

@@ -99,6 +99,7 @@ add_executable(${TARGET}
 "app/CanControl/src/can_control.cpp"
 "app/BoardId/src/board_id.cpp"
 "app/PD/src/pd_controler.cpp"
+"app/NtcTemperature_sensors/src/ntc_termistors.cpp"
 
 )
 
@@ -137,6 +138,7 @@ target_include_directories(${TARGET} PRIVATE
 "app/MovementControl/inc"
 "app/BoardId/inc"
 "app/PD/inc"
+"app/NtcTemperature_sensors/inc"
 )
 
 

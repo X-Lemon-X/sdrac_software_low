@@ -4,11 +4,16 @@
 #include "stm32f4xx_hal.h"
 #include "main.h"
 #include <string.h>
+#include "stdlib.h"
+
 
 using namespace CAN_CONTROL;
 
-CanControl::CanControl(){
-  rx_msg_buffer.clear();
+CanControl::CanControl(){}
+
+CanControl::~CanControl(){
+  delete timing_led_rx;
+  delete timing_led_tx;
 }
 
 void CanControl::init(CAN_HandleTypeDef &_can_interface, uint32_t _can_fifo,TIMING::Ticker &_ticker,const GPIO_PIN &_pin_tx_led,const GPIO_PIN &_pin_rx_led){
@@ -25,9 +30,11 @@ void CanControl::init(CAN_HandleTypeDef &_can_interface, uint32_t _can_fifo,TIMI
   timing_led_tx->set_behaviour(CAN_LED_BLINK_PERIOD_US,false);
 }
 
-void CanControl::push_to_queue(CAN_MSG &msg){
-  if(rx_msg_buffer.size() == CAN_QUEUE_SIZE)
-    rx_msg_buffer.pop_front();
+void CanControl::push_to_queue(CAN_MSG *msg){
+  if(rx_msg_buffer.size() == CAN_QUEUE_SIZE){
+    free(msg);
+    return;
+  }
   rx_msg_buffer.push_back(msg);
 }
 
@@ -45,11 +52,12 @@ void CanControl::irq_handle_rx(){
   blink_rx_led();
   if (HAL_CAN_GetRxMessage(can_interface, can_fifo, &header, data) != HAL_OK)
     return;
-  CAN_MSG msg;
-  msg.frame_id = header.StdId;
-  msg.remote_request = header.RTR == CAN_RTR_REMOTE;
-  msg.data_size = header.DLC;
-  memcpy(msg.data,data,msg.data_size);
+  CAN_MSG *msg = (CAN_MSG*)malloc(sizeof(CAN_MSG));
+  msg->frame_id = header.StdId;
+  msg->remote_request = header.RTR == CAN_RTR_REMOTE;
+  msg->data_size = header.DLC;
+  memcpy(msg->data,data,msg->data_size);
+  // free(data);
   push_to_queue(msg);
 }
 
@@ -76,13 +84,12 @@ void CanControl::send_message(CAN_MSG &msg){
   blink_tx_led();
 }
 
-uint8_t CanControl::get_message(CAN_MSG *msg){
+uint8_t CanControl::get_message(CAN_MSG **msg){
   if(rx_msg_buffer.empty())
     return 1;
   if(msg == nullptr)
     return 2;
-  CAN_MSG &rx = rx_msg_buffer.front();
-  memcpy(msg,&rx,sizeof(CAN_MSG));
+  *msg = rx_msg_buffer.front();
   rx_msg_buffer.pop_front();
   return 0;
 }
