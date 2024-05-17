@@ -286,8 +286,8 @@ void handle_can_rx(){
   __disable_irq();
   int status = can_controler.get_message(&recived_msg);
   __enable_irq();
-  // log_debug("RX: " + std::to_string(status));
-  if(status==0 || recived_msg == nullptr) return;
+  log_debug("RX: " + std::to_string(status));
+  if(status || recived_msg == nullptr) return;
   tim_can_disconnected.reset();
   log_debug("RX: " + std::to_string(recived_msg->frame_id) + " " + std::to_string(status));
   free(recived_msg);
