@@ -171,8 +171,8 @@ void id_config(){
 
     //-------------------MOVEMENT CONTROLER CONFIGURATION-------------------
     PDCONTROLER::PdControler *pdc = new PDCONTROLER::PdControler(main_clock);
-    pdc->set_Kp(0.90);
-    pdc->set_Kd(0.01f);
+    pdc->set_Kp(0.9999);
+    pdc->set_Kd(0.0001f);
     movement_controler.set_limit_position(-1.089126f, 4.236856f);
     movement_controler.set_max_velocity(PI);
     movement_controler.init(main_clock, stp_motor, encoder_arm, *pdc);
@@ -248,7 +248,7 @@ void id_config(){
 void periferal_config(){
   log_debug("Start periferal_config\n");
   // dma adc1 settings
-  // HAL_ADC_Start_DMA(&hadc1, adc_dma_buffer, ADC_DMA_BUFFER_SIZE);
+  HAL_ADC_Start_DMA(&hadc1, adc_dma_buffer, ADC_DMA_BUFFER_SIZE);
 
   // timer 10 settings
   HAL_NVIC_SetPriority(TIM1_TRG_COM_TIM11_IRQn,6,0);
@@ -286,12 +286,13 @@ void handle_can_rx(){
   __disable_irq();
   int status = can_controler.get_message(&recived_msg);
   __enable_irq();
-  log_debug("RX: " + std::to_string(status));
+  // log_debug("RX: " + std::to_string(status));
   if(status || recived_msg == nullptr) return;
   tim_can_disconnected.reset();
-  log_debug("RX: " + std::to_string(recived_msg->frame_id) + " " + std::to_string(status));
-  free(recived_msg);
-  return;
+  // log_debug("RX: " + std::to_string(recived_msg->frame_id) + " " + std::to_string(status));
+  
+  // delete recived_msg;
+  // return;
 
   
   if(recived_msg->frame_id == CAN_KONARM_X_SET_POS_FRAME_ID){
@@ -327,7 +328,7 @@ void handle_can_rx(){
   else if (recived_msg->frame_id == CAN_KONARM_X_CLEAR_ERRORS_FRAME_ID){
   }
 
-  free(recived_msg);
+  delete recived_msg;
 }
 
 void analog_values_assigning(){

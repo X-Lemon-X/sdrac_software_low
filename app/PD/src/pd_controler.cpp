@@ -10,10 +10,12 @@ float PdControler::calculate(float current_position, float target_position, floa
   float dt = current_time - previous_time;
   previous_time = current_time;
   // return Kp * (target_position - current_position) + Kd * (target_velocity - state_velocity);
-  float error = target_velocity - current_velocity;
-  // add inertia to the system
-  float velocity =  Kp * error;
   
+  
+  // float error = target_velocity - current_velocity;
+  // add inertia to the system
+  float velocity =  (Kp * previous_velocity) + (Kd * target_velocity);
+  previous_velocity = velocity;
   return velocity;
 }
 

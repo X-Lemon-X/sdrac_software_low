@@ -34,7 +34,7 @@ void CanControl::init(CAN_HandleTypeDef &_can_interface, uint32_t _can_fifo,TIMI
 
 void CanControl::push_to_queue(CAN_MSG *msg){
   if(rx_msg_buffer.size() == CAN_QUEUE_SIZE){
-    free(msg);
+    delete msg;
     return;
   }
   rx_msg_buffer.push_back(msg);
@@ -61,7 +61,8 @@ void CanControl::irq_handle_rx(){
   blink_rx_led();
   if (HAL_CAN_GetRxMessage(can_interface, can_fifo, &header, data) != HAL_OK)
     return;
-  CAN_MSG *msg = (CAN_MSG*)malloc(sizeof(CAN_MSG));
+  // CAN_MSG *msg = (CAN_MSG*)malloc(sizeof(CAN_MSG));
+  CAN_MSG *msg = new CAN_MSG;
   if(msg == nullptr)
     return;
   msg->frame_id = header.StdId;
@@ -112,7 +113,9 @@ int CanControl::get_message(CAN_MSG **msg){
     return 1;
   if(msg == nullptr)
     return 2;
-  *msg = rx_msg_buffer.front();
+  CAN_MSG *ms = rx_msg_buffer.front();
+  // *msg = rx_msg_buffer.front();
+  *msg = ms;
   rx_msg_buffer.pop_front();
   return 0;
 }

@@ -4,6 +4,7 @@
     {
       "name": "Cortex Debug",
       "cwd": "${workspaceFolder}",
+      "preLaunchTask": "CMake:build",
       "executable": "./build/executable.elf",
       "request": "launch",
       "type": "cortex-debug",

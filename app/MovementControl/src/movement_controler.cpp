@@ -38,16 +38,19 @@ void MovementControler::init(TIMING::Ticker &_ticker, STEPER_MOTOR::SteperMotor 
 void MovementControler::handle(){
   if (!initialized) return;
   current_position = encoder->get_absoulte_angle();
-  current_velocity = encoder->get_velocity();
+  // current_velocity = encoder->get_velocity();
+  
 
   float new_velocity = movement_equation->calculate(current_position, target_position, current_velocity, target_velocity);
-
+  
   if (abs(new_velocity) > max_velocity)
     new_velocity = (new_velocity > 0) ? max_velocity : -max_velocity;
 
   if (current_position < min_position || current_position > max_position)
     new_velocity = 0.0;
 
+  current_velocity = new_velocity;
+  // log_debug("set_velocity:" + std::to_string(new_velocity));
   steper_motor->set_enable(enable);
   steper_motor->set_velocity(new_velocity);
 }
