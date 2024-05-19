@@ -9,6 +9,7 @@
 
 #define USB_PROGRAMER_REBOOT "SB_reboot\n"
 #define USB_PROGRAMER_PROGRAM "SB_enterdfu\n"
+#define USB_PROGRAMER_INFO "SB_info\n"
 #define USB_PROGRAMER_BUFFER_SIZE APP_RX_DATA_SIZE
 
 namespace USB_PROGRAMER{
@@ -20,14 +21,18 @@ class UsbProgramer
 private:
   const GPIO_PIN &boot_device;
   uint8_t buffer[USB_PROGRAMER_BUFFER_SIZE];
+  char *usb_programer_info = nullptr;
 public:
   UsbProgramer(const GPIO_PIN &boot_device);
-  
+
   /// @brief should be called in the main loop to handle the usb programing
   void handler();
 
   /// @brief resets the stm32 uC
   void reset_device();
+
+  /// @brief returns the info string
+  void set_info(const char *info, uint8_t size);
 
   /// @brief restart stm32 device and enters DFU  mode for USB programing
   void enter_dfu_mode();

@@ -28,6 +28,11 @@ void UsbProgramer::enter_dfu_mode(){
   while (true){}
 }
 
+void UsbProgramer::set_info(const char *info){
+  usb_programer_info = (char*)info;
+  usb_programer_info_size = size;
+}
+
 void UsbProgramer::handler(){
   uint32_t size =0;
   // add thsi static int8_t CDC_Receive_FS(uint8_t* Buf, uint32_t *Len);
@@ -38,14 +43,14 @@ void UsbProgramer::handler(){
   size = usb_programer_buffer_len;
   usb_programer_buffer_len = 0;
   if(strcmp((char*)usb_programer_buffer, USB_PROGRAMER_REBOOT)==0){
-    log_debug("UsbProgramer:Rebooting device");
+    log_info("UsbProgramer:Rebooting device");
     reset_device();
   }
   else if(strcmp((char*)usb_programer_buffer, USB_PROGRAMER_PROGRAM)==0){
-    log_debug("UsbProgramer: Entering USB-DFU mode");
+    log_info("UsbProgramer: Entering USB-DFU mode");
     enter_dfu_mode();
-  }
-  else{
-    // log_debug("UsbProgramer:Unknown command");
+  }else if(strcmp((char*)usb_programer_buffer, USB_PROGRAMER_INFO)==0){
+    log_info("UsbProgramer: Sending info");
+    log_info(std::to_string(usb_programer_info));
   }
 }

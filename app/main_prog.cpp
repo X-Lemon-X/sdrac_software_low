@@ -16,6 +16,7 @@
 #include "pd_controler.hpp"
 #include "pin.hpp"
 #include "ntc_termistors.hpp"
+#include "version.hpp"
 #include <cfloat>
 
 #include <string>
@@ -110,8 +111,7 @@ void main_prog(){
   pre_periferal_config();
   periferal_config();
   id_config();
-  init_controls();
-  main_loop();
+  init_controls()
 }
 
 void pre_periferal_config(){
@@ -123,6 +123,14 @@ void pre_periferal_config(){
 void id_config(){
   log_debug("Start id_config\n");
   log_debug("Board id: " + std::to_string(board_id.get_id()));
+
+  std::string info = "SDRACboard\n";
+  info += "Software version:" + std::to_string(VERSION_MAJOR) + "." + std::to_string(VERSION_MINOR) + '\n';
+  info += "Board id: " + board_id.get_id_string();
+  info += "Description: SDRACboard from SDRAC project https://nihilia.xyz  https://konar.pwr.edu.pl\n";
+  char *info_c = new char[info.size()];
+  std::copy(info.begin(), info.end(), info_c);
+  usb_programer.set_info(info_c);
 
   encoder_arm.set_address(ENCODER_MT6701_I2C_ADDRESS);
   encoder_arm.set_resolution(ENCODER_MT6702_RESOLUTION);
@@ -382,14 +390,14 @@ void main_loop(){
     movement_controler.handle();
 
     if(tim_data_usb_send.triggered()){
-      // log_info("V:" + std::to_string(voltage_vcc) +
-      //    " Tste:" + std::to_string(temoperature_steper_motor) + 
-      //    " Tbor:" + std::to_string(temoperature_board) + 
-      //    " Tmot:" + std::to_string(temoperature_steper_driver) + 
-      //    " E:" + std::to_string(encoder_arm.get_angle()) + 
-      //    " V:" + std::to_string(encoder_arm.get_velocity()) + 
-      //    " P:" + std::to_string(movement_controler.get_current_position()) + 
-      //    " V:" + std::to_string(movement_controler.get_current_velocity()));
+      log_info("V:" + std::to_string(voltage_vcc) +
+         " Tste:" + std::to_string(temoperature_steper_motor) + 
+         " Tbor:" + std::to_string(temoperature_board) + 
+         " Tmot:" + std::to_string(temoperature_steper_driver) + 
+         " E:" + std::to_string(encoder_arm.get_angle()) + 
+         " V:" + std::to_string(encoder_arm.get_velocity()) + 
+         " P:" + std::to_string(movement_controler.get_current_position()) + 
+         " V:" + std::to_string(movement_controler.get_current_velocity()));
     }
 
     if(tim_usb.triggered()){
