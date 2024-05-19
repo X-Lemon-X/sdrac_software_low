@@ -28,9 +28,8 @@ void UsbProgramer::enter_dfu_mode(){
   while (true){}
 }
 
-void UsbProgramer::set_info(const char *info){
-  usb_programer_info = (char*)info;
-  usb_programer_info_size = size;
+void UsbProgramer::set_info(std::string info){
+  usb_programer_info = info;
 }
 
 void UsbProgramer::handler(){
@@ -50,7 +49,8 @@ void UsbProgramer::handler(){
     log_info("UsbProgramer: Entering USB-DFU mode");
     enter_dfu_mode();
   }else if(strcmp((char*)usb_programer_buffer, USB_PROGRAMER_INFO)==0){
+    // HAL_Delay(2000);
     log_info("UsbProgramer: Sending info");
-    log_info(std::to_string(usb_programer_info));
+    log_info(std::string(usb_programer_info));
   }
 }

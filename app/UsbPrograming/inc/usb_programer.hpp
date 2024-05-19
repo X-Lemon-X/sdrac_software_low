@@ -21,7 +21,7 @@ class UsbProgramer
 private:
   const GPIO_PIN &boot_device;
   uint8_t buffer[USB_PROGRAMER_BUFFER_SIZE];
-  char *usb_programer_info = nullptr;
+  std::string usb_programer_info;
 public:
   UsbProgramer(const GPIO_PIN &boot_device);
 
@@ -32,7 +32,7 @@ public:
   void reset_device();
 
   /// @brief returns the info string
-  void set_info(const char *info, uint8_t size);
+  void set_info(std::string info);
 
   /// @brief restart stm32 device and enters DFU  mode for USB programing
   void enter_dfu_mode();

@@ -111,7 +111,8 @@ void main_prog(){
   pre_periferal_config();
   periferal_config();
   id_config();
-  init_controls()
+  init_controls();
+  main_loop();
 }
 
 void pre_periferal_config(){
@@ -125,12 +126,10 @@ void id_config(){
   log_debug("Board id: " + std::to_string(board_id.get_id()));
 
   std::string info = "SDRACboard\n";
-  info += "Software version:" + std::to_string(VERSION_MAJOR) + "." + std::to_string(VERSION_MINOR) + '\n';
-  info += "Board id: " + board_id.get_id_string();
+  info += "Software version:" + std::to_string(VERSION_MAJOR) + "." + std::to_string(VERSION_MINOR) + "\n";
+  info += "Board id: " + std::to_string(board_id.get_id()) + "\n";
   info += "Description: SDRACboard from SDRAC project https://nihilia.xyz  https://konar.pwr.edu.pl\n";
-  char *info_c = new char[info.size()];
-  std::copy(info.begin(), info.end(), info_c);
-  usb_programer.set_info(info_c);
+  usb_programer.set_info(info);
 
   encoder_arm.set_address(ENCODER_MT6701_I2C_ADDRESS);
   encoder_arm.set_resolution(ENCODER_MT6702_RESOLUTION);

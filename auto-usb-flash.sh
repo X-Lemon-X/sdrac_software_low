@@ -13,38 +13,43 @@ NC='\033[0m' # No Color
 
 function install_program () {
   if ! [ -x "$(command -v $1)" ]; then
-  echo -e "${ORANGE}Installing $1${NC}"
-  sudo apt-get install $1 -y
-else
-  echo -e "${BLUE}$1 is installed${NC}"
-fi
+    echo -e "${ORANGE}Installing $1${NC}"
+    sudo apt-get install $1 -y
+  else
+    echo -e "${BLUE}$1 is installed${NC}"
+  fi
 }
 
 function check_if_program_is_installed () {
   if ! [ -x "$(command -v $1)" ]; then
-  echo -e "${RED}Error: $1 is not installed.${NC}"
-  #ask user if he wants to install the program
-  read -p "Do you want to install $1? (y/n)" -n 1 -r
-  echo
-  if [[ $REPLY =~ ^[Yy]$ ]]; then
-    install_program $1
+    echo -e "${RED}Error: $1 is not installed.${NC}"
+    #ask user if he wants to install the program
+    read -p "Do you want to install $1? (y/n)" -n 1 -r
+    echo
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+      install_program $1
+    else
+      echo -e "${ORANGE}Exiting...${NC}"
+      exit 1
+    fi
   else
-    echo -e "${ORANGE}Exiting...${NC}"
-    exit 1
+    echo -e "${BLUE}$1 is installed${NC}"
   fi
-else
-  echo -e "${BLUE}$1 is installed${NC}"
-fi
 }
 
 function check_if_file_exist () {
   if [ ! -f $1 ]; then
-  echo -e "${RED}file: $1 not found.${NC}" >&2
-  echo 1
-else
-  echo -e "${BLUE}file found $1 ${NC}" >&2
-  echo 0
-fi
+    echo -e "${RED}file: $1 not found.${NC}" >&2
+    echo 1
+  else
+    echo -e "${BLUE}file found $1 ${NC}" >&2
+    echo 0
+  fi
+}
+
+# send command to device to first arg is device path second is command
+function send_command_to_device () {
+  stty -F $1 115200 cs8 -cstopb -parenb raw && echo $2 > $1
 }
 
 #check if required programs are installed
@@ -91,11 +96,17 @@ if [ -z $device_path ]; then
   exit 1
 fi
 
+
+# send_command_to_device $device_path "SB_info"
+
 echo -e "${BLUE}Flashing USB device: $device_path${NC}"
 
 
 # open viryal com port and write SB_enterdfu on boud rate 115200
-stty -F $device_path 115200 cs8 -cstopb -parenb raw && echo SB_enterdfu > $device_path
+# stty -F $device_path 115200 cs8 -cstopb -parenb raw && echo SB_enterdfu > $device_path
+send_command_to_device $device_path SB_enterdfu
+# send_command_to_device $device_path SB_info 
+
 sleep 2 #hive board some time to enter dfu mode
 dfu-util -a 0 -i 0 -s 0x08000000:leave -D $bin_file 2> /dev/null
 
