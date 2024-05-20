@@ -16,27 +16,9 @@ The project is based on the STM32F412RGT6 microcontroller.
  - reading angles from encoder
  - Timing and timers main system clock with microsecond precision
 
-## Starting CAN converter
-```bash
-ls /dev | grep ttyAC # to check on which port the converter is
-sudo slcand -o -c -s8 /dev/ttyACM0 can0 # dont forget to change the port
-sudo ip link set dev can0 up type can bitrate 1000000 
-```
-flag -s sets the speed of the transmission
-```bash
-  -s0 = 10k
-  -s1 = 20k
-  -s2 = 50k
-  -s3 = 100k
-  -s4 = 125k
-  -s5 = 250k
-  -s6 = 500k
-  -s7 = 750k
-  -s8 = 1M
-```
 
-# After cloning the project
-After cloning the project you have to bind a git hook to the project. In order to have the autmatic software version genration.
+## After cloning the project
+After cloning the project you have to bind a git hook to the project. In order to have the automatic software version generation.
 To do that you have to run the following command in the project directory
 ```bash
 cp update-software-version.sh .git/hooks/post-commit
@@ -47,8 +29,9 @@ This will generate the app/version.hpp file with the definitions of current vers
 #define VERSION_MAJOR 0 //for example
 #define VERSION_MINOR 23  //for example
 ```
+The new version will be generated after each commit.
 
-# Building the project:
+## Building the project:
 Building the project requires GNU Arm Embedded Toolchain to be installed.
 1. Download it from this site https://developer.arm.com/downloads/-/gnu-rm 
 2. Move the extracted files in some directory for example "$HOME/.local/share/arm-none-aebi", 
@@ -59,9 +42,9 @@ if [ -d "$HOME/.local/share/arm-none-aebi/bin" ]; then
     PATH="$HOME/.local/share/arm-none-aebi/bin:$PATH" 
 fi
 ```
-4. Restart the pc
+4. Restart the pc or bash
 
-# Flashing the board
+## Flashing the board
 There are three ways to flash the board:
 1. Using the ST-Link
 2. Using the USB-flash-script (Preferred unless the board was never flashed before)
@@ -96,7 +79,7 @@ Then after you connect the board to pc via st-link you can flash the board by ru
 st-flash --reset write build/executable.bin 0x08000000
 ```
 
-# Debugging
+## Debugging
 To debug the baord you need cortex-debug extension for vscode.
 and st-link utility installed.
 the in vs code add in .vscode/launch.json the following code
@@ -118,14 +101,32 @@ the in vs code add in .vscode/launch.json the following code
 ```
 and then you can start the debugging by pressing F5 or by clicking on the debug icon in the debug tab.
 
+## Starting CAN converter
+```bash
+ls /dev | grep ttyAC # to check on which port the converter is
+sudo slcand -o -c -s8 /dev/ttyACM0 can0 # dont forget to change the port
+sudo ip link set dev can0 up type can bitrate 1000000 
+```
+flag -s sets the speed of the transmission
+```bash
+  -s0 = 10k
+  -s1 = 20k
+  -s2 = 50k
+  -s3 = 100k
+  -s4 = 125k
+  -s5 = 250k
+  -s6 = 500k
+  -s7 = 750k
+  -s8 = 1M
+```
 
 ## Generating files in CubeMX
-### seting up CubeMX
+### Setting up CubeMX
 Open file sdrac_cubemx.ioc in CubeMX
 In project menager set the Toolchain to Makefile, and the Toolchain/folder to the folder where the project is located.
 Set all the settings you want and generate code.
 
-### Adding code to main
+### Adding code to main (for SDRAC project)
 "For SDRAC project"
 in main.c add the following code
 ```c
@@ -138,17 +139,17 @@ and in the main function add the following code
 then chnage the extension of the main.c to main.cpp
 
 
-### Adding code to USB_DEVICE
-"For SDRAC project"
-Open file usbd_cdc_if.c "USB_DEVICE/App/usbd_cdc_if.c"
- In function 
+### Adding code to USB_DEVICE (for SDRAC project)
+Open file usbd_cdc_if.c "USB_DEVICE/App/usbd_cdc_if.c".
+Find this function. 
  ```c
- int8_t CDC_Receive_FS(uint8_t* Buf, uint32_t *Len) 
+ int8_t CDC_Receive_FS(uint8_t* Buf, uint32_t *Len) {
+  //...
+ }
  ```
  modify the code to look like this
 ```c
-static int8_t CDC_Receive_FS(uint8_t* Buf, uint32_t *Len)
-{
+static int8_t CDC_Receive_FS(uint8_t* Buf, uint32_t *Len){
   /* USER CODE BEGIN 6 */
   USBD_CDC_SetRxBuffer(&hUsbDeviceFS, &Buf[0]);
   USBD_CDC_ReceivePacket(&hUsbDeviceFS);
