@@ -36,10 +36,16 @@ flag -s sets the speed of the transmission
 ```
 
 # After cloning the project
-After cloning the project you have to bind a git hook to the project. in order to have the autmatic versioning of the software of the board.
+After cloning the project you have to bind a git hook to the project. In order to have the autmatic software version genration.
 To do that you have to run the following command in the project directory
 ```bash
-cp update-software-version.sh .git/hooks/pre-commit
+cp update-software-version.sh .git/hooks/post-commit
+chmod +x .git/hooks/post-commit # if the file is not executable
+```
+This will generate the app/version.hpp file with the definitions of current version of the software.
+```cpp
+#define VERSION_MAJOR 0 //for example
+#define VERSION_MINOR 23  //for example
 ```
 
 # Building the project:

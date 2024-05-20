@@ -8,6 +8,7 @@
 #include "pin.hpp"
 #include "can_control.hpp"
 #include "board_id.hpp"
+#include "version.hpp"
 
 #ifndef MAIN_PROG_H
 #define MAIN_PROG_H
