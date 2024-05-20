@@ -5,6 +5,13 @@
 #ifndef BOARD_ID_HPP
 #define BOARD_ID_HPP
 
+
+/// @brief if BOARD_ID_OWERWRITE is defined, then BOARD_ID_OWERWRITE_ID will be used as board id  
+#define BOARD_ID_OWERWRITE
+#define BOARD_ID_OWERWRITE_ID 3
+
+
+
 namespace BOARD_ID{
 
 class Board_id{

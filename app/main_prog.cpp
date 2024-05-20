@@ -151,6 +151,9 @@ void id_config(){
     CAN_X_FILTER_MASK_LOW = 0x000;
 
 
+    //-------------------ENCODER STEPER MOTOR POSITION CONFIGURATION-------------------
+    // to do
+
     //-------------------STEPER MOTOR CONFIGURATION-------------------
     stp_motor.set_steps_per_revolution(400);
     stp_motor.set_gear_ratio(75);
@@ -161,7 +164,7 @@ void id_config(){
     stp_motor.set_enable(false);
 
 
-    //-------------------ENCODER CONFIGURATION-------------------
+    //-------------------ENCODER ARM POSITION CONFIGURATION-------------------
     FILTERS::Filter_moving_avarage *fv = new FILTERS::Filter_moving_avarage(main_clock);
     fv->set_size(60); // 15 for smooth movement but delay with sampling to 50
 
@@ -177,8 +180,8 @@ void id_config(){
 
     //-------------------MOVEMENT CONTROLER CONFIGURATION-------------------
     PDCONTROLER::PdControler *pdc = new PDCONTROLER::PdControler(main_clock);
-    pdc->set_Kp(0.9999);
-    pdc->set_Kd(0.0001f);
+    pdc->set_Kp(0.90);
+    pdc->set_Kd(0.10f);
     movement_controler.set_limit_position(-1.089126f, 4.236856f);
     movement_controler.set_max_velocity(PI);
     movement_controler.init(main_clock, stp_motor, encoder_arm, *pdc);
@@ -196,6 +199,42 @@ void id_config(){
     CAN_X_FILTER_ID_LOW = 0x000;
     CAN_X_FILTER_MASK_HIGH = 0xff0<<5;
     CAN_X_FILTER_MASK_LOW = 0x000;
+
+        //-------------------ENCODER STEPER MOTOR POSITION CONFIGURATION-------------------
+    // to do
+
+    //-------------------STEPER MOTOR CONFIGURATION-------------------
+    stp_motor.set_steps_per_revolution(400);
+    stp_motor.set_gear_ratio(75);
+    stp_motor.set_max_velocity(PI);
+    stp_motor.set_min_velocity(0.01);
+    stp_motor.set_reverse(true);
+    stp_motor.init();
+    stp_motor.set_enable(false);
+
+
+    //-------------------ENCODER ARM POSITION CONFIGURATION-------------------
+    FILTERS::Filter_moving_avarage *fv = new FILTERS::Filter_moving_avarage(main_clock);
+    fv->set_size(60); // 15 for smooth movement but delay with sampling to 50
+
+    encoder_arm.set_offset(-0.194048f);
+    encoder_arm.set_reverse(true);
+    encoder_arm.set_enable_pos_filter(false);
+    encoder_arm.set_enable_velocity(true);
+    encoder_arm.set_enable_velocity_filter(true);
+    encoder_arm.set_velocity_sample_amount(10);
+    encoder_arm.set_dead_zone_correction_angle(PI_d2*3);
+    encoder_arm.init(hi2c1,main_clock,nullptr,fv);
+    
+
+    //-------------------MOVEMENT CONTROLER CONFIGURATION-------------------
+    PDCONTROLER::PdControler *pdc = new PDCONTROLER::PdControler(main_clock);
+    pdc->set_Kp(0.90);
+    pdc->set_Kd(0.10f);
+    movement_controler.set_limit_position(-1.089126f, 4.236856f);
+    movement_controler.set_max_velocity(PI);
+    movement_controler.init(main_clock, stp_motor, encoder_arm, *pdc);
+
     break;
   }
   case SDRAC_ID_3:{
@@ -209,6 +248,42 @@ void id_config(){
     CAN_X_FILTER_ID_LOW = 0x000;
     CAN_X_FILTER_MASK_HIGH = 0xff0<<5;
     CAN_X_FILTER_MASK_LOW = 0x000;
+
+        //-------------------ENCODER STEPER MOTOR POSITION CONFIGURATION-------------------
+    // to do
+
+    //-------------------STEPER MOTOR CONFIGURATION-------------------
+    stp_motor.set_steps_per_revolution(400);
+    stp_motor.set_gear_ratio(75);
+    stp_motor.set_max_velocity(PI);
+    stp_motor.set_min_velocity(0.01);
+    stp_motor.set_reverse(true);
+    stp_motor.init();
+    stp_motor.set_enable(false);
+
+
+    //-------------------ENCODER ARM POSITION CONFIGURATION-------------------
+    FILTERS::Filter_moving_avarage *fv = new FILTERS::Filter_moving_avarage(main_clock);
+    fv->set_size(60); // 15 for smooth movement but delay with sampling to 50
+
+    encoder_arm.set_offset(-0.194048f);
+    encoder_arm.set_reverse(true);
+    encoder_arm.set_enable_pos_filter(false);
+    encoder_arm.set_enable_velocity(true);
+    encoder_arm.set_enable_velocity_filter(true);
+    encoder_arm.set_velocity_sample_amount(10);
+    encoder_arm.set_dead_zone_correction_angle(PI_d2*3);
+    encoder_arm.init(hi2c1,main_clock,nullptr,fv);
+    
+
+    //-------------------MOVEMENT CONTROLER CONFIGURATION-------------------
+    PDCONTROLER::PdControler *pdc = new PDCONTROLER::PdControler(main_clock);
+    pdc->set_Kp(0.90);
+    pdc->set_Kd(0.10f);
+    movement_controler.set_limit_position(-1.089126f, 4.236856f);
+    movement_controler.set_max_velocity(PI);
+    movement_controler.init(main_clock, stp_motor, encoder_arm, *pdc);
+    
     break;
   }
   case SDRAC_ID_4:{

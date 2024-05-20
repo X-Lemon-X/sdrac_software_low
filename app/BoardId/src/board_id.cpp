@@ -7,8 +7,12 @@ Board_id::Board_id(const GPIO_PIN &_id_0,const GPIO_PIN &_id_1,const GPIO_PIN &_
 }
 
 uint8_t Board_id::get_id(){
-  return 1;
-  
+
+  #ifdef BOARD_ID_OWERWRITE
+    return BOARD_ID_OWERWRITE_ID;
+  #endif
+
+  #ifndef BOARD_ID_OWERWRITE
   if (id_set) return id;
   id = 0;
   id |= READ_GPIO(id_0);
@@ -16,4 +20,5 @@ uint8_t Board_id::get_id(){
   id |= READ_GPIO(id_2) << 2;
   id_set = true;
   return id;
+  #endif
 }

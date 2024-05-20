@@ -35,6 +35,13 @@ flag -s sets the speed of the transmission
   -s8 = 1M
 ```
 
+# After cloning the project
+After cloning the project you have to bind a git hook to the project. in order to have the autmatic versioning of the software of the board.
+To do that you have to run the following command in the project directory
+```bash
+cp update-software-version.sh .git/hooks/pre-commit
+```
+
 # Building the project:
 Building the project requires GNU Arm Embedded Toolchain to be installed.
 1. Download it from this site https://developer.arm.com/downloads/-/gnu-rm 
