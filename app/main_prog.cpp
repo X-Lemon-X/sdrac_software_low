@@ -135,8 +135,7 @@ void id_config(){
   encoder_arm.set_resolution(ENCODER_MT6702_RESOLUTION);
   encoder_arm.set_angle_register(ENCODER_MEM_ADDR_ANNGLE);
 
-  switch (board_id.get_id())
-  {
+  switch (board_id.get_id()){
   case SDRAC_ID_1:{
     //-------------------CAN CONFIGURATION-------------------
     CAN_KONARM_X_STATUS_FRAME_ID = CAN_KONARM_1_STATUS_FRAME_ID;
