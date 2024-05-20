@@ -4,10 +4,10 @@ The project is based on the STM32F412RGT6 microcontroller.
 
 ## TO DO:
  - simple arm control alogrithm ( PID ?  P is working for velocity control)
- - reading ADC (sort of working)
  - reading/writing data to FRAM
  - IO control from CAN ?
 ## DONE:
+ - reading ADC (sort of working)
  - USB data reciving/sending
  - distingushing between different baords
  - CAN reciving/sending data
