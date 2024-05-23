@@ -15,7 +15,7 @@
 
 //**************************************************************************************************
 // log levels 
-#define LOG_DEBUG
+// #define LOG_DEBUG
 // #define LOG_INFO
 // #define LOG_WARN
 // #define LOG_ERROR
@@ -126,6 +126,9 @@ void main_prog();
 //**************************************************************************************************
 // debug loging options
 
+
+#define _LOG_LVL 4
+
 #ifdef LOG_DEBUG
   #define _LOG_LVL 0
 #endif // LOG_DEBUG
@@ -164,7 +167,7 @@ void main_prog();
 #if _LOG_LVL <= 3
   #define log_error(...) loger.error(__VA_ARGS__)
 #else
-  #define log_error(...)
+  #define log_error(...) 
 #endif // LOG_ERROR
 
 

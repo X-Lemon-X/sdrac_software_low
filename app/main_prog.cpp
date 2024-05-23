@@ -159,7 +159,7 @@ void id_config(){
     stp_motor.set_gear_ratio(75);
     stp_motor.set_max_velocity(PI);
     stp_motor.set_min_velocity(0.01);
-    stp_motor.set_reverse(true);
+    stp_motor.set_reverse(false);
     stp_motor.init();
     stp_motor.set_enable(false);
 
@@ -168,13 +168,13 @@ void id_config(){
     FILTERS::Filter_moving_avarage *fv = new FILTERS::Filter_moving_avarage(main_clock);
     fv->set_size(60); // 15 for smooth movement but delay with sampling to 50
 
-    encoder_arm.set_offset(-0.194048f);
+    encoder_arm.set_offset(-5.23547649f);
     encoder_arm.set_reverse(true);
     encoder_arm.set_enable_pos_filter(false);
     encoder_arm.set_enable_velocity(true);
     encoder_arm.set_enable_velocity_filter(true);
     encoder_arm.set_velocity_sample_amount(10);
-    encoder_arm.set_dead_zone_correction_angle(PI_d2*3);
+    encoder_arm.set_dead_zone_correction_angle(0);
     encoder_arm.init(hi2c1,main_clock,nullptr,fv);
     
 
@@ -182,7 +182,7 @@ void id_config(){
     PDCONTROLER::PdControler *pdc = new PDCONTROLER::PdControler(main_clock);
     pdc->set_Kp(0.90);
     pdc->set_Kd(0.10f);
-    movement_controler.set_limit_position(-1.089126f, 4.236856f);
+    movement_controler.set_limit_position(-PI_m2*10, PI_m2*10);
     movement_controler.set_max_velocity(PI);
     movement_controler.init(main_clock, stp_motor, encoder_arm, *pdc);
 
@@ -200,7 +200,7 @@ void id_config(){
     CAN_X_FILTER_MASK_HIGH = 0xff0<<5;
     CAN_X_FILTER_MASK_LOW = 0x000;
 
-        //-------------------ENCODER STEPER MOTOR POSITION CONFIGURATION-------------------
+    //-------------------ENCODER STEPER MOTOR POSITION CONFIGURATION-------------------
     // to do
 
     //-------------------STEPER MOTOR CONFIGURATION-------------------
@@ -208,7 +208,7 @@ void id_config(){
     stp_motor.set_gear_ratio(75);
     stp_motor.set_max_velocity(PI);
     stp_motor.set_min_velocity(0.01);
-    stp_motor.set_reverse(true);
+    stp_motor.set_reverse(false);
     stp_motor.init();
     stp_motor.set_enable(false);
 
@@ -217,13 +217,13 @@ void id_config(){
     FILTERS::Filter_moving_avarage *fv = new FILTERS::Filter_moving_avarage(main_clock);
     fv->set_size(60); // 15 for smooth movement but delay with sampling to 50
 
-    encoder_arm.set_offset(-0.194048f);
-    encoder_arm.set_reverse(true);
+    encoder_arm.set_offset(-4.219981f);
+    encoder_arm.set_reverse(false);
     encoder_arm.set_enable_pos_filter(false);
     encoder_arm.set_enable_velocity(true);
     encoder_arm.set_enable_velocity_filter(true);
     encoder_arm.set_velocity_sample_amount(10);
-    encoder_arm.set_dead_zone_correction_angle(PI_d2*3);
+    encoder_arm.set_dead_zone_correction_angle(PI);
     encoder_arm.init(hi2c1,main_clock,nullptr,fv);
     
 
@@ -231,7 +231,7 @@ void id_config(){
     PDCONTROLER::PdControler *pdc = new PDCONTROLER::PdControler(main_clock);
     pdc->set_Kp(0.90);
     pdc->set_Kd(0.10f);
-    movement_controler.set_limit_position(-1.089126f, 4.236856f);
+    movement_controler.set_limit_position(-PI_d2, PI_d2);
     movement_controler.set_max_velocity(PI);
     movement_controler.init(main_clock, stp_motor, encoder_arm, *pdc);
 
@@ -266,7 +266,7 @@ void id_config(){
     FILTERS::Filter_moving_avarage *fv = new FILTERS::Filter_moving_avarage(main_clock);
     fv->set_size(60); // 15 for smooth movement but delay with sampling to 50
 
-    encoder_arm.set_offset(-0.194048f);
+    encoder_arm.set_offset(-0.240067f);
     encoder_arm.set_reverse(true);
     encoder_arm.set_enable_pos_filter(false);
     encoder_arm.set_enable_velocity(true);
@@ -363,12 +363,11 @@ void periferal_config(){
 }
 
 void handle_can_rx(){
-  CAN_CONTROL::CAN_MSG *recived_msg= nullptr;
   __disable_irq();
-  int status = can_controler.get_message(&recived_msg);
+  CAN_CONTROL::CAN_MSG *recived_msg = can_controler.get_message();
   __enable_irq();
   // log_debug("RX: " + std::to_string(status));
-  if(status || recived_msg == nullptr) return;
+  if(recived_msg == nullptr) return;
   tim_can_disconnected.reset();
   // log_debug("RX: " + std::to_string(recived_msg->frame_id) + " " + std::to_string(status));
   
@@ -409,7 +408,8 @@ void handle_can_rx(){
   else if (recived_msg->frame_id == CAN_KONARM_X_CLEAR_ERRORS_FRAME_ID){
   }
 
-  delete recived_msg;
+  // delete recived_msg;
+  free(recived_msg);
 }
 
 void analog_values_assigning(){

@@ -79,7 +79,7 @@ public:
   /// @brief  Get the message from the RX buffer
   /// @param msg  pointer to the CAN_MSG object
   /// @return amount of messages in the buffer
-  int get_message(CAN_MSG **msg);
+  CAN_MSG* get_message();
 };
 
 } // namespace CAN_CONTROL

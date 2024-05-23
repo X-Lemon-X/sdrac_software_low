@@ -27,11 +27,12 @@ public:
   }
 
   ~List(){
-    Node *current = head;
+    Node *current = tail;
     Node *next;
     while(current != nullptr){
       next = current->next;
       free(current);
+      current = next;
     }
   }
 
@@ -68,8 +69,6 @@ public:
     if(head == tail){
       head = nullptr;
       tail = nullptr;
-      free(temp);
-      return;
     }else{
       head = head->prev;
       head->next = nullptr;

@@ -79,7 +79,8 @@ add_executable(${TARGET}
 "Core/Src/main.cpp"
 
 # Add the startup file the name should be the same as the stm32 you are using
-"Drivers/CMSIS/Device/ST/STM32F4xx/Source/Templates/gcc/startup_stm32f412rx.s"
+# "Drivers/CMSIS/Device/ST/STM32F4xx/Source/Templates/gcc/startup_stm32f412rx.s"
+"startup_stm32f412rx.s"
 
 # Add all your custom source files
 "app/main_prog_callbacks.cpp"
