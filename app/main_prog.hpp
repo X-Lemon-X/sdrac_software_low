@@ -36,7 +36,7 @@
 
 #define ENCODER_AS5600_I2C_ADDRESS 0x36 // 0b0110110
 #define ENCODER_AS5600_RESOLUTION 4096
-#define ENCODER_AS5600_ANGLE_REG 0x0E
+#define ENCODER_AS5600_ANGLE_REG 0x0C
 
 
 //**************************************************************************************************

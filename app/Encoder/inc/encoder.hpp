@@ -12,7 +12,14 @@
 #define ANGLE_MAX_DEFFERENCE 2.0f // 1 radian
 
 namespace ENCODER {
-  
+
+/// @brief translates the register data to angle for AS5600 magnetic encoder 
+uint16_t translate_reg_to_angle_AS5600(uint8_t first,uint8_t second);
+
+/// @brief translates the register data to angle for MT6701 magnetic encoder
+uint16_t translate_reg_to_angle_MT6701(uint8_t first,uint8_t second);
+
+
 class Encoder {
 private:
   I2C_HandleTypeDef *hi2c;
@@ -41,6 +48,8 @@ private:
   bool enable_velocity_filter;
   uint16_t velocity_sample_count;
   uint16_t velocity_samples_amount;
+
+  uint16_t (*translate_reg_to_angle_function)(uint8_t,uint8_t);
   
   /// @brief Calucaltes velcoicty, and passes it thoroung a filter
   /// @param angle current angle
@@ -139,7 +148,16 @@ public:
   /// In the counter clockwise direction on the left side of the dead zone angle negative and on the right side positive
   /// @param begin_roation_dead_zone_correction_angle the angle in radians, can be set to 0 if dead zone correction angle shall not be used.
   void set_dead_zone_correction_angle(float begin_roation_dead_zone_correction_angle);
+
+
+  /// @brief sets the function that will be used to translate register data to angle.
+  /// It have to return the angle in uint16_t and takes the data from two registers first and second.
+  /// @param function the function that will be used to read the angle
+  /// @return the angle in uint16_t in binary format for example 0-4095 or 0-16383
+  void set_function_to_read_angle(uint16_t (*function)(uint8_t,uint8_t));
 };
+
+
 
 }
 

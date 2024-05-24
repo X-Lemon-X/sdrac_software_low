@@ -7,6 +7,18 @@
 
 using namespace ENCODER;
 
+uint16_t ENCODER::translate_reg_to_angle_AS5600(uint8_t data1, uint8_t data2){
+  uint16_t reg = (uint16_t)(data1 & 0x0F) << 8;
+  reg |= (uint16_t)(data2);
+  return reg;
+}
+
+uint16_t ENCODER::translate_reg_to_angle_MT6701(uint8_t data1, uint8_t data2){
+  uint16_t reg = (uint16_t)data1 << 6;
+  reg |= (uint16_t)(data2 & 0xfc) >> 2;
+  return reg;
+}
+
 Encoder::Encoder(){
 this->resolution = 4096;
 this->address = 0x40;
@@ -18,6 +30,7 @@ this->enable_filter = false;
 this->enable_velocity = false;
 this->enable_velocity_filter = false;
 this->dead_zone_correction_angle=0;
+this->translate_reg_to_angle_function = ENCODER::translate_reg_to_angle_MT6701;
 }
 
 void Encoder::init(I2C_HandleTypeDef &hi2c, TIMING::Ticker &ticker, FILTERS::FilterBase *filter_angle, FILTERS::FilterBase *filter_velocity){
@@ -34,6 +47,9 @@ void Encoder::init(I2C_HandleTypeDef &hi2c, TIMING::Ticker &ticker, FILTERS::Fil
   // after first starting after power down
   if(dead_zone_correction_angle != 0)
     this->over_drive_angle = angle > this->dead_zone_correction_angle ? -PI_m2 : 0; 
+  else // if no dead zone correction is needed then coret to the shortest path to 0
+    this->over_drive_angle = std::abs(PI_m2 - angle) < std::abs(angle) ? -PI_m2 : 0;
+
   this->prev_angle =  angle;
   read_angle();
   this->prev_angle_velocity = this->absolute_angle;
@@ -46,8 +62,11 @@ bool Encoder::ping_encoder(){
 uint16_t Encoder::read_raw_angle(){
   HAL_StatusTypeDef status = HAL_I2C_Mem_Read(hi2c, address, angle_register, 1, this->data, 2, 5);
   if(status != HAL_OK) return 0;
-  uint16_t reg = (uint16_t)this->data[0] << 6;
-  reg |= (uint16_t)(this->data[1] & 0xfc) >> 2;
+
+  uint16_t reg = translate_reg_to_angle_function(data[0], data[1]);
+
+  // uint16_t reg = (uint16_t)this->data[0] << 6;
+  // reg |= (uint16_t)(this->data[1] & 0xfc) >> 2;
   return reg;
 }
 
@@ -152,4 +171,8 @@ void Encoder::set_velocity_sample_amount(uint16_t velocity_samples_amount){
 
 void Encoder::set_dead_zone_correction_angle(float dead_zone_correction_angle){
   this->dead_zone_correction_angle = abs(dead_zone_correction_angle);
+}
+
+void Encoder::set_function_to_read_angle(uint16_t (*function)(uint8_t,uint8_t)){
+  this->translate_reg_to_angle_function = function;
 }

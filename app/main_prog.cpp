@@ -172,6 +172,7 @@ void id_config(){
     FILTERS::Filter_moving_avarage *fv = new FILTERS::Filter_moving_avarage(main_clock);
     fv->set_size(60); // 15 for smooth movement but delay with sampling to 50
 
+    encoder_arm.set_function_to_read_angle(ENCODER::translate_reg_to_angle_MT6701);
     encoder_arm.set_offset(-5.23547649f);
     encoder_arm.set_reverse(true);
     encoder_arm.set_enable_pos_filter(false);
@@ -221,6 +222,7 @@ void id_config(){
     FILTERS::Filter_moving_avarage *fv = new FILTERS::Filter_moving_avarage(main_clock);
     fv->set_size(60); // 15 for smooth movement but delay with sampling to 50
 
+    encoder_arm.set_function_to_read_angle(ENCODER::translate_reg_to_angle_MT6701);
     encoder_arm.set_offset(-4.219981f);
     encoder_arm.set_reverse(false);
     encoder_arm.set_enable_pos_filter(false);
@@ -270,6 +272,7 @@ void id_config(){
     FILTERS::Filter_moving_avarage *fv = new FILTERS::Filter_moving_avarage(main_clock);
     fv->set_size(60); // 15 for smooth movement but delay with sampling to 50
 
+    encoder_arm.set_function_to_read_angle(ENCODER::translate_reg_to_angle_MT6701);
     encoder_arm.set_offset(-0.240067f);
     encoder_arm.set_reverse(true);
     encoder_arm.set_enable_pos_filter(false);
