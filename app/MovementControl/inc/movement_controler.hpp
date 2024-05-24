@@ -56,7 +56,8 @@ private:
   float target_velocity;
   float current_velocity;
   bool enable;
-  bool dont_overide_limit_position;
+  bool dont_override_limit_position;
+  bool limit_positon_achieved;
 public:
 
   /// @brief Arm controler interface
@@ -102,10 +103,12 @@ public:
   /// @return Current velocity in rad/s
   float get_current_velocity() const;
 
+  bool get_limit_position_achieved() const;
+
   /// @brief ovveride the limit position by turning off the limit position
   /// definitely not recommended to make it true for a regular use since it can damage the arm
   /// @param override True to turn off the limit position, false to turn on the limit position
-  void overide_limit_position(bool override);
+  void override_limit_position(bool override);
 };
 
 

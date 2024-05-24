@@ -17,7 +17,7 @@ MovementControler::MovementControler(){
   current_position = 0;
   target_velocity = 0;
   current_velocity = 0;
-  dont_overide_limit_position = true;
+  dont_override_limit_position = true;
 }
 
 MovementControler::~MovementControler(){
@@ -46,8 +46,12 @@ void MovementControler::handle(){
   if (abs(new_velocity) > max_velocity)
     new_velocity = (new_velocity > 0) ? max_velocity : -max_velocity;
 
-  if ( dont_overide_limit_position && ( current_position < min_position || current_position > max_position))
+  if ( dont_override_limit_position && ( current_position < min_position || current_position > max_position)){
     new_velocity = 0.0;
+    limit_positon_achieved = true;
+  }else {
+    limit_positon_achieved = false;
+  }
 
   current_velocity = new_velocity;
   steper_motor->set_enable(enable);
@@ -84,6 +88,10 @@ float MovementControler::get_current_velocity()const{
   return current_velocity;
 }
 
-void MovementControler::overide_limit_position(bool overide){
-  dont_overide_limit_position = !overide;
+void MovementControler::override_limit_position(bool overide){
+  dont_override_limit_position = !overide;
+}
+
+bool MovementControler::get_limit_position_achieved() const{
+  return limit_positon_achieved;
 }
