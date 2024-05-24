@@ -15,7 +15,7 @@
 
 //**************************************************************************************************
 // log levels 
-// #define LOG_DEBUG
+#define LOG_DEBUG
 // #define LOG_INFO
 // #define LOG_WARN
 // #define LOG_ERROR
@@ -33,6 +33,11 @@
 #define ENCODER_MEM_ADDR_ANNGLE 0x03
 #define ENCODER_MT6701_I2C_ADDRESS 0xC //  0b0001100
 #define ENCODER_MT6702_RESOLUTION 16384
+
+#define ENCODER_AS5600_I2C_ADDRESS 0x36 // 0b0110110
+#define ENCODER_AS5600_RESOLUTION 4096
+#define ENCODER_AS5600_ANGLE_REG 0x0E
+
 
 //**************************************************************************************************
 // CAN CONSTANTS
