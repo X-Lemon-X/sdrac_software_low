@@ -106,7 +106,7 @@ float Encoder::get_angle() const{
   return this->prev_angle;
 }
 
-float Encoder::get_absoulte_angle() const{
+float Encoder::get_absoulute_angle() const{
   return this->absolute_angle;
 }
 

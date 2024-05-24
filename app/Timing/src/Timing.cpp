@@ -19,11 +19,6 @@ void Ticker::irq_update_ticker(){
   tick_micros = tick_millis*1000;
 }
 
-void Timing::set_behaviour(uint32_t _period, bool _repeat){
-  period = _period;
-  repeat = _repeat;
-}
-
 uint32_t Ticker::get_micros() {
   __disable_irq();
   uint32_t mic =  (uint32_t)TIM10->CNT + tick_micros;
@@ -39,6 +34,11 @@ float Ticker::get_seconds() {
   return (float)get_micros() * 0.000001f;
 }
 
+void Timing::set_behaviour(uint32_t _period, bool _repeat){
+  period = _period;
+  repeat = _repeat;
+}
+
 Timing::Timing(Ticker &_ticker): ticker(_ticker){
   period = 0;
   last_time = ticker.get_micros();
@@ -46,14 +46,16 @@ Timing::Timing(Ticker &_ticker): ticker(_ticker){
 }
 
 void Timing::reset(){
-  last_time = ticker.get_micros();
+  this->last_time = ticker.get_micros() - 10;
 }
 
 bool Timing::triggered(){
-  uint32_t current_time = ticker.get_micros();
-  if (current_time - last_time > period){
-    if (repeat) last_time = current_time;
-    return true;
-  }
-  return false;
+  uint32_t dif,current_time = ticker.get_micros();
+  // why this is here?
+  // because the request for time previous value is higher than the current value
+  // which means that the timer has overflowed and the difference is gretaer than the period
+  dif = current_time > this->last_time? current_time - this->last_time : this->last_time - current_time;
+  if (dif < this->period) return false;
+  if (repeat) this->last_time = current_time;
+  return true;
 }

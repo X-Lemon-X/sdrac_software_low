@@ -348,6 +348,7 @@ void periferal_config(){
 
 
 }
+
 void post_id_config(){
     // Can1 settings
   CAN_FilterTypeDef can_filter;
@@ -375,7 +376,6 @@ void handle_can_rx(){
   if(recived_msg == nullptr) return;
   tim_can_disconnected.reset();
 
-  
   if(recived_msg->frame_id == CAN_KONARM_X_SET_POS_FRAME_ID){
     can_konarm_1_set_pos_t signals;
     can_konarm_1_set_pos_unpack(&signals, recived_msg->data, recived_msg->data_size);
@@ -452,17 +452,15 @@ void main_loop(){
     handle_can_rx();
     can_controler.handle();
 
-    
     if(tim_encoder.triggered()){
       encoder_arm.handle();
     }
-    
-    if(tim_can_disconnected.triggered()){
+
+    if(tim_can_disconnected.triggered()){      
       movement_controler.set_enable(false);
       movement_controler.set_velocity(0);
       movement_controler.set_position(movement_controler.get_current_position());
     }
-    
     movement_controler.handle();
 
     if(tim_data_usb_send.triggered()){

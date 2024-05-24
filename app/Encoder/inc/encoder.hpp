@@ -85,11 +85,11 @@ public:
   /// @return the angle in radians
   float get_angle() const;
 
-  /// @brief gets the latest cacualted absolute angle 
+  /// @brief gets the latest calculated absolute angle 
   /// absoulte angle includes information how many times the encoder has rotated
   /// for example if the encoder has rotated 3 times the angle will be 6pi + the current angle
   /// @return the absoulte angle in radians
-  float get_absoulte_angle() const;
+  float get_absoulute_angle() const;
 
   /// @brief sets the resolution of the encoder
   /// @param resolution the resolution of the encoder 
@@ -133,11 +133,11 @@ public:
   void set_velocity_sample_amount(uint16_t velocity_samples_amount);\
 
   /// @brief sets the begin roation dead zone correction angle
-  /// the dead zone angle is used to correct initial value of the angle to be etehr positive or negative
-  /// since the same angle can be read as either positive or negative value -pi/2 or 3pi/2
+  /// The dead zone angle is used to correct initial value of the angle to be eather positive or negative.
+  /// Since the same angle can be read as either positive or negative value for exmple -pi/2 or 3pi/2
   /// the dead zone angle is used to correct this by making the angle 
-  /// on the left side of the dead zone angle negative and on the right side positive
-  /// @param begin_roation_dead_zone_correction_angle the angle in radians, can be set to 0 if not used
+  /// In the counter clockwise direction on the left side of the dead zone angle negative and on the right side positive
+  /// @param begin_roation_dead_zone_correction_angle the angle in radians, can be set to 0 if dead zone correction angle shall not be used.
   void set_dead_zone_correction_angle(float begin_roation_dead_zone_correction_angle);
 };
 

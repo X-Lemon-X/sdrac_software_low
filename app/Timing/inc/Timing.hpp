@@ -43,9 +43,11 @@ class Timing
 private:
   Ticker &ticker;
   uint32_t period;
-  uint32_t last_time;
   bool repeat;
 public:
+  uint32_t last_time;
+  uint32_t difference_d;
+  uint32_t current_time_d;
   /// @brief Construct a new Timing object
   /// @param ticker reference to the ticker object with us resolution
   Timing(Ticker &ticker);
