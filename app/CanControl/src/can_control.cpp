@@ -11,7 +11,10 @@
 
 using namespace CAN_CONTROL;
 
-CanControl::CanControl(){}
+CanControl::CanControl(){
+  filter_mask = 0;
+  filter_base_id = 0;
+}
 
 CanControl::~CanControl(){
   delete timing_led_rx;
@@ -26,6 +29,7 @@ void CanControl::init(CAN_HandleTypeDef &_can_interface, uint32_t _can_fifo,TIMI
   pin_rx_led = &_pin_rx_led;
   timing_led_rx = new TIMING::Timing(*ticker);
   timing_led_tx = new TIMING::Timing(*ticker);
+ 
   
   // rx_msg_buffer.resize(CAN_QUEUE_SIZE+1);
   timing_led_rx->set_behaviour(CAN_LED_BLINK_PERIOD_US,false);
@@ -33,18 +37,16 @@ void CanControl::init(CAN_HandleTypeDef &_can_interface, uint32_t _can_fifo,TIMI
 }
 
 void CanControl::push_to_queue(CAN_MSG *msg){
-  // if(rx_msg_buffer.size() == CAN_QUEUE_SIZE){
-  //   delete msg;
-  //   return;
-  // }
-  // rx_msg_buffer.push_back(msg);
-
-  if(rx_msg_buffer_2.size() == CAN_QUEUE_SIZE){
+  if(rx_msg_buffer.size() == CAN_QUEUE_SIZE){
     free(msg);
     return;
   }
-  rx_msg_buffer_2.push_back(msg);
+  rx_msg_buffer.push_back(msg);
+}
 
+void CanControl::set_filter(uint32_t base_id, uint32_t mask){
+  filter_mask = mask;
+  filter_base_id = base_id;
 }
 
 void CanControl::blink_tx_led(){
@@ -61,15 +63,15 @@ void CanControl::irq_handle_rx(){
   blink_rx_led();
   if (HAL_CAN_GetRxMessage(can_interface, can_fifo, &header, data) != HAL_OK)
     return;
+  if ((header.StdId & filter_mask) != filter_base_id)
+    return;
   CAN_MSG *msg = (CAN_MSG*)malloc(sizeof(CAN_MSG));
-  // CAN_MSG *msg = new CAN_MSG;
   if(msg == nullptr)
     return;
   msg->frame_id = header.StdId;
   msg->remote_request = header.RTR == CAN_RTR_REMOTE;
   msg->data_size = header.DLC;
   memcpy(msg->data,data,msg->data_size);
-  // free(data);
   push_to_queue(msg);
 }
 
@@ -83,11 +85,19 @@ void CanControl::handle(){
   
   if(this->timing_led_tx->triggered())
     WRITE_GPIO((*pin_tx_led),GPIO_PIN_RESET);
+
+  CAN_MSG *msg = tx_msg_buffer.get_front();
+  if(msg == nullptr) return;
+
+  if(send_msg(*msg) == 0){
+    tx_msg_buffer.pop_front();
+    free(msg);
+  }
 }
 
-void CanControl::send_message(CAN_MSG &msg){
-
-  while(HAL_CAN_GetTxMailboxesFreeLevel(can_interface)==0){__NOP();}
+uint8_t CanControl::send_msg(CAN_MSG &msg){
+  if(HAL_CAN_GetTxMailboxesFreeLevel(can_interface)==0) 
+    return 1;
 
   CAN_TxHeaderTypeDef tx_header;
   tx_header.StdId = msg.frame_id;
@@ -95,26 +105,29 @@ void CanControl::send_message(CAN_MSG &msg){
   tx_header.RTR = CAN_RTR_DATA;
   tx_header.IDE = CAN_ID_STD;
   tx_header.TransmitGlobalTime = DISABLE;
-  HAL_StatusTypeDef status =HAL_CAN_AddTxMessage(can_interface,&tx_header,msg.data,&last_tx_mailbox);
-  if(status != HAL_OK)
-    log_debug("CAN TX error");
+  if(HAL_CAN_AddTxMessage(can_interface,&tx_header,msg.data,&last_tx_mailbox)!=HAL_OK) 
+    return 2;
   blink_tx_led();
+  return 0;
+}
+
+void CanControl::send_msg_to_queue(CAN_MSG *msg){
+  if(msg == nullptr)
+    return;
+
+  if(tx_msg_buffer.size() == CAN_QUEUE_SIZE){
+    free(msg);
+    return;
+  }
+  // __disable_irq();
+  tx_msg_buffer.push_back(msg);
+  // __enable_irq();
 }
 
 CAN_MSG* CanControl::get_message(){
-  if(rx_msg_buffer_2.size() == 0)
+  CAN_MSG *ms = rx_msg_buffer.get_front();
+  if (ms == nullptr)
     return nullptr;
-  CAN_MSG *ms = rx_msg_buffer_2.get_front();
-  rx_msg_buffer_2.pop_front();
+  rx_msg_buffer.pop_front();
   return ms;
-  
-  // if(rx_msg_buffer.empty())
-  //   return 1;
-  // if(msg == nullptr)
-  //   return 2;
-  // CAN_MSG *ms = rx_msg_buffer.front();
-  // // *msg = rx_msg_buffer.front();
-  // *msg = ms;
-  // rx_msg_buffer.pop_front();
-  // return 0;
 }

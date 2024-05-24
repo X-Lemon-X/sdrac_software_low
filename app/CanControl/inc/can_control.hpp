@@ -32,11 +32,14 @@ private:
   TIMING::Timing *timing_led_tx;
   uint8_t data[CAN_DATA_FRAME_MAX_SIZE];
   CAN_RxHeaderTypeDef header;
-  std::list<CAN_MSG*> rx_msg_buffer;
-  LIST_EMB::List<CAN_MSG*> rx_msg_buffer_2;
+  LIST_EMB::List<CAN_MSG*> rx_msg_buffer;
+  LIST_EMB::List<CAN_MSG*> tx_msg_buffer;
   const GPIO_PIN *pin_tx_led;
   const GPIO_PIN *pin_rx_led;
   uint32_t last_tx_mailbox;
+
+  uint32_t filter_mask;
+  uint32_t filter_base_id;
 
   /// @brief  turn on the TX led for a short period
  void blink_tx_led();
@@ -62,6 +65,10 @@ public:
   /// @param pin_rx_led  pin object for the RX led
   void init(CAN_HandleTypeDef &can_interface,uint32_t can_fifo,TIMING::Ticker &ticker,const GPIO_PIN &pin_tx_led,const GPIO_PIN &pin_rx_led);
 
+  /// @brief  Add a filter to the CAN interface. Why because i can't get the hardware filters to work properly!
+  /// @param base_id  base id of the filter
+  /// @param mask  mask of the filter
+  void set_filter(uint32_t base_id, uint32_t mask);
 
   /// @brief  Handle the RX interrupt
   void irq_handle_rx();
@@ -73,8 +80,11 @@ public:
   ///         It will handle the RX and TX leds and other tasks that require some updates
   void handle();
 
-  /// @brief  Send a message over CAN bus
-  void send_message(CAN_MSG &msg);
+  /// @brief  Send a message to a CAN bus
+  /// @param msg  pointer to the CAN_MSG object
+  uint8_t send_msg(CAN_MSG &msg);
+
+  void send_msg_to_queue(CAN_MSG *msg);
   
   /// @brief  Get the message from the RX buffer
   /// @param msg  pointer to the CAN_MSG object

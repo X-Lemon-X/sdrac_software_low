@@ -102,6 +102,8 @@ void main_loop();
 /// @brief This function is used to configure the board base on it's hardware id
 void id_config();
 
+void post_id_config();
+
 /// @brief This function is used to init the interfaces
 void init_controls();
 
@@ -111,6 +113,7 @@ void main_prog(){
   pre_periferal_config();
   periferal_config();
   id_config();
+  post_id_config();
   init_controls();
   main_loop();
 }
@@ -145,9 +148,10 @@ void id_config(){
     
     // ids 11bit 0b110 0001 0000  and 18 bit 0b00 0000 0000 0000 0000
     //mask 11bit 0b111 1111 0000  and 18 bit 0b00 0000 0000 0000 0000
-    CAN_X_FILTER_ID_HIGH = 0x610<<5;   // why 5 bits shift because we want tu push the 11 bit id to the 16 bit regiser strting from 5th bit
+    // for some reason filter mask is not working properly so we have to do it in software
+    CAN_X_FILTER_ID_HIGH = 0x610;   // why 5 bits shift because we want tu push the 11 bit id to the 16 bit regiser strting from 5th bit
     CAN_X_FILTER_ID_LOW = 0x000;
-    CAN_X_FILTER_MASK_HIGH = 0xff0<<5;
+    CAN_X_FILTER_MASK_HIGH = 0xff0;
     CAN_X_FILTER_MASK_LOW = 0x000;
 
 
@@ -195,9 +199,9 @@ void id_config(){
     CAN_KONARM_X_GET_POS_FRAME_ID = CAN_KONARM_2_GET_POS_FRAME_ID;
     CAN_KONARM_X_CLEAR_ERRORS_FRAME_ID = CAN_KONARM_2_CLEAR_ERRORS_FRAME_ID;
 
-    CAN_X_FILTER_ID_HIGH = 0x620<<5;
+    CAN_X_FILTER_ID_HIGH = 0x620;
     CAN_X_FILTER_ID_LOW = 0x000;
-    CAN_X_FILTER_MASK_HIGH = 0xff0<<5;
+    CAN_X_FILTER_MASK_HIGH = 0xff0;
     CAN_X_FILTER_MASK_LOW = 0x000;
 
     //-------------------ENCODER STEPER MOTOR POSITION CONFIGURATION-------------------
@@ -244,9 +248,9 @@ void id_config(){
     CAN_KONARM_X_GET_POS_FRAME_ID = CAN_KONARM_3_GET_POS_FRAME_ID;
     CAN_KONARM_X_CLEAR_ERRORS_FRAME_ID = CAN_KONARM_3_CLEAR_ERRORS_FRAME_ID;
 
-    CAN_X_FILTER_ID_HIGH = 0x630<<5;
+    CAN_X_FILTER_ID_HIGH = 0x630;
     CAN_X_FILTER_ID_LOW = 0x000;
-    CAN_X_FILTER_MASK_HIGH = 0xff0<<5;
+    CAN_X_FILTER_MASK_HIGH = 0xFF0;
     CAN_X_FILTER_MASK_LOW = 0x000;
 
         //-------------------ENCODER STEPER MOTOR POSITION CONFIGURATION-------------------
@@ -342,37 +346,34 @@ void periferal_config(){
   HAL_CAN_DeInit(&hcan1);
   HAL_CAN_Init(&hcan1);
 
-  // Can1 settings
+
+}
+void post_id_config(){
+    // Can1 settings
   CAN_FilterTypeDef can_filter;
   can_filter.FilterBank = 1;
-  can_filter.FilterMode = CAN_FILTERMODE_IDMASK;
-  can_filter.FilterScale = CAN_FILTERSCALE_32BIT;
   can_filter.FilterFIFOAssignment = CAN_FILTER_FIFO0;
   can_filter.FilterActivation = CAN_FILTER_ENABLE;
+  can_filter.FilterMode = CAN_FILTERMODE_IDMASK;
+  can_filter.FilterScale = CAN_FILTERSCALE_16BIT;
   can_filter.FilterIdHigh = CAN_X_FILTER_ID_HIGH;
   can_filter.FilterIdLow = CAN_X_FILTER_ID_LOW;
   can_filter.FilterMaskIdHigh = CAN_X_FILTER_MASK_HIGH;
   can_filter.FilterMaskIdLow = CAN_X_FILTER_MASK_LOW;
-  can_filter.SlaveStartFilterBank = 2;
+  can_filter.SlaveStartFilterBank = 0;
   HAL_StatusTypeDef status =  HAL_CAN_ConfigFilter(&hcan1, &can_filter);
+  can_controler.set_filter(CAN_X_FILTER_ID_HIGH, CAN_X_FILTER_MASK_HIGH);
   can_controler.init(hcan1, CAN_FILTER_FIFO0, main_clock, pin_tx_led, pin_rx_led);
   status =  HAL_CAN_Start(&hcan1);
-  status =  HAL_CAN_ActivateNotification(&hcan1, CAN_IT_RX_FIFO0_MSG_PENDING | CAN_IT_RX_FIFO1_MSG_PENDING);
-
-  
+  status =  HAL_CAN_ActivateNotification(&hcan1, CAN_IT_RX_FIFO0_MSG_PENDING ); //| CAN_IT_RX_FIFO1_MSG_PENDING); 
 }
 
 void handle_can_rx(){
   __disable_irq();
   CAN_CONTROL::CAN_MSG *recived_msg = can_controler.get_message();
   __enable_irq();
-  // log_debug("RX: " + std::to_string(status));
   if(recived_msg == nullptr) return;
   tim_can_disconnected.reset();
-  // log_debug("RX: " + std::to_string(recived_msg->frame_id) + " " + std::to_string(status));
-  
-  // delete recived_msg;
-  // return;
 
   
   if(recived_msg->frame_id == CAN_KONARM_X_SET_POS_FRAME_ID){
@@ -386,24 +387,26 @@ void handle_can_rx(){
     log_debug("sp:" + std::to_string(targetPosition) + " sv:" + std::to_string(targetVelocity));
   }
   else if (recived_msg->frame_id == CAN_KONARM_X_GET_POS_FRAME_ID && recived_msg->remote_request){
-    CAN_CONTROL::CAN_MSG send_msg = {0};
+    CAN_CONTROL::CAN_MSG *send_msg = (CAN_CONTROL::CAN_MSG*)malloc(sizeof(CAN_CONTROL::CAN_MSG));
     can_konarm_1_get_pos_t src_p;
-    send_msg.frame_id = CAN_KONARM_X_GET_POS_FRAME_ID;
+    send_msg->frame_id = CAN_KONARM_X_GET_POS_FRAME_ID;
     src_p.position = can_konarm_1_get_pos_position_encode(movement_controler.get_current_position());
     src_p.velocity = can_konarm_1_get_pos_velocity_encode(movement_controler.get_current_velocity());
-    send_msg.data_size = CAN_KONARM_1_GET_POS_LENGTH;
-    can_konarm_1_get_pos_pack(send_msg.data, &src_p, send_msg.data_size);
-    can_controler.send_message(send_msg);
+    send_msg->data_size = CAN_KONARM_1_GET_POS_LENGTH;
+    can_konarm_1_get_pos_pack(send_msg->data, &src_p, send_msg->data_size);
+    // can_controler.send_msg(send_msg);
+    can_controler.send_msg_to_queue(send_msg);
     log_debug("get pos");
   }
   else if (recived_msg->frame_id == CAN_KONARM_X_STATUS_FRAME_ID && recived_msg->remote_request){
-    CAN_CONTROL::CAN_MSG send_msg = {0};
+    CAN_CONTROL::CAN_MSG *send_msg = (CAN_CONTROL::CAN_MSG*)malloc(sizeof(CAN_CONTROL::CAN_MSG));
     can_konarm_1_status_t src_p;
-    send_msg.frame_id = CAN_KONARM_X_STATUS_FRAME_ID;
+    send_msg->frame_id = CAN_KONARM_X_STATUS_FRAME_ID;
     src_p.status = can_konarm_1_status_status_encode(CAN_KONARM_1_STATUS_STATUS_OK_CHOICE);
-    send_msg.data_size = CAN_KONARM_1_STATUS_LENGTH;
-    can_konarm_1_status_pack(send_msg.data, &src_p, send_msg.data_size);
-    can_controler.send_message(send_msg);
+    send_msg->data_size = CAN_KONARM_1_STATUS_LENGTH;
+    can_konarm_1_status_pack(send_msg->data, &src_p, send_msg->data_size);
+    // can_controler.send_msg(send_msg);
+    can_controler.send_msg_to_queue(send_msg);
   }
   else if (recived_msg->frame_id == CAN_KONARM_X_CLEAR_ERRORS_FRAME_ID){
   }
