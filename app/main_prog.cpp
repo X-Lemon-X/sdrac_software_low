@@ -384,7 +384,6 @@ void handle_can_rx(){
     movement_controler.set_velocity(targetVelocity);
     movement_controler.set_position(targetPosition);
     movement_controler.set_enable(true);
-    log_debug("sp:" + std::to_string(targetPosition) + " sv:" + std::to_string(targetVelocity));
   }
   else if (recived_msg->frame_id == CAN_KONARM_X_GET_POS_FRAME_ID && recived_msg->remote_request){
     CAN_CONTROL::CAN_MSG *send_msg = (CAN_CONTROL::CAN_MSG*)malloc(sizeof(CAN_CONTROL::CAN_MSG));
@@ -394,9 +393,7 @@ void handle_can_rx(){
     src_p.velocity = can_konarm_1_get_pos_velocity_encode(movement_controler.get_current_velocity());
     send_msg->data_size = CAN_KONARM_1_GET_POS_LENGTH;
     can_konarm_1_get_pos_pack(send_msg->data, &src_p, send_msg->data_size);
-    // can_controler.send_msg(send_msg);
     can_controler.send_msg_to_queue(send_msg);
-    log_debug("get pos");
   }
   else if (recived_msg->frame_id == CAN_KONARM_X_STATUS_FRAME_ID && recived_msg->remote_request){
     CAN_CONTROL::CAN_MSG *send_msg = (CAN_CONTROL::CAN_MSG*)malloc(sizeof(CAN_CONTROL::CAN_MSG));
@@ -405,7 +402,6 @@ void handle_can_rx(){
     src_p.status = can_konarm_1_status_status_encode(CAN_KONARM_1_STATUS_STATUS_OK_CHOICE);
     send_msg->data_size = CAN_KONARM_1_STATUS_LENGTH;
     can_konarm_1_status_pack(send_msg->data, &src_p, send_msg->data_size);
-    // can_controler.send_msg(send_msg);
     can_controler.send_msg_to_queue(send_msg);
   }
   else if (recived_msg->frame_id == CAN_KONARM_X_CLEAR_ERRORS_FRAME_ID){

@@ -52,7 +52,8 @@ void Timing::reset(){
 bool Timing::triggered(){
   uint32_t dif,current_time = ticker.get_micros();
   // why this is here?
-  // because the request for time previous value is higher than the current value
+  // because some times last_value is higher than the current_time why is that?
+  // because the timer have  irq problems when the vale of the time is rapidly checked
   // which means that the timer has overflowed and the difference is gretaer than the period
   dif = current_time > this->last_time? current_time - this->last_time : this->last_time - current_time;
   if (dif < this->period) return false;
