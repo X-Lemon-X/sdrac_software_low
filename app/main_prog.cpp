@@ -18,6 +18,8 @@
 #include "ntc_termistors.hpp"
 #include "version.hpp"
 #include <cfloat>
+#include "config_struct.hpp"
+#include "id_config.hpp"
 
 #include <string>
 #include <charconv>
@@ -58,14 +60,18 @@ GPIO_PIN pin_boot_device = {GPIO_PIN_8, GPIOC};
 // Global stuff
 
 uint32_t adc_dma_buffer[ADC_DMA_BUFFER_SIZE+1];
-
+ID_CONFIG config;
 TIMING::Ticker main_clock;
 LOGGER::Logger loger(LOGGER::LOG_LEVEL::LOG_LEVEL_DEBUG,false);
 BOARD_ID::Board_id board_id(pin_cid_0, pin_cid_1, pin_cid_2);
 STEPER_MOTOR::SteperMotor stp_motor(htim3, TIM_CHANNEL_1, pin_steper_direction, pin_steper_enable);
 CAN_CONTROL::CanControl can_controler;
 MOVEMENT_CONTROLER::MovementControler movement_controler;
+PDCONTROLER::PdControler pid_pos(main_clock);
+
+FILTERS::Filter_moving_avarage encoder_arm_moving_avarage(main_clock);
 ENCODER::Encoder encoder_arm;
+
 USB_PROGRAMER::UsbProgramer usb_programer(pin_boot_device);
 TIMING::Timing tim_can_disconnected(main_clock);
 float temoperature_board = 0;
@@ -86,26 +92,7 @@ uint32_t CAN_KONARM_X_GET_POS_FRAME_ID;
 
 //**************************************************************************************************
 
-/// @brief This function is used to configure things that have to be configurated before all the periferals
-void pre_periferal_config();
 
-/// @brief This function is used to configure the periferals
-/// mostly stuff that have to be configurated after CumeMX generation
-void periferal_config();
-
-/// @brief This function is used to handle the can controll
-void handle_can_rx();
-
-/// @brief This function is used to handle the main loop, never returns
-void main_loop();
-
-/// @brief This function is used to configure the board base on it's hardware id
-void id_config();
-
-void post_id_config();
-
-/// @brief This function is used to init the interfaces
-void init_controls();
 
 //**************************************************************************************************
 void main_prog(){
@@ -123,6 +110,7 @@ void pre_periferal_config(){
   NTCTERMISTORS::termistor_divider_resisitor = 100000;
   NTCTERMISTORS::termistor_default_resistance = 100000;
 }
+
 
 void id_config(){
   log_debug("Start id_config\n");
@@ -331,6 +319,68 @@ void id_config(){
     break;
   }
   }  
+
+
+  // switch (board_id.get_id()){
+  // // case SDRAC_ID_0: config = config_id_0; break;
+  // case SDRAC_ID_1: config = config_id_1; break;
+  // case SDRAC_ID_2: config = config_id_2; break;
+  // case SDRAC_ID_3: config = config_id_3; break;
+  // // case SDRAC_ID_4: config = config_id_4; break;
+  // // case SDRAC_ID_5: config = config_id_5; break;
+  // // case SDRAC_ID_6: config = config_id_6; break;
+  // default: config = config_id_1; break;
+  // }
+
+  // CAN_KONARM_X_STATUS_FRAME_ID = config.can_konarm_status_frame_id;
+  // CAN_KONARM_X_SET_POS_FRAME_ID = config.can_konarm_set_pos_frame_id;
+  // CAN_KONARM_X_GET_POS_FRAME_ID = config.can_konarm_get_pos_frame_id;
+  // CAN_KONARM_X_CLEAR_ERRORS_FRAME_ID = config.can_konarm_clear_errors_frame_id;
+  
+  // // ids 11bit 0b110 0001 0000  and 18 bit 0b00 0000 0000 0000 0000
+  // //mask 11bit 0b111 1111 0000  and 18 bit 0b00 0000 0000 0000 0000
+  // // for some reason filter mask is not working properly so we have to do it in software
+  // CAN_X_FILTER_ID_HIGH = config.can_filter_id_high;   // why 5 bits shift because we want tu push the 11 bit id to the 16 bit regiser strting from 5th bit
+  // CAN_X_FILTER_ID_LOW = config.can_filter_id_low;
+  // CAN_X_FILTER_MASK_HIGH = config.can_filter_mask_high;
+  // CAN_X_FILTER_MASK_LOW = config.can_filter_mask_low;
+
+
+  // //-------------------ENCODER STEPER MOTOR POSITION CONFIGURATION-------------------
+  // // to do
+
+  // //-------------------STEPER MOTOR CONFIGURATION-------------------
+  // stp_motor.set_steps_per_revolution(config.stepper_motor_steps_per_rev);
+  // stp_motor.set_gear_ratio(config.stepper_motor_gear_ratio);
+  // stp_motor.set_max_velocity(config.stepper_motor_max_velocity);
+  // stp_motor.set_min_velocity(config.stepper_motor_min_velocity);
+  // stp_motor.set_reverse(config.stepper_motor_reverse);
+  // stp_motor.init();
+  // stp_motor.set_enable(false);
+
+
+  // //-------------------ENCODER ARM POSITION CONFIGURATION-------------------
+  
+  // encoder_arm_moving_avarage.set_size(60); // 15 for smooth movement but delay with sampling to 50
+  // encoder_arm.set_function_to_read_angle(ENCODER::translate_reg_to_angle_MT6701);
+  // encoder_arm.set_offset(config.encoder_arm_offset);
+  // encoder_arm.set_reverse(config.encoder_arm_reverse);
+  // encoder_arm.set_enable_pos_filter(false);
+  // encoder_arm.set_enable_velocity(true);
+  // encoder_arm.set_enable_velocity_filter(true);
+  // encoder_arm.set_velocity_sample_amount(config.encoder_motor_velocity_sample_amount);
+  // encoder_arm.set_dead_zone_correction_angle(config.encoder_arm_dead_zone_correction_angle);
+  // encoder_arm.init(hi2c1,main_clock,nullptr,&encoder_arm_moving_avarage);
+  
+
+  // //-------------------MOVEMENT CONTROLER CONFIGURATION-------------------
+  // pid_pos.set_Kp(config.pid_p);
+  // pid_pos.set_Ki(config.pid_i);
+  // pid_pos.set_Kd(config.pid_d);
+  // movement_controler.set_limit_position(config.movement_limit_lower, config.movement_limit_upper);
+  // movement_controler.set_max_velocity(config.movement_max_velocity);
+  // movement_controler.init(main_clock, stp_motor, encoder_arm, pid_pos);
+
 }
 
 void periferal_config(){

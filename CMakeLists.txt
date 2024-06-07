@@ -160,7 +160,7 @@ $<$<COMPILE_LANGUAGE:ASM>:
 	>
   $<$<COMPILE_LANGUAGE:C>:
   -O0 -g
-  -std=c17
+  -std=c++20
   -fexceptions
   -fdata-sections
   -ffunction-sections
@@ -179,7 +179,7 @@ $<$<COMPILE_LANGUAGE:ASM>:
 
 $<$<COMPILE_LANGUAGE:CXX>:
 -O0 -g
--std=c++17
+-std=c++20
 -fexceptions
 -Wall
 -Wextra

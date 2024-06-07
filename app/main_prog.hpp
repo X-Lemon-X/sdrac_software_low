@@ -9,6 +9,7 @@
 #include "can_control.hpp"
 #include "board_id.hpp"
 #include "version.hpp"
+#include "config_struct.hpp"
 
 #ifndef MAIN_PROG_H
 #define MAIN_PROG_H
@@ -27,6 +28,7 @@
 #define PI_d2 1.57079632679489661923f
 #define PI_d4 0.78539816339744830962f
 #define PI_m2 6.28318530717958647692f
+#define PI_m3d2 4.71238898038468985769f
 
 //**************************************************************************************************
 // I2C CONSTANTS
@@ -38,6 +40,10 @@
 #define ENCODER_AS5600_RESOLUTION 4096
 #define ENCODER_AS5600_ANGLE_REG 0x0C
 
+
+//**************************************************************************************************
+// ID CONFIG
+extern ID_CONFIG config;
 
 //**************************************************************************************************
 // CAN CONSTANTS
@@ -127,6 +133,27 @@ extern BOARD_ID::Board_id board_id;
 /// @brief main program, this function is called from main and never returns
 void main_prog();
 
+
+/// @brief This function is used to configure things that have to be configurated before all the periferals
+void pre_periferal_config();
+
+/// @brief This function is used to configure the periferals
+/// mostly stuff that have to be configurated after CumeMX generation
+void periferal_config();
+
+/// @brief This function is used to handle the can controll
+void handle_can_rx();
+
+/// @brief This function is used to handle the main loop, never returns
+void main_loop();
+
+/// @brief This function is used to configure the board base on it's hardware id
+void id_config();
+
+void post_id_config();
+
+/// @brief This function is used to init the interfaces
+void init_controls();
 
 //**************************************************************************************************
 // debug loging options
