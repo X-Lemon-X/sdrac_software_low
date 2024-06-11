@@ -67,6 +67,10 @@ void MovementControler::set_enable(bool enable){
 }
 
 void MovementControler::set_position(float position){
+  if(position < min_position)
+    position = min_position;
+  if(position > max_position)
+    position = max_position;
   target_position = position;
 }
 

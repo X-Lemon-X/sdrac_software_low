@@ -20,6 +20,7 @@
 #include <cfloat>
 #include "config_struct.hpp"
 #include "id_config.hpp"
+#include "MCP9700AT.hpp"
 
 #include <string>
 #include <charconv>
@@ -29,7 +30,7 @@
 // Gpio assigments
 GPIO_PIN pin_user_led_1 = {GPIO_PIN_6, GPIOC};
 GPIO_PIN pin_user_led_2 = {GPIO_PIN_7, GPIOC};
-GPIO_PIN pin_user_btn_1 = {GPIO_PIN_9, GPIOC}; // GPIO_PIN_9, GPIOA
+GPIO_PIN pin_user_btn_1 = {GPIO_PIN_9, GPIOA}; // GPIO_PIN_9, GPIOC for rev1
 GPIO_PIN pin_tx_led = {GPIO_PIN_12, GPIOB}; 
 GPIO_PIN pin_rx_led = {GPIO_PIN_13, GPIOB};
 GPIO_PIN pin_encoder = {GPIO_PIN_3, GPIOB};  
@@ -465,10 +466,10 @@ void handle_can_rx(){
 }
 
 void analog_values_assigning(){
-  temoperature_board = pin_temp_board.analog_value;
-  temoperature_steper_driver = NTCTERMISTORS::get_temperature(pin_temp_steper_board.analog_value);
-  temoperature_steper_motor = NTCTERMISTORS::get_temperature(pin_temp_motor.analog_value);
-  voltage_vcc = (float)pin_vsense.analog_value/ 4096.0f * 36.3f ;
+  temoperature_board = MCP9700AT::get_temperature(VOLTAGE_VALUE(pin_temp_board));
+  temoperature_steper_driver = NTCTERMISTORS::get_temperature(VOLTAGE_VALUE(pin_temp_steper_board));
+  temoperature_steper_motor = NTCTERMISTORS::get_temperature(VOLTAGE_VALUE(pin_temp_motor));
+  voltage_vcc = VOLTAGE_VALUE(pin_vsense) * ADC_VSENSE_MULTIPLIER;
 }
 
 void init_controls(){
@@ -489,7 +490,7 @@ void main_loop(){
   TIMING::Timing tim_movement(main_clock);
   TIMING::Timing tim_data_usb_send(main_clock);
   TIMING::Timing tim_caculate_temp(main_clock);
-  tim_blink.set_behaviour(TIMING::frequency_to_period(4), true);
+  tim_blink.set_behaviour(TIMING::frequency_to_period(1), true);
   tim_encoder.set_behaviour(TIMING::frequency_to_period(1000), true);
   tim_usb.set_behaviour(TIMING::frequency_to_period(4), true);
   tim_movement.set_behaviour(TIMING::frequency_to_period(1000), true);
@@ -513,7 +514,9 @@ void main_loop(){
     movement_controler.handle();
 
     if(tim_data_usb_send.triggered()){
-      log_info("V:" + std::to_string(voltage_vcc) +
+      log_info(
+         "ID:" + std::to_string(board_id.get_id()) +
+         "V:" + std::to_string(voltage_vcc) +
          " Tste:" + std::to_string(temoperature_steper_motor) + 
          " Tbor:" + std::to_string(temoperature_board) + 
          " Tmot:" + std::to_string(temoperature_steper_driver) + 
