@@ -42,7 +42,8 @@ class MovementControler{
 private:
   TIMING::Ticker *ticker;
   STEPER_MOTOR::SteperMotor *steper_motor;
-  ENCODER::Encoder *encoder;
+  ENCODER::Encoder *encoder_pos;
+  ENCODER::Encoder *encoder_vel;
   MovementEquation *movement_equation;
   bool initialized;
 
@@ -68,8 +69,9 @@ public:
   /// @brief Initialize the controler/ shpuld be called after all the encoder, motor and ticker objects are initialized and ready to use
   /// @param ticker Ticker object for main system time wity microsecond resolution
   /// @param steper_motor Steper motor object
-  /// @param encoder Encoder object
-  void init(TIMING::Ticker &ticker, STEPER_MOTOR::SteperMotor &steper_motor, ENCODER::Encoder &encoder, MovementEquation &movement_equation);
+  /// @param encoder_pos encodere for a position of the arm (probablly mounted on the arm shaft)
+  /// @param encoder_velocity encoder for the velocity of the arm (probablly mounted on the engine shaft)
+  void init(TIMING::Ticker &ticker, STEPER_MOTOR::SteperMotor &steper_motor, ENCODER::Encoder &encoder_pos,ENCODER::Encoder &encoder_velocity, MovementEquation &movement_equation);
   
   /// @brief Handles all the caluclation and limits, this function should be called in the main loop as often as possible
   void handle();

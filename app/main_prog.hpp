@@ -63,17 +63,7 @@ extern uint32_t CAN_KONARM_X_SET_POS_FRAME_ID;
 extern uint32_t CAN_KONARM_X_GET_POS_FRAME_ID;
 // extern uint32_t CAN_KONARM_X_GET_TEMP_FRAME_ID;
 
-//**************************************************************************************************
-// ID CONSTANTS
 
-#define SDRAC_ID_0 0x00
-#define SDRAC_ID_1 0x01
-#define SDRAC_ID_2 0x02
-#define SDRAC_ID_3 0x03
-#define SDRAC_ID_4 0x04
-#define SDRAC_ID_5 0x05
-#define SDRAC_ID_6 0x06
-#define SDRAC_ID_7 0x07
 
 //**************************************************************************************************
 // PINOUT CONSTANTS

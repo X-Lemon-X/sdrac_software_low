@@ -1,8 +1,46 @@
 #include "config_struct.hpp"
 #include "main_prog.hpp"
+#include <limits>
 
 #ifndef CONFIG_HPP
 #define CONFIG_HPP
+
+const ID_CONFIG config_id_default ={
+
+  .can_filter_mask_high = 0xff0,
+  .can_filter_mask_low = 0x000,
+  .can_filter_id_high = 0x600,
+  .can_filter_id_low = 0x000,
+
+  .can_konarm_status_frame_id = 0x601,
+  .can_konarm_set_pos_frame_id = 0x602,
+  .can_konarm_get_pos_frame_id = 0x603,
+  .can_konarm_clear_errors_frame_id = 0x604,
+
+
+  .stepper_motor_steps_per_rev = 400.0f,
+  .stepper_motor_gear_ratio = 75.0f,
+  .stepper_motor_max_velocity = 0.0f,
+  .stepper_motor_min_velocity = 0.0f,
+  .stepper_motor_reverse = false,
+
+  .encoder_arm_offset = 0.0f,
+  .encoder_arm_reverse = false,
+  .encoder_arm_dead_zone_correction_angle = 0.0f,
+
+  .encoder_motor_offset = 0.0f,
+  .encoder_motor_reverse = false,
+  .encoder_motor_dead_zone_correction_angle = 0.0f,
+  .encoder_motor_velocity_sample_amount = 0,
+
+  .pid_p = 0.0f,
+  .pid_i = 0.0f,
+  .pid_d = 0.0f,
+
+  .movement_max_velocity = 0.0f,
+  .movement_limit_lower = 0.0f,
+  .movement_limit_upper = 0.0f,
+};
 
 const ID_CONFIG config_id_1 ={
 
@@ -110,5 +148,112 @@ const ID_CONFIG config_id_3 = {
   .movement_limit_lower = -1.089126f,
   .movement_limit_upper =  4.236856f,
 };
+
+const ID_CONFIG config_id_4 = {
+   .can_filter_mask_high = 0xff0,
+  .can_filter_mask_low = 0x000,
+  .can_filter_id_high = 0x640,
+  .can_filter_id_low = 0x000,
+
+  .can_konarm_status_frame_id = CAN_KONARM_4_STATUS_FRAME_ID,
+  .can_konarm_set_pos_frame_id = CAN_KONARM_4_SET_POS_FRAME_ID,
+  .can_konarm_get_pos_frame_id = CAN_KONARM_4_GET_POS_FRAME_ID,
+  .can_konarm_clear_errors_frame_id = CAN_KONARM_4_CLEAR_ERRORS_FRAME_ID,
+
+  .stepper_motor_steps_per_rev = 400.0f,
+  .stepper_motor_gear_ratio = 71.9f,
+  .stepper_motor_max_velocity = PI,
+  .stepper_motor_min_velocity = 0.1f,
+  .stepper_motor_reverse = false,
+
+  .encoder_arm_offset = 0.0f,
+  .encoder_arm_reverse = true,
+  .encoder_arm_dead_zone_correction_angle = PI_m3d2,
+
+  .encoder_motor_offset = 0.0f,
+  .encoder_motor_reverse = false,
+  .encoder_motor_dead_zone_correction_angle = 0.0f,
+  .encoder_motor_velocity_sample_amount = 10,
+
+  .pid_p = 0.9f,
+  .pid_i = 0.0f,
+  .pid_d = 0.1f,
+
+  .movement_max_velocity = PI,
+  .movement_limit_lower = std::numeric_limits<float>::min(),
+  .movement_limit_upper =  std::numeric_limits<float>::max(),
+};
+
+
+const ID_CONFIG config_id_5 = {
+   .can_filter_mask_high = 0xff0,
+  .can_filter_mask_low = 0x000,
+  .can_filter_id_high = 0x650,
+  .can_filter_id_low = 0x000,
+
+  .can_konarm_status_frame_id = CAN_KONARM_5_STATUS_FRAME_ID,
+  .can_konarm_set_pos_frame_id = CAN_KONARM_5_SET_POS_FRAME_ID,
+  .can_konarm_get_pos_frame_id = CAN_KONARM_5_GET_POS_FRAME_ID,
+  .can_konarm_clear_errors_frame_id = CAN_KONARM_5_CLEAR_ERRORS_FRAME_ID,
+
+  .stepper_motor_steps_per_rev = 400.0f,
+  .stepper_motor_gear_ratio = 71.9f,
+  .stepper_motor_max_velocity = PI,
+  .stepper_motor_min_velocity = 0.1f,
+  .stepper_motor_reverse = false,
+
+  .encoder_arm_offset = 0.0f,
+  .encoder_arm_reverse = true,
+  .encoder_arm_dead_zone_correction_angle = PI_m3d2,
+
+  .encoder_motor_offset = 0.0f,
+  .encoder_motor_reverse = false,
+  .encoder_motor_dead_zone_correction_angle = 0.0f,
+  .encoder_motor_velocity_sample_amount = 10,
+
+  .pid_p = 0.9f,
+  .pid_i = 0.0f,
+  .pid_d = 0.1f,
+
+  .movement_max_velocity = PI,
+  .movement_limit_lower = std::numeric_limits<float>::min(),
+  .movement_limit_upper =  std::numeric_limits<float>::max(),
+};
+
+const ID_CONFIG config_id_6 = {
+   .can_filter_mask_high = 0xff0,
+  .can_filter_mask_low = 0x000,
+  .can_filter_id_high = 0x660,
+  .can_filter_id_low = 0x000,
+
+  .can_konarm_status_frame_id = CAN_KONARM_5_STATUS_FRAME_ID,
+  .can_konarm_set_pos_frame_id = CAN_KONARM_5_SET_POS_FRAME_ID,
+  .can_konarm_get_pos_frame_id = CAN_KONARM_5_GET_POS_FRAME_ID,
+  .can_konarm_clear_errors_frame_id = CAN_KONARM_5_CLEAR_ERRORS_FRAME_ID,
+
+  .stepper_motor_steps_per_rev = 400.0f,
+  .stepper_motor_gear_ratio = 71.9f,
+  .stepper_motor_max_velocity = PI,
+  .stepper_motor_min_velocity = 0.1f,
+  .stepper_motor_reverse = false,
+
+  .encoder_arm_offset = 0.0f,
+  .encoder_arm_reverse = true,
+  .encoder_arm_dead_zone_correction_angle = PI_m3d2,
+
+  .encoder_motor_offset = 0.0f,
+  .encoder_motor_reverse = false,
+  .encoder_motor_dead_zone_correction_angle = 0.0f,
+  .encoder_motor_velocity_sample_amount = 10,
+
+  .pid_p = 0.9f,
+  .pid_i = 0.0f,
+  .pid_d = 0.1f,
+
+  .movement_max_velocity = PI,
+  .movement_limit_lower = std::numeric_limits<float>::min(),
+  .movement_limit_upper =  std::numeric_limits<float>::max(),
+};
+
 
 #endif

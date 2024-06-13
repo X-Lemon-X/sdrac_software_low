@@ -21,7 +21,7 @@ uint16_t ENCODER::translate_reg_to_angle_MT6701(uint8_t data1, uint8_t data2){
 
 Encoder::Encoder(){
 this->resolution = 4096;
-this->address = 0x40;
+this->address = 0x36;
 this->reverse = false;
 this->offset = 0;
 this->data[0] = 0;
@@ -30,7 +30,7 @@ this->enable_filter = false;
 this->enable_velocity = false;
 this->enable_velocity_filter = false;
 this->dead_zone_correction_angle=0;
-this->translate_reg_to_angle_function = ENCODER::translate_reg_to_angle_MT6701;
+this->translate_reg_to_angle_function = ENCODER::translate_reg_to_angle_AS5600;
 }
 
 void Encoder::init(I2C_HandleTypeDef &hi2c, TIMING::Ticker &ticker, FILTERS::FilterBase *filter_angle, FILTERS::FilterBase *filter_velocity){
