@@ -336,7 +336,7 @@ void main_loop(){
     if(tim_data_usb_send.triggered()){
       log_info(
          "ID:" + std::to_string(board_id.get_id()) +
-         " V:" + std::to_string(VERSION_MAJOR) + "." + std::to_string(VERSION_MINOR) +
+         " v" + std::to_string(VERSION_MAJOR) + "." + std::to_string(VERSION_MINOR) +
          " Vsen:" + std::to_string(voltage_vcc) +
          " Tste:" + std::to_string(temoperature_steper_motor) + 
          " Tbor:" + std::to_string(temoperature_board) + 
