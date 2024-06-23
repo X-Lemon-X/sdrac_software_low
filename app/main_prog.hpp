@@ -111,16 +111,40 @@ extern GPIO_PIN pin_cid_2;
 #define ADC_DMA_BUFFER_SIZE 8
 extern uint32_t adc_dma_buffer[ADC_DMA_BUFFER_SIZE+1];
 
+/// @brief ADC handler
 extern ADC_HandleTypeDef hadc1;
+
+/// @brief  DMA handler
 extern DMA_HandleTypeDef hdma_adc1;
+
+/// @brief CAN handler for the can comuncatin between baords
 extern CAN_HandleTypeDef hcan1;
+
+/// @brief I2C handler for the encoder1, encoder2
 extern I2C_HandleTypeDef hi2c1;
+
+/// @brief I2C handler for the syncronisation between the boards
+extern I2C_HandleTypeDef hi2c3;
+
+/// @brief TIM handler for the main clock
 extern TIM_HandleTypeDef htim1;
+
+/// @brief TIM handler for the encoder1, encoder2
 extern TIM_HandleTypeDef htim2;
+
+/// @brief TIM handler for the stepper motor control
 extern TIM_HandleTypeDef htim3;
+
+/// @brief TIM handler for the IO use
 extern TIM_HandleTypeDef htim8;
+
+/// @brief TIM handler for the [us] precision clock
 extern TIM_HandleTypeDef htim10;
+
+/// @brief UART handler for the IO use
 extern UART_HandleTypeDef huart3;
+
+/// @brief USB handler for on board USB-C
 extern USBD_HandleTypeDef hUsbDeviceFS;
 
 //-----------------------------------

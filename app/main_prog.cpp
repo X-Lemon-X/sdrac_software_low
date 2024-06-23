@@ -78,12 +78,6 @@ float temoperature_steper_driver = 0;
 float temoperature_steper_motor = 0; 
 float voltage_vcc = 0;
 
-
-
-//**************************************************************************************************
-
-
-
 //**************************************************************************************************
 void main_prog(){
   log_debug("Start main_prog\n");
@@ -106,7 +100,6 @@ void pre_periferal_config(){
   encoder_motor.set_resolution(ENCODER_AS5600_RESOLUTION);
   encoder_motor.set_angle_register(ENCODER_AS5600_ANGLE_REG);
 }
-
 
 void id_config(){
   log_debug("Start id_config\n");
