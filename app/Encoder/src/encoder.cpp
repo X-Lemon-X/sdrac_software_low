@@ -1,11 +1,15 @@
 
 #include "main.h"
 #include "encoder.hpp"
+#include "stm32f4xx_hal.h"
 #include <stdexcept>
 #include <cmath>
-// #include "main_prog.hpp"
 
 using namespace ENCODER;
+
+
+#define PI_m2 6.28318530717958647692f
+
 
 uint16_t ENCODER::translate_reg_to_angle_AS5600(uint8_t data1, uint8_t data2){
   uint16_t reg = (uint16_t)(data1 & 0x0F) << 8;

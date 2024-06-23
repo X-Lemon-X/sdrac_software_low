@@ -1,6 +1,5 @@
 
 #include "ntc_termistors.hpp"
-#include "main.h"
 #include <cmath>
 #include <limits>
 

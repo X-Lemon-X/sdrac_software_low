@@ -1,8 +1,11 @@
 
 #include "steper_motor.hpp"
-#include "main_prog.hpp"
+#include <cmath>
 
 using namespace STEPER_MOTOR;
+
+#define PIM2 6.28318530717958647692f
+
 
 SteperMotor::SteperMotor(TIM_HandleTypeDef &_htim,unsigned int _timer_channel,const GPIO_PIN &_direction_pin,const GPIO_PIN &_enable_pin):
 htim(_htim),
@@ -22,7 +25,7 @@ enable_pin(_enable_pin){
 void SteperMotor::init(){
   uint32_t core_freq = HAL_RCC_GetHCLKFreq();
   uint32_t prescaler = htim.Instance->PSC;
-  this->radians_to_frequency = core_freq / prescaler / ((this->steps_per_revolution * this->gear_ratio) / PI_m2);
+  this->radians_to_frequency = core_freq / prescaler / ((this->steps_per_revolution * this->gear_ratio) / PIM2  );
 
   if (this->reverse){
     this->direction_positive = GPIO_PIN_RESET;
@@ -36,9 +39,9 @@ void SteperMotor::init(){
 
 void SteperMotor::set_velocity(float velocity){
 
-  if (abs(velocity) > this->max_velocity)
+  if (std::abs(velocity) > this->max_velocity)
     velocity = this->max_velocity;
-  else if (abs(velocity) < this->min_velocity){
+  else if (std::abs(velocity) < this->min_velocity){
     htim.Instance->CCR1 = 0;
     return;
   }

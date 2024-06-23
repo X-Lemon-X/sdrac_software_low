@@ -20,7 +20,7 @@ public:
   /// @brief Construct a new Ticker object
   Ticker();
 
-  /// @brief Update the current ticker 1++ for each call
+  /// @brief this function should be executed once in a timer interrupt for each passing 1ms, therefore the frequency of the imer interrupt shoul dbe set to exactly 1ms 
   void irq_update_ticker(); 
 
   // void update_ticker_loop();

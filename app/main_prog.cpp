@@ -21,6 +21,7 @@
 #include "config_struct.hpp"
 #include "id_config.hpp"
 #include "MCP9700AT.hpp"
+#include "Timing.hpp"
 
 #include <string>
 #include <charconv>
@@ -28,34 +29,30 @@
 
 //**************************************************************************************************
 // Gpio assigments
-GPIO_PIN pin_user_led_1 = {GPIO_PIN_6, GPIOC};
-GPIO_PIN pin_user_led_2 = {GPIO_PIN_7, GPIOC};
-GPIO_PIN pin_user_btn_1 = {GPIO_PIN_9, GPIOA}; // GPIO_PIN_9, GPIOC for rev1
-GPIO_PIN pin_tx_led = {GPIO_PIN_12, GPIOB}; 
-GPIO_PIN pin_rx_led = {GPIO_PIN_13, GPIOB};
-GPIO_PIN pin_encoder = {GPIO_PIN_3, GPIOB};  
-GPIO_PIN pin_poz_zero_sensor = {GPIO_PIN_4, GPIOA}; 
-GPIO_PIN pin_inout_ca1 = {GPIO_PIN_5, GPIOA}; 
-GPIO_PIN pin_inout_ca2 = {GPIO_PIN_7, GPIOA};
-GPIO_PIN pin_inout_crx = {GPIO_PIN_4, GPIOC};
-GPIO_PIN pin_inout_ctx = {GPIO_PIN_10, GPIOB};
-GPIO_PIN pin_sync_sda = {GPIO_PIN_9, GPIOC}; 
-GPIO_PIN pin_sync_scl = {GPIO_PIN_8, GPIOA};
-
-GPIO_PIN pin_temp_steper_board = {GPIO_PIN_0, GPIOA};
-GPIO_PIN pin_temp_board = {GPIO_PIN_1, GPIOA};
-GPIO_PIN pin_temp_motor = {GPIO_PIN_2, GPIOA};
-GPIO_PIN pin_vsense = {GPIO_PIN_3, GPIOA};
-
-GPIO_PIN pin_steper_direction = {GPIO_PIN_0, GPIOB};
-GPIO_PIN pin_steper_enable = {GPIO_PIN_1, GPIOB};
-GPIO_PIN pin_steper_step = {GPIO_PIN_6, GPIOA};
-GPIO_PIN pin_boot_device = {GPIO_PIN_8, GPIOC};
-
-// to do
- GPIO_PIN pin_cid_0 = {GPIO_PIN_10, GPIOC};
- GPIO_PIN pin_cid_1 = {GPIO_PIN_11, GPIOC};
- GPIO_PIN pin_cid_2 = {GPIO_PIN_12, GPIOC};
+GPIO_PIN pin_user_led_1 = {GPIO_PIN_6, GPIOC,0};
+GPIO_PIN pin_user_led_2 = {GPIO_PIN_7, GPIOC,0};
+GPIO_PIN pin_user_btn_1 = {GPIO_PIN_9, GPIOA,0}; // GPIO_PIN_9, GPIOC for rev 1 of the board
+GPIO_PIN pin_tx_led = {GPIO_PIN_12, GPIOB,0}; 
+GPIO_PIN pin_rx_led = {GPIO_PIN_13, GPIOB,0};
+GPIO_PIN pin_encoder = {GPIO_PIN_3, GPIOB,0};  
+GPIO_PIN pin_poz_zero_sensor = {GPIO_PIN_4, GPIOA,0}; 
+GPIO_PIN pin_inout_ca1 = {GPIO_PIN_5, GPIOA,0}; 
+GPIO_PIN pin_inout_ca2 = {GPIO_PIN_7, GPIOA,0};
+GPIO_PIN pin_inout_crx = {GPIO_PIN_4, GPIOC,0};
+GPIO_PIN pin_inout_ctx = {GPIO_PIN_10, GPIOB,0};
+GPIO_PIN pin_sync_sda = {GPIO_PIN_9, GPIOC,0}; 
+GPIO_PIN pin_sync_scl = {GPIO_PIN_8, GPIOA,0};
+GPIO_PIN pin_temp_steper_board = {GPIO_PIN_0, GPIOA,0};
+GPIO_PIN pin_temp_board = {GPIO_PIN_1, GPIOA,0};
+GPIO_PIN pin_temp_motor = {GPIO_PIN_2, GPIOA,0};
+GPIO_PIN pin_vsense = {GPIO_PIN_3, GPIOA,0};
+GPIO_PIN pin_steper_direction = {GPIO_PIN_0, GPIOB,0};
+GPIO_PIN pin_steper_enable = {GPIO_PIN_1, GPIOB,0};
+GPIO_PIN pin_steper_step = {GPIO_PIN_6, GPIOA,0};
+GPIO_PIN pin_boot_device = {GPIO_PIN_8, GPIOC,0};
+GPIO_PIN pin_cid_0 = {GPIO_PIN_10, GPIOC,0};
+GPIO_PIN pin_cid_1 = {GPIO_PIN_11, GPIOC,0};
+GPIO_PIN pin_cid_2 = {GPIO_PIN_12, GPIOC,0};
 
 //**************************************************************************************************
 // Global stuff
@@ -81,16 +78,7 @@ float temoperature_steper_driver = 0;
 float temoperature_steper_motor = 0; 
 float voltage_vcc = 0;
 
-//**************************************************************************************************
-// Id dependable configuration 
-uint32_t CAN_X_FILTER_MASK_LOW;
-uint32_t CAN_X_FILTER_MASK_HIGH;
-uint32_t CAN_X_FILTER_ID_LOW;
-uint32_t CAN_X_FILTER_ID_HIGH;
-uint32_t CAN_KONARM_X_CLEAR_ERRORS_FRAME_ID;
-uint32_t CAN_KONARM_X_STATUS_FRAME_ID;
-uint32_t CAN_KONARM_X_SET_POS_FRAME_ID;
-uint32_t CAN_KONARM_X_GET_POS_FRAME_ID;
+
 
 //**************************************************************************************************
 
@@ -108,9 +96,8 @@ void main_prog(){
 }
 
 void pre_periferal_config(){
-  NTCTERMISTORS::termistor_supply_voltage = 3.3;
-  NTCTERMISTORS::termistor_divider_resisitor = 100000;
-  NTCTERMISTORS::termistor_default_resistance = 100000;
+  NTCTERMISTORS::termistor_supply_voltage = UC_SUPPLY_VOLTAGE;
+  NTCTERMISTORS::termistor_divider_resisitor = TERMISTOR_RESISTANCE;
   encoder_arm.set_address(ENCODER_MT6701_I2C_ADDRESS);
   encoder_arm.set_resolution(ENCODER_MT6702_RESOLUTION);
   encoder_arm.set_angle_register(ENCODER_MEM_ADDR_ANNGLE);
@@ -140,21 +127,7 @@ void id_config(){
   case BOARD_ID_6: config = config_id_6; break;
   default: config = config_id_default; break;
   }
-
-  CAN_KONARM_X_STATUS_FRAME_ID = config.can_konarm_status_frame_id;
-  CAN_KONARM_X_SET_POS_FRAME_ID = config.can_konarm_set_pos_frame_id;
-  CAN_KONARM_X_GET_POS_FRAME_ID = config.can_konarm_get_pos_frame_id;
-  CAN_KONARM_X_CLEAR_ERRORS_FRAME_ID = config.can_konarm_clear_errors_frame_id;
   
-  // ids 11bit 0b110 0001 0000  and 18 bit 0b00 0000 0000 0000 0000
-  //mask 11bit 0b111 1111 0000  and 18 bit 0b00 0000 0000 0000 0000
-  // for some reason filter mask is not working properly so we have to do it in software
-  CAN_X_FILTER_ID_HIGH = config.can_filter_id_high;   // why 5 bits shift because we want tu push the 11 bit id to the 16 bit regiser strting from 5th bit
-  CAN_X_FILTER_ID_LOW = config.can_filter_id_low;
-  CAN_X_FILTER_MASK_HIGH = config.can_filter_mask_high;
-  CAN_X_FILTER_MASK_LOW = config.can_filter_mask_low;
-
-
   //-------------------STEPER MOTOR CONFIGURATION-------------------
   stp_motor.set_steps_per_revolution(config.stepper_motor_steps_per_rev);
   stp_motor.set_gear_ratio(config.stepper_motor_gear_ratio);
@@ -188,7 +161,7 @@ void id_config(){
   encoder_arm.set_enable_pos_filter(false);
   encoder_arm.set_enable_velocity(true);
   encoder_arm.set_enable_velocity_filter(true);
-  encoder_arm.set_velocity_sample_amount(config.encoder_motor_velocity_sample_amount);
+  encoder_arm.set_velocity_sample_amount(config.encoder_arm_velocity_sample_amount);
   encoder_arm.set_dead_zone_correction_angle(config.encoder_arm_dead_zone_correction_angle);
   encoder_arm.init(hi2c1,main_clock,nullptr,&encoder_arm_moving_avarage);
   
@@ -230,16 +203,16 @@ void post_id_config(){
   can_filter.FilterActivation = CAN_FILTER_ENABLE;
   can_filter.FilterMode = CAN_FILTERMODE_IDMASK;
   can_filter.FilterScale = CAN_FILTERSCALE_16BIT;
-  can_filter.FilterIdHigh = CAN_X_FILTER_ID_HIGH;
-  can_filter.FilterIdLow = CAN_X_FILTER_ID_LOW;
-  can_filter.FilterMaskIdHigh = CAN_X_FILTER_MASK_HIGH;
-  can_filter.FilterMaskIdLow = CAN_X_FILTER_MASK_LOW;
+  can_filter.FilterIdHigh = config.can_filter_id_high;
+  can_filter.FilterIdLow = config.can_filter_id_low;
+  can_filter.FilterMaskIdHigh = config.can_filter_mask_high;
+  can_filter.FilterMaskIdLow = config.can_filter_mask_low;
   can_filter.SlaveStartFilterBank = 0;
-  HAL_StatusTypeDef status =  HAL_CAN_ConfigFilter(&hcan1, &can_filter);
-  can_controler.set_filter(CAN_X_FILTER_ID_HIGH, CAN_X_FILTER_MASK_HIGH);
+  HAL_CAN_ConfigFilter(&hcan1, &can_filter);
+  can_controler.set_filter(config.can_filter_id_high, config.can_filter_mask_high);
   can_controler.init(hcan1, CAN_FILTER_FIFO0, main_clock, pin_tx_led, pin_rx_led);
-  status =  HAL_CAN_Start(&hcan1);
-  status =  HAL_CAN_ActivateNotification(&hcan1, CAN_IT_RX_FIFO0_MSG_PENDING ); //| CAN_IT_RX_FIFO1_MSG_PENDING); 
+  HAL_CAN_Start(&hcan1);
+  HAL_CAN_ActivateNotification(&hcan1, CAN_IT_RX_FIFO0_MSG_PENDING ); //| CAN_IT_RX_FIFO1_MSG_PENDING); 
 }
 
 void handle_can_rx(){
@@ -249,7 +222,7 @@ void handle_can_rx(){
   if(recived_msg == nullptr) return;
   tim_can_disconnected.reset();
 
-  if(recived_msg->frame_id == CAN_KONARM_X_SET_POS_FRAME_ID){
+  if(recived_msg->frame_id == config.can_konarm_set_pos_frame_id){
     can_konarm_1_set_pos_t signals;
     can_konarm_1_set_pos_unpack(&signals, recived_msg->data, recived_msg->data_size);
     float targetPosition = can_konarm_1_set_pos_position_decode(signals.position);
@@ -258,26 +231,26 @@ void handle_can_rx(){
     movement_controler.set_position(targetPosition);
     movement_controler.set_enable(true);
   }
-  else if (recived_msg->frame_id == CAN_KONARM_X_GET_POS_FRAME_ID && recived_msg->remote_request){
+  else if (recived_msg->frame_id == config.can_konarm_get_pos_frame_id && recived_msg->remote_request){
     CAN_CONTROL::CAN_MSG *send_msg = (CAN_CONTROL::CAN_MSG*)malloc(sizeof(CAN_CONTROL::CAN_MSG));
     can_konarm_1_get_pos_t src_p;
-    send_msg->frame_id = CAN_KONARM_X_GET_POS_FRAME_ID;
+    send_msg->frame_id = config.can_konarm_get_pos_frame_id;
     src_p.position = can_konarm_1_get_pos_position_encode(movement_controler.get_current_position());
     src_p.velocity = can_konarm_1_get_pos_velocity_encode(movement_controler.get_current_velocity());
     send_msg->data_size = CAN_KONARM_1_GET_POS_LENGTH;
     can_konarm_1_get_pos_pack(send_msg->data, &src_p, send_msg->data_size);
     can_controler.send_msg_to_queue(send_msg);
   }
-  else if (recived_msg->frame_id == CAN_KONARM_X_STATUS_FRAME_ID && recived_msg->remote_request){
+  else if (recived_msg->frame_id == config.can_konarm_status_frame_id && recived_msg->remote_request){
     CAN_CONTROL::CAN_MSG *send_msg = (CAN_CONTROL::CAN_MSG*)malloc(sizeof(CAN_CONTROL::CAN_MSG));
     can_konarm_1_status_t src_p;
-    send_msg->frame_id = CAN_KONARM_X_STATUS_FRAME_ID;
+    send_msg->frame_id = config.can_konarm_status_frame_id;
     src_p.status = can_konarm_1_status_status_encode(CAN_KONARM_1_STATUS_STATUS_OK_CHOICE);
     send_msg->data_size = CAN_KONARM_1_STATUS_LENGTH;
     can_konarm_1_status_pack(send_msg->data, &src_p, send_msg->data_size);
     can_controler.send_msg_to_queue(send_msg);
   }
-  else if (recived_msg->frame_id == CAN_KONARM_X_CLEAR_ERRORS_FRAME_ID){
+  else if (recived_msg->frame_id == config.can_konarm_clear_errors_frame_id){
   }
 
   // delete recived_msg;

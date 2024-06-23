@@ -4,11 +4,9 @@
 #define STEPER_MOTOR_HPP
 
 #include "stm32f4xx_hal.h"
-#include "main_prog.hpp"
 #include "Timing.hpp"
+#include "pin.hpp"
 
-
-#define CPU_FREQ_MHZ 96.0f
 
 namespace STEPER_MOTOR
 {

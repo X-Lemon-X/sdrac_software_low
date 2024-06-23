@@ -1,10 +1,9 @@
 
 #include "usb_programer.hpp"
-#include "main_prog.hpp"
-// #include "usb_device.h"
+#include "pin.hpp"
 #include "usbd_cdc_if.h"
-// #include "usbd_def.h"
 #include <string>
+#include "logger.hpp"
 
 using namespace USB_PROGRAMER;
 

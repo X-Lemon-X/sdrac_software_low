@@ -1,12 +1,10 @@
+#ifndef ENCODERS_H
+#define ENCODERS_H
+
 #include "main.h"
-#include "main_prog.hpp"
 #include <deque>
 #include "Timing.hpp"
 #include "filter.hpp"
-// #include <cstdint>
-
-#ifndef ENCODERS_H
-#define ENCODERS_H
 
 #define VELOCITY_FILTER_SIZE 6
 #define ANGLE_MAX_DEFFERENCE 2.0f // 1 radian

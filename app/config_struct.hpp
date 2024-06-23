@@ -26,6 +26,7 @@ bool stepper_motor_reverse;
 float encoder_arm_offset;
 bool  encoder_arm_reverse;
 float encoder_arm_dead_zone_correction_angle;
+uint16_t encoder_arm_velocity_sample_amount;
 
 // Encoder pos motor
 float encoder_motor_offset;

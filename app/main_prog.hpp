@@ -1,3 +1,7 @@
+
+#ifndef MAIN_PROG_H
+#define MAIN_PROG_H
+
 #include "logger.hpp"
 #include "Timing.hpp"
 #include "main.h"
@@ -10,9 +14,6 @@
 #include "board_id.hpp"
 #include "version.hpp"
 #include "config_struct.hpp"
-
-#ifndef MAIN_PROG_H
-#define MAIN_PROG_H
 
 //**************************************************************************************************
 // log levels 
@@ -43,27 +44,13 @@
 //**************************************************************************************************
 // ADC CONSTANTS
 
+#define UC_SUPPLY_VOLTAGE 3.3f
 #define ADC_VSENSE_MULTIPLIER 43.830646314f
+#define TERMISTOR_RESISTANCE 100000.0f
 
 //**************************************************************************************************
 // ID CONFIG
 extern ID_CONFIG config;
-
-//**************************************************************************************************
-// CAN CONSTANTS
-#define CAN_STRIP_BITS_FOR_MASK(id) ((id & 0xFF0) << 5)
-extern uint32_t CAN_X_FILTER_MASK_LOW;
-extern uint32_t CAN_X_FILTER_MASK_HIGH;
-extern uint32_t CAN_X_FILTER_ID_LOW;
-extern uint32_t CAN_X_FILTER_ID_HIGH;
-
-extern uint32_t CAN_KONARM_X_CLEAR_ERRORS_FRAME_ID;
-extern uint32_t CAN_KONARM_X_STATUS_FRAME_ID;
-extern uint32_t CAN_KONARM_X_SET_POS_FRAME_ID;
-extern uint32_t CAN_KONARM_X_GET_POS_FRAME_ID;
-// extern uint32_t CAN_KONARM_X_GET_TEMP_FRAME_ID;
-
-
 
 //**************************************************************************************************
 // PINOUT CONSTANTS
@@ -89,12 +76,34 @@ extern GPIO_PIN pin_steper_direction;
 extern GPIO_PIN pin_steper_enable ;
 extern GPIO_PIN pin_steper_step ;
 extern GPIO_PIN pin_boot_device;
-
-//to do
 extern GPIO_PIN pin_cid_0;
 extern GPIO_PIN pin_cid_1;
 extern GPIO_PIN pin_cid_2;
 
+// GPIO_PIN pin_user_led_1 = {GPIO_PIN_6, GPIOC,0};
+// GPIO_PIN pin_user_led_2 = {GPIO_PIN_7, GPIOC,0};
+// GPIO_PIN pin_user_btn_1 = {GPIO_PIN_9, GPIOA,0}; // GPIO_PIN_9, GPIOC for rev 1 of the board
+// GPIO_PIN pin_tx_led = {GPIO_PIN_12, GPIOB,0}; 
+// GPIO_PIN pin_rx_led = {GPIO_PIN_13, GPIOB,0};
+// GPIO_PIN pin_encoder = {GPIO_PIN_3, GPIOB,0};  
+// GPIO_PIN pin_poz_zero_sensor = {GPIO_PIN_4, GPIOA,0}; 
+// GPIO_PIN pin_inout_ca1 = {GPIO_PIN_5, GPIOA,0}; 
+// GPIO_PIN pin_inout_ca2 = {GPIO_PIN_7, GPIOA,0};
+// GPIO_PIN pin_inout_crx = {GPIO_PIN_4, GPIOC,0};
+// GPIO_PIN pin_inout_ctx = {GPIO_PIN_10, GPIOB,0};
+// GPIO_PIN pin_sync_sda = {GPIO_PIN_9, GPIOC,0}; 
+// GPIO_PIN pin_sync_scl = {GPIO_PIN_8, GPIOA,0};
+// GPIO_PIN pin_temp_steper_board = {GPIO_PIN_0, GPIOA,0};
+// GPIO_PIN pin_temp_board = {GPIO_PIN_1, GPIOA,0};
+// GPIO_PIN pin_temp_motor = {GPIO_PIN_2, GPIOA,0};
+// GPIO_PIN pin_vsense = {GPIO_PIN_3, GPIOA,0};
+// GPIO_PIN pin_steper_direction = {GPIO_PIN_0, GPIOB,0};
+// GPIO_PIN pin_steper_enable = {GPIO_PIN_1, GPIOB,0};
+// GPIO_PIN pin_steper_step = {GPIO_PIN_6, GPIOA,0};
+// GPIO_PIN pin_boot_device = {GPIO_PIN_8, GPIOC,0};
+// GPIO_PIN pin_cid_0 = {GPIO_PIN_10, GPIOC,0};
+// GPIO_PIN pin_cid_1 = {GPIO_PIN_11, GPIOC,0};
+// GPIO_PIN pin_cid_2 = {GPIO_PIN_12, GPIOC,0};
 
 
 //**************************************************************************************************

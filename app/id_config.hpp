@@ -1,9 +1,15 @@
 #include "config_struct.hpp"
-#include "main_prog.hpp"
+#include "CanDB.h"
 #include <limits>
 
 #ifndef CONFIG_HPP
 #define CONFIG_HPP
+
+
+// ids 11bit 0b110 0001 0000  and 18 bit 0b00 0000 0000 0000 0000
+//mask 11bit 0b111 1111 0000  and 18 bit 0b00 0000 0000 0000 0000
+// for some reason filter mask is not working properly so we have to do it in software
+// why 5 bits shift because we want tu push the 11 bit id to the 16 bit regiser strting from 5th bit
 
 const ID_CONFIG config_id_default ={
 
@@ -27,6 +33,7 @@ const ID_CONFIG config_id_default ={
   .encoder_arm_offset = 0.0f,
   .encoder_arm_reverse = false,
   .encoder_arm_dead_zone_correction_angle = 0.0f,
+  .encoder_arm_velocity_sample_amount=0,
 
   .encoder_motor_offset = 0.0f,
   .encoder_motor_reverse = false,
@@ -64,6 +71,7 @@ const ID_CONFIG config_id_1 ={
   .encoder_arm_offset = -5.23547649f,
   .encoder_arm_reverse = true,
   .encoder_arm_dead_zone_correction_angle = 0.0f,
+  .encoder_arm_velocity_sample_amount=0,
 
   .encoder_motor_offset = 0.0f,
   .encoder_motor_reverse = false,
@@ -99,6 +107,7 @@ const ID_CONFIG config_id_2 = {
   .encoder_arm_offset = -4.219981f,
   .encoder_arm_reverse = false,
   .encoder_arm_dead_zone_correction_angle = PI,
+  .encoder_arm_velocity_sample_amount=0,
 
   .encoder_motor_offset = 0.0f,
   .encoder_motor_reverse = false,
@@ -134,6 +143,7 @@ const ID_CONFIG config_id_3 = {
   .encoder_arm_offset = -0.240067f,
   .encoder_arm_reverse = true,
   .encoder_arm_dead_zone_correction_angle = PI_m3d2,
+  .encoder_arm_velocity_sample_amount=0,
 
   .encoder_motor_offset = 0.0f,
   .encoder_motor_reverse = false,
@@ -169,6 +179,7 @@ const ID_CONFIG config_id_4 = {
   .encoder_arm_offset = 0.0f,
   .encoder_arm_reverse = true,
   .encoder_arm_dead_zone_correction_angle = PI_m3d2,
+  .encoder_arm_velocity_sample_amount=0,
 
   .encoder_motor_offset = 0.0f,
   .encoder_motor_reverse = false,
@@ -205,6 +216,7 @@ const ID_CONFIG config_id_5 = {
   .encoder_arm_offset = 0.0f,
   .encoder_arm_reverse = true,
   .encoder_arm_dead_zone_correction_angle = PI_m3d2,
+  .encoder_arm_velocity_sample_amount=0,
 
   .encoder_motor_offset = 0.0f,
   .encoder_motor_reverse = false,
@@ -240,6 +252,7 @@ const ID_CONFIG config_id_6 = {
   .encoder_arm_offset = 0.0f,
   .encoder_arm_reverse = true,
   .encoder_arm_dead_zone_correction_angle = PI_m3d2,
+  .encoder_arm_velocity_sample_amount=0,
 
   .encoder_motor_offset = 0.0f,
   .encoder_motor_reverse = false,

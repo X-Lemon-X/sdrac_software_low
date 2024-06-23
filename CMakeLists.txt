@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.16)
+cmake_minimum_required(VERSION 3.25)
 
 # ether use toolchain folder with arm-none-eabi.cmake file
 # set(CMAKE_TOOLCHAIN_FILE "toolchain/arm-none-eabi.cmake")
@@ -141,6 +141,7 @@ target_include_directories(${TARGET} PRIVATE
 "app/PD/inc"
 "app/Temperature_sensors/inc"
 "app/list/inc"
+"app/Gpio/inc"
 )
 
 
@@ -186,6 +187,7 @@ $<$<COMPILE_LANGUAGE:CXX>:
 -Wpedantic
 -Wdouble-promotion
 -Werror=return-type
+-Wunused-parameter
 
 -fno-threadsafe-statics
 -fno-common

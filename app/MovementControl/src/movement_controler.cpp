@@ -1,10 +1,8 @@
 
-#include "main.h"
+// #include "main.h"
 #include "stm32f4xx_hal.h"
 #include "movement_controler.hpp"
-#include "logger.hpp"
-#include "main_prog.hpp"
-
+#include <cmath>
 
 using namespace MOVEMENT_CONTROLER;
 
@@ -44,7 +42,7 @@ void MovementControler::handle(){
   
   float new_velocity = movement_equation->calculate(current_position, target_position, current_velocity, target_velocity);
   
-  if (abs(new_velocity) > max_velocity)
+  if (std::abs(new_velocity) > max_velocity)
     new_velocity = (new_velocity > 0) ? max_velocity : -max_velocity;
 
   if ( dont_override_limit_position && ( current_position < min_position || current_position > max_position)){
@@ -81,7 +79,7 @@ void MovementControler::set_limit_position(float min_position, float max_positio
 }
 
 void MovementControler::set_max_velocity(float max_velocity){
-  this->max_velocity = abs(max_velocity);
+  this->max_velocity = std::abs(max_velocity);
 }
 
 

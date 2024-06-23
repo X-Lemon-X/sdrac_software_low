@@ -1,8 +1,8 @@
 #include <string>
-#include "main_prog.hpp"
 #include "usb_device.h"
 #include "usbd_cdc_if.h"
 #include "usbd_def.h"
+#include "pin.hpp"
 
 #ifndef USB_PROGRAMER_H
 #define USB_PROGRAMER_H
