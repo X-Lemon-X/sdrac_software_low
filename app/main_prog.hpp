@@ -53,8 +53,7 @@
 extern ID_CONFIG config;
 
 //**************************************************************************************************
-// PINOUT CONSTANTS
-
+// PINOUT
 extern GPIO_PIN pin_user_led_1;
 extern GPIO_PIN pin_user_led_2;
 extern GPIO_PIN pin_user_btn_1;
