@@ -21,6 +21,7 @@
 // #define LOG_INFO
 // #define LOG_WARN
 // #define LOG_ERROR
+#define LOG_SHOW_TIMESTAMP true
 
 
 //**************************************************************************************************
@@ -189,20 +190,24 @@ void init_controls();
 
 #ifdef LOG_DEBUG
   #define _LOG_LVL 0
+  #define LOG_LOGER_LEVEL LOGGER::LOG_LEVEL::LOG_LEVEL_DEBUG
 #endif // LOG_DEBUG
+
 
 #ifdef LOG_INFO
   #define _LOG_LVL 1
+  #define LOG_LOGER_LEVEL LOGGER::LOG_LEVEL::LOG_LEVEL_INFO
 #endif // LOG_INFO
 
 #ifdef LOG_WARN
   #define _LOG_LVL 2
+  #define LOG_LOGER_LEVEL LOGGER::LOG_LEVEL::LOG_LEVEL_WARNING
 #endif // LOG_WARN
 
 #ifdef LOG_ERROR
   #define _LOG_LVL 3
+  #define LOG_LOGER_LEVEL LOGGER::LOG_LEVEL::LOG_LEVEL_ERROR
 #endif // LOG_ERROR
-
 
 #if _LOG_LVL <= 0
   #define log_debug(...) loger.debug(__VA_ARGS__)

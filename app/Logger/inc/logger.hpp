@@ -21,6 +21,10 @@ private:
 public:
   /// @brief  initiate the logger
   /// @param level - log level
+  /// @param print_info if set to false the loger will simply print log messages with END_OF_LINE sign at the end. 
+  /// If set to true then the message will be encapsulated as if it were json format with the message as it fields,
+  /// the logger will add aditional info like time stamp, software version, id of the board log_lvl.
+  /// and putt user msg as a separet json field in the main json with name "msg" : { user_msg }
   Logger(LOG_LEVEL level, bool print_info);
 
   void error(std::string msg);

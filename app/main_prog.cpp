@@ -60,7 +60,7 @@ GPIO_PIN pin_cid_2 = {GPIO_PIN_12, GPIOC,0};
 uint32_t adc_dma_buffer[ADC_DMA_BUFFER_SIZE+1];
 ID_CONFIG config;
 TIMING::Ticker main_clock;
-LOGGER::Logger loger(LOGGER::LOG_LEVEL::LOG_LEVEL_DEBUG,false);
+LOGGER::Logger loger(LOG_LOGER_LEVEL,LOG_SHOW_TIMESTAMP);
 BOARD_ID::Board_id board_id(pin_cid_0, pin_cid_1, pin_cid_2);
 STEPER_MOTOR::SteperMotor stp_motor(htim3, TIM_CHANNEL_1, pin_steper_direction, pin_steper_enable);
 CAN_CONTROL::CanControl can_controler;
@@ -301,16 +301,14 @@ void main_loop(){
 
     if(tim_data_usb_send.triggered()){
       log_info(
-         "ID:" + std::to_string(board_id.get_id()) +
-         " v" + std::to_string(VERSION_MAJOR) + "." + std::to_string(VERSION_MINOR) +
-         " Vsen:" + std::to_string(voltage_vcc) +
-         " Tste:" + std::to_string(temoperature_steper_motor) + 
-         " Tbor:" + std::to_string(temoperature_board) + 
-         " Tmot:" + std::to_string(temoperature_steper_driver) + 
-         " Eang:" + std::to_string(encoder_arm.get_angle()) + 
-         " Vvel:" + std::to_string(encoder_arm.get_velocity()) + 
-         " Pos:" + std::to_string(movement_controler.get_current_position()) + 
-         " Vel:" + std::to_string(movement_controler.get_current_velocity()));
+         "\"Vsen\":\"" + std::to_string(voltage_vcc) +
+         "\",\"Tste\":\"" + std::to_string(temoperature_steper_motor) + 
+         "\",\"Tbor\":\"" + std::to_string(temoperature_board) + 
+         "\",\"Tmot\":\"" + std::to_string(temoperature_steper_driver) + 
+         "\",\"Eang\":\"" + std::to_string(encoder_arm.get_angle()) + 
+         "\",\"Vvel\":\"" + std::to_string(encoder_arm.get_velocity()) + 
+         "\",\"Pos\":\"" + std::to_string(movement_controler.get_current_position()) + 
+         "\",\"Vel\":\"" + std::to_string(movement_controler.get_current_velocity()));
     }
 
     if(tim_usb.triggered()){
