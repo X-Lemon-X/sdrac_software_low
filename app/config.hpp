@@ -40,7 +40,7 @@
 
 //**************************************************************************************************
 // I2C CONSTANTS
-#define ENCODER_MEM_ADDR_ANNGLE 0x03
+#define ENCODER_MT6701_ANGLE_REG 0x03
 #define ENCODER_MT6701_I2C_ADDRESS 0xC //  0b0001100
 #define ENCODER_MT6702_RESOLUTION 16384
 
@@ -57,6 +57,20 @@
 #define TERMISTOR_RESISTANCE 100000.0f
 
 extern uint32_t adc_dma_buffer[ADC_DMA_BUFFER_SIZE+1];
+
+//**************************************************************************************************
+// TIMING CONSTANTS
+
+#define TIMING_LED_BLINK_FQ 1
+#define TIMING_LED_ERROR_BLINK_FQ 7
+#define TIMING_ENCODER_UPDATE_FQ 1000
+#define TIMING_USB_RECIVED_DATA_FQ 5
+#define TIMING_USB_SEND_DATA_FQ 50
+#define TIMING_READ_TEMPERATURE_FQ 20
+#define TIMING_CAN_DISCONNECTED_PERIOD 1000000
+
+
+
 //**************************************************************************************************
 // ID CONFIG
 

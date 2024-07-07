@@ -43,14 +43,25 @@ Timing::Timing(Ticker &_ticker): ticker(_ticker){
   period = 0;
   last_time = ticker.get_micros();
   repeat = true;
+  timer_enabled=true;
 }
 
 void Timing::reset(){
   this->last_time = ticker.get_micros() - 10;
 }
 
+void Timing::enable(bool timer_enabled){
+  this->timer_enabled = timer_enabled;
+}
+
 bool Timing::triggered(){
-  uint32_t dif,current_time = ticker.get_micros();
+  uint32_t dif;
+  uint32_t current_time = ticker.get_micros();
+
+  if(!timer_enabled){
+    this->last_time = current_time;
+    return false;
+  }
   // why this is here?
   // because some times last_value is higher than the current_time why is that?
   // because the timer have  irq problems when the vale of the time is rapidly checked

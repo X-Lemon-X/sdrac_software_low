@@ -22,9 +22,7 @@ void main_loop();
 /// @brief This function is used to configure the board base on it's hardware id
 void id_config();
 
+/// @brief  Initites stuff after id have been configured
 void post_id_config();
-
-/// @brief This function is used to init the interfaces
-void init_controls();
 
 #endif // MAIN_PROG_H

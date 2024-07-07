@@ -44,6 +44,7 @@ private:
   Ticker &ticker;
   uint32_t period;
   bool repeat;
+  bool timer_enabled;
 public:
   uint32_t last_time;
   uint32_t difference_d;
@@ -63,6 +64,9 @@ public:
 
   /// @brief Reset the timer, it current time and repeat status
   void reset();
+
+  /// @brief allows to disbale and enabel timer freely 
+  void enable(bool timer_enabled);
 };
 
 } // namespace TIMING

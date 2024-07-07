@@ -21,7 +21,6 @@
 #include "MCP9700AT.hpp"
 #include "Timing.hpp"
 #include "config.hpp"
-
 #include <string>
 #include <charconv>
 #include <vector>
@@ -36,33 +35,52 @@ float temoperature_board = 0;
 float temoperature_steper_driver = 0;
 float temoperature_steper_motor = 0; 
 float voltage_vcc = 0;
+bool board_error = false;
 
 //**************************************************************************************************
 void main_prog(){
-  log_debug("Start main_prog\n");
+  log_debug("\"state\":\"Start main_prog\"");
   pre_periferal_config();
   periferal_config();
   id_config();
   post_id_config();
-  init_controls();
   main_loop();
 }
 
 void pre_periferal_config(){
+  log_debug("\"state\":\"pre_perifial_config\"");
   NTCTERMISTORS::termistor_supply_voltage = UC_SUPPLY_VOLTAGE;
   NTCTERMISTORS::termistor_divider_resisitor = TERMISTOR_RESISTANCE;
   encoder_arm.set_address(ENCODER_MT6701_I2C_ADDRESS);
   encoder_arm.set_resolution(ENCODER_MT6702_RESOLUTION);
-  encoder_arm.set_angle_register(ENCODER_MEM_ADDR_ANNGLE);
+  encoder_arm.set_angle_register(ENCODER_MT6701_ANGLE_REG);
 
   encoder_motor.set_address(ENCODER_AS5600_I2C_ADDRESS);
   encoder_motor.set_resolution(ENCODER_AS5600_RESOLUTION);
   encoder_motor.set_angle_register(ENCODER_AS5600_ANGLE_REG);
 }
 
+void periferal_config(){
+  log_debug("\"state\":\"periferal_config\"");
+  // dma adc1 settings
+  HAL_ADC_Start_DMA(&hadc1, adc_dma_buffer, ADC_DMA_BUFFER_SIZE);
+
+  // timer 10 settings
+  HAL_NVIC_SetPriority(TIM1_TRG_COM_TIM11_IRQn,6,0);
+  HAL_NVIC_EnableIRQ(TIM1_TRG_COM_TIM11_IRQn);
+  HAL_TIM_Base_Start_IT(&htim10);
+
+  // timer 3 settings
+  HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_1);
+
+  HAL_CAN_DeInit(&hcan1);
+  HAL_CAN_Init(&hcan1);
+
+
+}
+
 void id_config(){
-  log_debug("Start id_config\n");
-  log_debug("Board id: " + std::to_string(board_id.get_id()));
+  log_debug("\"state\":\"id_config\"");
 
   std::string info = "SDRACboard\n";
   info += "Software version:" + std::to_string(VERSION_MAJOR) + "." + std::to_string(VERSION_MINOR) + "\n";
@@ -103,7 +121,6 @@ void id_config(){
   encoder_motor.init(hi2c1,main_clock,nullptr,nullptr);
 
 
-
   //-------------------ENCODER ARM POSITION CONFIGURATION-------------------
   
   encoder_arm_moving_avarage.set_size(60); // 15 for smooth movement but delay with sampling to 50
@@ -128,27 +145,8 @@ void id_config(){
 
 }
 
-void periferal_config(){
-  log_debug("Start periferal_config\n");
-  // dma adc1 settings
-  HAL_ADC_Start_DMA(&hadc1, adc_dma_buffer, ADC_DMA_BUFFER_SIZE);
-
-  // timer 10 settings
-  HAL_NVIC_SetPriority(TIM1_TRG_COM_TIM11_IRQn,6,0);
-  HAL_NVIC_EnableIRQ(TIM1_TRG_COM_TIM11_IRQn);
-  HAL_TIM_Base_Start_IT(&htim10);
-
-  // timer 3 settings
-  HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_1);
-
-  HAL_CAN_DeInit(&hcan1);
-  HAL_CAN_Init(&hcan1);
-
-
-}
-
 void post_id_config(){
-    // Can1 settings
+  log_debug("\"state\":\"post_id_config\"");
   CAN_FilterTypeDef can_filter;
   can_filter.FilterBank = 1;
   can_filter.FilterFIFOAssignment = CAN_FILTER_FIFO0;
@@ -165,6 +163,20 @@ void post_id_config(){
   can_controler.init(hcan1, CAN_FILTER_FIFO0, main_clock, pin_tx_led, pin_rx_led);
   HAL_CAN_Start(&hcan1);
   HAL_CAN_ActivateNotification(&hcan1, CAN_IT_RX_FIFO0_MSG_PENDING ); //| CAN_IT_RX_FIFO1_MSG_PENDING); 
+
+
+  // init the movement controler should be done after the encoder and the steper motor are initialized
+  movement_controler.set_position(encoder_arm.get_angle());
+  movement_controler.set_velocity(0.0f);
+  movement_controler.set_enable(false);
+  movement_controler.handle();
+}
+
+void analog_values_assigning(){
+  temoperature_board = MCP9700AT::get_temperature(VOLTAGE_VALUE(pin_temp_board));
+  temoperature_steper_driver = NTCTERMISTORS::get_temperature(VOLTAGE_VALUE(pin_temp_steper_board));
+  temoperature_steper_motor = NTCTERMISTORS::get_temperature(VOLTAGE_VALUE(pin_temp_motor));
+  voltage_vcc = VOLTAGE_VALUE(pin_vsense) * ADC_VSENSE_MULTIPLIER;
 }
 
 void handle_can_rx(){
@@ -209,42 +221,26 @@ void handle_can_rx(){
   free(recived_msg);
 }
 
-void analog_values_assigning(){
-  temoperature_board = MCP9700AT::get_temperature(VOLTAGE_VALUE(pin_temp_board));
-  temoperature_steper_driver = NTCTERMISTORS::get_temperature(VOLTAGE_VALUE(pin_temp_steper_board));
-  temoperature_steper_motor = NTCTERMISTORS::get_temperature(VOLTAGE_VALUE(pin_temp_motor));
-  voltage_vcc = VOLTAGE_VALUE(pin_vsense) * ADC_VSENSE_MULTIPLIER;
-}
-
-void init_controls(){
-  log_debug("Start init_interfaces\n");
-
-  // init the movement controler should be done after the encoder and the steper motor are initialized
-  movement_controler.set_position(encoder_arm.get_angle());
-  movement_controler.set_velocity(0);
-  movement_controler.set_enable(false);
-  movement_controler.handle();
-}
-
 void main_loop(){
   log_debug("Start main_loop\n");
   TIMING::Timing tim_blink(main_clock);
+  TIMING::Timing tim_blink_error(main_clock);
   TIMING::Timing tim_encoder(main_clock);
   TIMING::Timing tim_usb(main_clock);
-  TIMING::Timing tim_movement(main_clock);
   TIMING::Timing tim_data_usb_send(main_clock);
   TIMING::Timing tim_caculate_temp(main_clock);
-  tim_blink.set_behaviour(TIMING::frequency_to_period(1), true);
-  tim_encoder.set_behaviour(TIMING::frequency_to_period(1000), true);
-  tim_usb.set_behaviour(TIMING::frequency_to_period(4), true);
-  tim_movement.set_behaviour(TIMING::frequency_to_period(1000), true);
-  tim_data_usb_send.set_behaviour(TIMING::frequency_to_period(50), true);
-  tim_can_disconnected.set_behaviour(1000000, false);
-  tim_caculate_temp.set_behaviour(TIMING::frequency_to_period(20), true);
+  tim_blink_error.set_behaviour(TIMING::frequency_to_period(TIMING_LED_ERROR_BLINK_FQ),true);
+  tim_blink.set_behaviour(TIMING::frequency_to_period(TIMING_LED_BLINK_FQ), true);
+  tim_encoder.set_behaviour(TIMING::frequency_to_period(TIMING_ENCODER_UPDATE_FQ), true);
+  tim_usb.set_behaviour(TIMING::frequency_to_period(TIMING_USB_RECIVED_DATA_FQ), true);
+  tim_data_usb_send.set_behaviour(TIMING::frequency_to_period(TIMING_USB_SEND_DATA_FQ), true);
+  tim_can_disconnected.set_behaviour(TIMING_CAN_DISCONNECTED_PERIOD, false);
+  tim_caculate_temp.set_behaviour(TIMING::frequency_to_period(TIMING_READ_TEMPERATURE_FQ), true);
 
   while (1){
     handle_can_rx();
     can_controler.handle();
+    
 
     if(tim_encoder.triggered()){
       encoder_arm.handle();
@@ -256,6 +252,7 @@ void main_loop(){
       movement_controler.set_velocity(0);
       movement_controler.set_position(movement_controler.get_current_position());
     }
+    
     movement_controler.handle();
 
     if(tim_data_usb_send.triggered()){
@@ -276,6 +273,11 @@ void main_loop(){
 
     if(tim_blink.triggered()) {
       TOGGLE_GPIO(pin_user_led_1);
+    }
+
+    if(tim_blink_error.triggered()){
+      if(board_error) TOGGLE_GPIO(pin_user_led_2); 
+      else WRITE_GPIO(pin_user_led_2,GPIO_PIN_RESET);
     }
     
     if(tim_caculate_temp.triggered()){
