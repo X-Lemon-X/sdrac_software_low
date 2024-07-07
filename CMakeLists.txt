@@ -102,6 +102,7 @@ add_executable(${TARGET}
 "app/PD/src/pd_controler.cpp"
 "app/Temperature_sensors/src/ntc_termistors.cpp"
 "app/Temperature_sensors/src/MCP9700AT.cpp"
+"app/config.cpp"
 )
 
 

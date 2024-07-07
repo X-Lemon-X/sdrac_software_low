@@ -1,8 +1,7 @@
 #include "logger.hpp"
 #include "main.h"
 #include "usbd_cdc_if.h"
-#include "main_prog.hpp"
-
+#include "config.hpp"
 using namespace LOGGER;
 
 

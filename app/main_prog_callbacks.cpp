@@ -1,6 +1,6 @@
-#include "main_prog.hpp"
 #include "main.h"
 #include "stm32f4xx_hal.h"
+#include "config.hpp"
 
 
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
