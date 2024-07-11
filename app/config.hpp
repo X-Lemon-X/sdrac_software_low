@@ -61,7 +61,7 @@ extern uint32_t adc_dma_buffer[ADC_DMA_BUFFER_SIZE+1];
 //**************************************************************************************************
 // TIMING CONSTANTS
 
-#define TIMING_LED_BLINK_FQ 1
+#define TIMING_LED_BLINK_FQ 2
 #define TIMING_LED_ERROR_BLINK_FQ 7
 #define TIMING_ENCODER_UPDATE_FQ 1000
 #define TIMING_USB_RECIVED_DATA_FQ 5

@@ -33,13 +33,12 @@ void UsbProgramer::set_info(std::string info){
 }
 
 void UsbProgramer::handler(){
-  uint32_t size =0;
   // add thsi static int8_t CDC_Receive_FS(uint8_t* Buf, uint32_t *Len);
   // to a file USB_DEVICE/App/usbd_cdc_if.h
   // CDC_Receive_FS(buffer, &size);
   if(usb_programer_data_recived == 0) return;
   usb_programer_data_recived = 0;
-  size = usb_programer_buffer_len;
+  uint32_t size = usb_programer_buffer_len;
   usb_programer_buffer_len = 0;
   if(strcmp((char*)usb_programer_buffer, USB_PROGRAMER_REBOOT)==0){
     log_info("UsbProgramer:Rebooting device");
