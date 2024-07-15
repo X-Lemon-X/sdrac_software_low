@@ -5,6 +5,7 @@
 #include "Timing.hpp"
 #include <list>
 #include "list.hpp"
+#include "circular_buffor.hpp"
 
 #ifndef CAN_CONTROL_HPP
 #define CAN_CONTROL_HPP
@@ -32,8 +33,11 @@ private:
   TIMING::Timing *timing_led_tx;
   uint8_t data[CAN_DATA_FRAME_MAX_SIZE];
   CAN_RxHeaderTypeDef header;
-  LIST_EMB::List<CAN_MSG*> rx_msg_buffer;
-  LIST_EMB::List<CAN_MSG*> tx_msg_buffer;
+  // LIST_EMB::List<CAN_MSG*> rx_msg_buffer;
+  // LIST_EMB::List<CAN_MSG*> tx_msg_buffer;
+  CIRCULAR_BUFFOR::static_circular_buffor<CAN_MSG,CAN_QUEUE_SIZE> rx_msg_buffor;
+  CIRCULAR_BUFFOR::static_circular_buffor<CAN_MSG,CAN_QUEUE_SIZE> tx_msg_buffor;
+
   const GPIO_PIN *pin_tx_led;
   const GPIO_PIN *pin_rx_led;
   uint32_t last_tx_mailbox;
@@ -49,7 +53,7 @@ private:
 
   /// @brief  push a message to the RX buffer
   /// @param msg  CAN_MSG to be pushed to the buffer
-  void push_to_queue(CAN_MSG *msg);
+  void push_to_queue(CAN_MSG &msg);
 public:
   
   /// @brief  Construct a new Can Control object
@@ -84,12 +88,12 @@ public:
   /// @param msg  pointer to the CAN_MSG object
   uint8_t send_msg(CAN_MSG &msg);
 
-  void send_msg_to_queue(CAN_MSG *msg);
+  uint8_t send_msg_to_queue(CAN_MSG &msg);
   
   /// @brief  Get the message from the RX buffer
   /// @param msg  pointer to the CAN_MSG object
-  /// @return amount of messages in the buffer
-  CAN_MSG* get_message();
+  /// @return 0 if success
+  uint8_t get_message(CAN_MSG *msg);
 };
 
 } // namespace CAN_CONTROL

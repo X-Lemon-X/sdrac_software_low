@@ -7,6 +7,7 @@
 #include <string.h>
 #include "stdlib.h"
 #include "list.hpp"
+#include "circular_buffor.hpp"
 
 
 using namespace CAN_CONTROL;
@@ -29,19 +30,12 @@ void CanControl::init(CAN_HandleTypeDef &_can_interface, uint32_t _can_fifo,TIMI
   pin_rx_led = &_pin_rx_led;
   timing_led_rx = new TIMING::Timing(*ticker);
   timing_led_tx = new TIMING::Timing(*ticker);
- 
-  
-  // rx_msg_buffer.resize(CAN_QUEUE_SIZE+1);
   timing_led_rx->set_behaviour(CAN_LED_BLINK_PERIOD_US,false);
   timing_led_tx->set_behaviour(CAN_LED_BLINK_PERIOD_US,false);
 }
 
-void CanControl::push_to_queue(CAN_MSG *msg){
-  if(rx_msg_buffer.size() == CAN_QUEUE_SIZE){
-    free(msg);
-    return;
-  }
-  rx_msg_buffer.push_back(msg);
+void CanControl::push_to_queue(CAN_MSG &msg){
+  (void)rx_msg_buffor.push_back(msg);
 }
 
 void CanControl::set_filter(uint32_t base_id, uint32_t mask){
@@ -65,14 +59,13 @@ void CanControl::irq_handle_rx(){
     return;
   if ((header.StdId & filter_mask) != filter_base_id)
     return;
-  CAN_MSG *msg = (CAN_MSG*)malloc(sizeof(CAN_MSG));
-  if(msg == nullptr)
-    return;
-  msg->frame_id = header.StdId;
-  msg->remote_request = header.RTR == CAN_RTR_REMOTE;
-  msg->data_size = header.DLC;
-  memcpy(msg->data,data,msg->data_size);
-  push_to_queue(msg);
+
+  CAN_MSG msg;
+  msg.frame_id = header.StdId;
+  msg.remote_request = header.RTR == CAN_RTR_REMOTE;
+  msg.data_size = header.DLC;
+  memcpy(msg.data,data,msg.data_size);
+  (void)rx_msg_buffor.push_back(msg);
 }
 
 void CanControl::irq_handle_tx(){
@@ -86,12 +79,11 @@ void CanControl::handle(){
   if(this->timing_led_tx->triggered())
     WRITE_GPIO((*pin_tx_led),GPIO_PIN_RESET);
 
-  CAN_MSG *msg = tx_msg_buffer.get_front();
-  if(msg == nullptr) return;
-
-  if(send_msg(*msg) == 0){
-    tx_msg_buffer.pop_front();
-    free(msg);
+  CAN_MSG msg;
+  if(tx_msg_buffor.get_front(&msg)!=0)
+    return;
+  if(send_msg(msg) == 0){
+    (void)tx_msg_buffor.pop_front();
   }
 }
 
@@ -111,23 +103,14 @@ uint8_t CanControl::send_msg(CAN_MSG &msg){
   return 0;
 }
 
-void CanControl::send_msg_to_queue(CAN_MSG *msg){
-  if(msg == nullptr)
-    return;
-
-  if(tx_msg_buffer.size() == CAN_QUEUE_SIZE){
-    free(msg);
-    return;
-  }
-  // __disable_irq();
-  tx_msg_buffer.push_back(msg);
-  // __enable_irq();
+uint8_t CanControl::send_msg_to_queue(CAN_MSG &msg){
+  return tx_msg_buffor.push_back(msg);
 }
 
-CAN_MSG* CanControl::get_message(){
-  CAN_MSG *ms = rx_msg_buffer.get_front();
-  if (ms == nullptr)
-    return nullptr;
-  rx_msg_buffer.pop_front();
-  return ms;
+uint8_t CanControl::get_message(CAN_MSG *msg){   
+  uint8_t status =  rx_msg_buffor.get_front(msg);
+  if(status!=0)
+    return status;
+  rx_msg_buffor.pop_front();
+  return status;
 }

@@ -2,6 +2,6 @@
 #define VERSION_HPP
 
 #define VERSION_MAJOR 1
-#define VERSION_MINOR 82
+#define VERSION_MINOR 83
 
 #endif // VERSION_HPP

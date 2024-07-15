@@ -181,44 +181,45 @@ void analog_values_assigning(){
 
 void handle_can_rx(){
   __disable_irq();
-  CAN_CONTROL::CAN_MSG *recived_msg = can_controler.get_message();
+  CAN_CONTROL::CAN_MSG recived_msg;
+  uint8_t status =  can_controler.get_message(&recived_msg);
   __enable_irq();
-  if(recived_msg == nullptr) return;
+  if(status != 0) return;
   tim_can_disconnected.reset();
 
-  if(recived_msg->frame_id == config.can_konarm_set_pos_frame_id){
+  if(recived_msg.frame_id == config.can_konarm_set_pos_frame_id){
     can_konarm_1_set_pos_t signals;
-    can_konarm_1_set_pos_unpack(&signals, recived_msg->data, recived_msg->data_size);
+    can_konarm_1_set_pos_unpack(&signals, recived_msg.data, recived_msg.data_size);
     float targetPosition = can_konarm_1_set_pos_position_decode(signals.position);
     float targetVelocity = can_konarm_1_set_pos_velocity_decode(signals.velocity);
     movement_controler.set_velocity(targetVelocity);
     movement_controler.set_position(targetPosition);
     movement_controler.set_enable(true);
   }
-  else if (recived_msg->frame_id == config.can_konarm_get_pos_frame_id && recived_msg->remote_request){
-    CAN_CONTROL::CAN_MSG *send_msg = (CAN_CONTROL::CAN_MSG*)malloc(sizeof(CAN_CONTROL::CAN_MSG));
+  else if (recived_msg.frame_id == config.can_konarm_get_pos_frame_id && recived_msg.remote_request){
+    CAN_CONTROL::CAN_MSG send_msg;
     can_konarm_1_get_pos_t src_p;
-    send_msg->frame_id = config.can_konarm_get_pos_frame_id;
+    send_msg.frame_id = config.can_konarm_get_pos_frame_id;
     src_p.position = can_konarm_1_get_pos_position_encode(movement_controler.get_current_position());
     src_p.velocity = can_konarm_1_get_pos_velocity_encode(movement_controler.get_current_velocity());
-    send_msg->data_size = CAN_KONARM_1_GET_POS_LENGTH;
-    can_konarm_1_get_pos_pack(send_msg->data, &src_p, send_msg->data_size);
+    send_msg.data_size = CAN_KONARM_1_GET_POS_LENGTH;
+    can_konarm_1_get_pos_pack(send_msg.data, &src_p, send_msg.data_size);
     can_controler.send_msg_to_queue(send_msg);
   }
-  else if (recived_msg->frame_id == config.can_konarm_status_frame_id && recived_msg->remote_request){
-    CAN_CONTROL::CAN_MSG *send_msg = (CAN_CONTROL::CAN_MSG*)malloc(sizeof(CAN_CONTROL::CAN_MSG));
+  else if (recived_msg.frame_id == config.can_konarm_status_frame_id && recived_msg.remote_request){
+    CAN_CONTROL::CAN_MSG send_msg;
     can_konarm_1_status_t src_p;
-    send_msg->frame_id = config.can_konarm_status_frame_id;
+    send_msg.frame_id = config.can_konarm_status_frame_id;
     src_p.status = can_konarm_1_status_status_encode(CAN_KONARM_1_STATUS_STATUS_OK_CHOICE);
-    send_msg->data_size = CAN_KONARM_1_STATUS_LENGTH;
-    can_konarm_1_status_pack(send_msg->data, &src_p, send_msg->data_size);
+    send_msg.data_size = CAN_KONARM_1_STATUS_LENGTH;
+    can_konarm_1_status_pack(send_msg.data, &src_p, send_msg.data_size);
     can_controler.send_msg_to_queue(send_msg);
   }
-  else if (recived_msg->frame_id == config.can_konarm_clear_errors_frame_id){
+  else if (recived_msg.frame_id == config.can_konarm_clear_errors_frame_id){
   }
 
   // delete recived_msg;
-  free(recived_msg);
+  // free(recived_msg);
 }
 
 void main_loop(){
