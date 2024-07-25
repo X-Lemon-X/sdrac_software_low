@@ -22,3 +22,27 @@ jobs:
 
       - name: Save binary file
         run: cp build/executable.bin ${{ github.workspace }}/executable.bin
+
+  deploy:
+    needs: build
+    runs-on: [self-hosted, linux]
+    steps:
+      - name: Upload artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: Executable
+          path: ${{ github.workspace }}/executable.bin
+
+  badge:
+    needs: deploy
+    runs-on: [self-hosted, linux]
+    steps:
+      - name: Create badge
+        uses: actions/create-badge@v1
+        with:
+          path: ${{ github.workspace }}/executable.bin
+          style: flat-square
+          label: Executable
+          color: blue
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
