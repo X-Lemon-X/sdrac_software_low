@@ -21,4 +21,4 @@ jobs:
         run: cmake --build build
 
       - name: Save binary file
-        run: cp build/your_binary_file.bin ${{ github.workspace }}/your_binary_file.bin
+        run: cp build/executable.bin ${{ github.workspace }}/executable.bin
