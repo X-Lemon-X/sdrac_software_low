@@ -12,6 +12,12 @@ jobs:
   build:
     runs-on: [self-hosted, linux] 
     steps:
+      - name: Checkout code
+        run: actions/checkout@v4
+      
+      - name: Install dependencies
+        run: sudo apt-get update && sudo apt-get install -y cmake
+
       - name: Configure CMake
         run: cmake -B build
 
