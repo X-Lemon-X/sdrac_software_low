@@ -11,16 +11,7 @@ on:
 jobs:
   build:
     runs-on: [self-hosted, linux] 
-
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-
-      - name: Set up CMake
-        uses: actions/setup-cmake@v1
-        with:
-          cmake-version: '3.21'
-
       - name: Configure CMake
         run: cmake -B build
 
