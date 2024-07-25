@@ -32,17 +32,3 @@ jobs:
         with:
           name: Executable
           path: ${{ github.workspace }}/executable.bin
-
-  badge:
-    needs: deploy
-    runs-on: [self-hosted, linux]
-    steps:
-      - name: Create badge
-        uses: actions/create-badge@v1
-        with:
-          path: ${{ github.workspace }}/executable.bin
-          style: flat-square
-          label: Executable
-          color: blue
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
