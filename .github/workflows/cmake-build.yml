@@ -1,4 +1,4 @@
-name: CMake Build
+name: Build
 
 on:
   push:
@@ -10,7 +10,7 @@ on:
 
 jobs:
   build:
-    runs-on: power 
+    runs-on: [self-hosted, linux] 
 
     steps:
       - name: Checkout repository
