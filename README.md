@@ -1,4 +1,6 @@
-![build](https://github.com/X-Lemon-X/sdrac_software_low/actions/workflows/cmake-build.yml/badge.svg)
+
+<img align="right" src="https://github.com/X-Lemon-X/sdrac_software_low/actions/workflows/cmake-build.yml/badge.svg" />
+
 # SDRAC
 This is a a low level software for SDRACboards from SDRAC project (6DOF Manipulator). It is written in C++ and uses STM32CubeMX HAL library.
 The project is based on the STM32F412RGT6 microcontroller.
