@@ -88,6 +88,7 @@ void id_config(){
   info += "Description: SDRACboard from SDRAC project https://nihilia.xyz  https://konar.pwr.edu.pl\n";
   usb_programer.set_info(info);
 
+
   switch (board_id.get_id()){
   case BOARD_ID_1: config = config_id_1; break;
   case BOARD_ID_2: config = config_id_2; break;

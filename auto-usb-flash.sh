@@ -2,7 +2,7 @@ vendor_id="0483"
 product_id="5740"
 vendor_enc="SDRACproject"
 
-bin_file="build/executable.bin"
+bin_file="build/firmware.bin"
 
 
 RED='\033[0;31m'

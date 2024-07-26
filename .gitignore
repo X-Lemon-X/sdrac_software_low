@@ -19,5 +19,5 @@ generated/
 # Ignore system-specific files
 .DS_Store
 Thumbs.db
-
+.cache/
 .venv/

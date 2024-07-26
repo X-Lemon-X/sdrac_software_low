@@ -1,5 +1,9 @@
+CompileFlags:                     # Tweak the parse settings
+  Add: [-std=c++17,-std=c++11]
+  Remove: [-std=gnu++17,-std=gnu11]
+
 Index:
-  Background: Skip     # Disable slow background indexing of these files.
+  Background: Build     # Disable slow background indexing of these files.
 
 Diagnostics:
   ClangTidy:

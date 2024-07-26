@@ -3,6 +3,8 @@ cmake_minimum_required(VERSION 3.22)
 project(stm32cubemx)
 add_library(stm32cubemx INTERFACE)
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 # Enable CMake support for ASM and C  CXX languages
 enable_language(CXX C ASM)
 
@@ -25,7 +27,7 @@ target_include_directories(stm32cubemx INTERFACE
 )
 
 target_sources(stm32cubemx INTERFACE
-    ../../Core/Src/main.cxx
+    ../../Core/Src/main.cpp
     ../../Core/Src/stm32f4xx_it.c
     ../../Core/Src/stm32f4xx_hal_msp.c
     ../../USB_DEVICE/App/usb_device.c
