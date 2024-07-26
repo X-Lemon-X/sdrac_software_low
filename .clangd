@@ -1,0 +1,15 @@
+Index:
+  Background: Skip     # Disable slow background indexing of these files.
+
+Diagnostics:
+  ClangTidy:
+    Add: modernize*
+    FastCheckFilter: Strict
+  UnusedIncludes: Strict
+InlayHints:
+  BlockEnd: No
+  Designators: Yes
+  Enabled: Yes
+  ParameterNames: Yes
+  DeducedTypes: Yes
+  TypeNameLimit: 40
