@@ -1,4 +1,5 @@
 {
+  "intelliSenseMode": "arm-none-eabi-gcc",
   "stm32-for-vscode.openOCDPath": false,
   "C_Cpp.errorSquiggles": "disabled",
   "files.associations": {

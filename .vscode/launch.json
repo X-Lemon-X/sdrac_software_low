@@ -14,7 +14,7 @@
       "name": "Cortex Debug",
       "cwd": "${workspaceFolder}",
       "preLaunchTask": "CMake:build",
-      "executable": "./build/executable.elf",
+      "executable": "./build/firmware.elf",
       "request": "launch",
       "type": "cortex-debug",
       "runToEntryPoint": "main",
