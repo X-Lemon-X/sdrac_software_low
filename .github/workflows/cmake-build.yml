@@ -21,7 +21,7 @@ jobs:
         run: cmake --build build
 
       - name: Save binary file
-        run: cp build/executable.bin ${{ github.workspace }}/executable.bin
+        run: cp build/firmware.bin ${{ github.workspace }}/firmware.bin
 
   deploy:
     needs: build
@@ -31,4 +31,4 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: Executable
-          path: ${{ github.workspace }}/executable.bin
+          path: ${{ github.workspace }}/firmware.bin
