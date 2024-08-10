@@ -6,6 +6,7 @@
 #include "filter.hpp"
 #include "filter_moving_avarage.hpp"
 #include "filter_alfa_beta.hpp"
+#include "ntc_termistors.hpp"
 
 //**************************************************************************************************
 // Gpio assigments
@@ -311,3 +312,23 @@ MOVEMENT_CONTROLER::MovementControler movement_controler;
 ENCODER::Encoder encoder_arm;
 ENCODER::Encoder encoder_motor;
 USB_PROGRAMER::UsbProgramer usb_programer(pin_boot_device);
+NTCTERMISTORS::NtcTermistors temp_steper_driver(UC_SUPPLY_VOLTAGE,TERMISTOR_RESISTANCE);
+NTCTERMISTORS::NtcTermistors temp_steper_motor(UC_SUPPLY_VOLTAGE,TERMISTOR_RESISTANCE);
+ErrorData error_data;
+
+
+unsigned int ErrorData::get_amount_of_errors() const {
+  return (uint8_t)temp_engine_overheating + 
+         (uint8_t)temp_driver_overheating + 
+         (uint8_t)temp_board_overheating + 
+         (uint8_t)temp_engine_sensor_disconnect + 
+         (uint8_t)temp_driver_sensor_disconnect + 
+         (uint8_t)temp_board_sensor_disconnect + 
+         (uint8_t)encoder_arm_disconnect + 
+         (uint8_t)encoder_motor_disconnect + 
+         (uint8_t)baord_overvoltage +
+         (uint8_t)baord_undervoltage + 
+         (uint8_t)can_disconnect + 
+         (uint8_t)can_error + 
+         (uint8_t)controler_motor_limit_position;
+}

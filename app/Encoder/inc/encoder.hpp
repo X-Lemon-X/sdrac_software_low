@@ -27,6 +27,8 @@ private:
   FILTERS::FilterBase *filter_angle;
   FILTERS::FilterBase *filter_velocity;
 
+  bool encoder_connected;
+
   uint8_t data[2];
   float last_time;
   float prev_angle;
@@ -75,6 +77,12 @@ public:
   /// @return true if the encoder is connected
   bool ping_encoder();
 
+  /// @brief Check if last request to the encoder was successful if not the encoder is disconnected,
+  /// therefor it requires to be used when handle is called regularly, otherwise the return value will be unreliable.
+  /// use ping_encoder() if you want to check if the encoder is connected.
+  /// @return true if the encoder is connected.
+  bool is_connected() const;
+
   /// @brief handles the encoder updates data read from the encoder
   void handle();
 
@@ -102,44 +110,44 @@ public:
 
   /// @brief sets the resolution of the encoder
   /// @param resolution the resolution of the encoder 
-  void set_resolution(uint16_t resolution);
+  Encoder& set_resolution(uint16_t resolution);
   
   /// @brief sets the offset of the encoder
   /// @param offset the offset in radians
-  void set_offset(float offset);
+  Encoder& set_offset(float offset);
   
   /// @brief sets the reverse of the encoder
   /// @param reverse true if the encoder is reversed
-  void set_reverse(bool reverse);
+  Encoder& set_reverse(bool reverse);
   
   /// @brief sets the address of the encoder 
   /// @param address the address of the encoder
-  void set_address(uint8_t address);
+  Encoder& set_address(uint8_t address);
   
   /// @brief sets the angle register of the encoder
   /// @param angle_register the angle register of the encoder
-  void set_angle_register(uint8_t angle_register);
+  Encoder& set_angle_register(uint8_t angle_register);
   
   /// @brief sets the magnes detection register of the encoder (unsuported feature in MT6701)
   /// @param magnes_detection_register the magnes detection register of the encoder 
-  void set_magnes_detection_register(uint8_t magnes_detection_register);
+  Encoder& set_magnes_detection_register(uint8_t magnes_detection_register);
   
   /// @brief sets the enable filter of the encoder 
   /// @param enable_filter true if the filter is enabled
-  void set_enable_pos_filter(bool enable_filter);
+  Encoder& set_enable_pos_filter(bool enable_filter);
   
   /// @brief sets the enable velocity of the encoder 
   /// @param enable_velocity true if the you wnat the velocity to be calculated
-  void set_enable_velocity(bool enable_velocity);
+  Encoder& set_enable_velocity(bool enable_velocity);
   
   /// @brief sets the enable velocity filter of the encoder 
   /// @param enable_velocity_filter true if the velocity filter is enabled
-  void set_enable_velocity_filter(bool enable_velocity_filter);
+  Encoder& set_enable_velocity_filter(bool enable_velocity_filter);
 
   /// @brief sets how many smaples will be skipped before calculating the velocity
   /// fixes the problem of low velocity readings
   /// @param velocity_samples_amount the amount of samples to skip before calculating the velocity
-  void set_velocity_sample_amount(uint16_t velocity_samples_amount);\
+  Encoder& set_velocity_sample_amount(uint16_t velocity_samples_amount);\
 
   /// @brief sets the begin roation dead zone correction angle
   /// The dead zone angle is used to correct initial value of the angle to be eather positive or negative.
@@ -147,14 +155,14 @@ public:
   /// the dead zone angle is used to correct this by making the angle 
   /// In the counter clockwise direction on the left side of the dead zone angle negative and on the right side positive
   /// @param begin_roation_dead_zone_correction_angle the angle in radians, can be set to 0 if dead zone correction angle shall not be used.
-  void set_dead_zone_correction_angle(float begin_roation_dead_zone_correction_angle);
+  Encoder& set_dead_zone_correction_angle(float begin_roation_dead_zone_correction_angle);
 
 
   /// @brief sets the function that will be used to translate register data to angle.
   /// It have to return the angle in uint16_t and takes the data from two registers first and second.
   /// @param function the function that will be used to read the angle
   /// @return the angle in uint16_t in binary format for example 0-4095 or 0-16383
-  void set_function_to_read_angle(uint16_t (*function)(uint8_t,uint8_t));
+  Encoder& set_function_to_read_angle(uint16_t (*function)(uint8_t,uint8_t));
 };
 
 

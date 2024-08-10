@@ -5,7 +5,12 @@
 
 using namespace NTCTERMISTORS;
 
-float NTCTERMISTORS::get_temperature(float termistor_voltage) {
+
+NtcTermistors::NtcTermistors(float termistor_supply_voltage,float termistor_divider_resistance):
+  termistor_supply_voltage(termistor_supply_voltage),
+  termistor_divider_resisitor(termistor_divider_resistance) {}
+
+float NtcTermistors::get_temperature(float termistor_voltage) {
   // float voltage = (float)(adc_value / 4095) * termistor_supply_voltage;
   float ntc_resistance = termistor_divider_resisitor * termistor_voltage / ( termistor_supply_voltage - termistor_voltage);
   float logR = log(ntc_resistance);

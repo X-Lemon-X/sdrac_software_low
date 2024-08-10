@@ -2,7 +2,7 @@
 #include "main.h"
 #include "encoder.hpp"
 #include "stm32f4xx_hal.h"
-#include <stdexcept>
+// #include <stdexcept>
 #include <cmath>
 
 using namespace ENCODER;
@@ -65,10 +65,12 @@ bool Encoder::ping_encoder(){
 
 uint16_t Encoder::read_raw_angle(){
   HAL_StatusTypeDef status = HAL_I2C_Mem_Read(hi2c, address, angle_register, 1, this->data, 2, 5);
-  if(status != HAL_OK) return 0;
-
+  if(status != HAL_OK){
+    encoder_connected=false;
+    return 0;
+  }
+  encoder_connected=true;
   uint16_t reg = translate_reg_to_angle_function(data[0], data[1]);
-
   // uint16_t reg = (uint16_t)this->data[0] << 6;
   // reg |= (uint16_t)(this->data[1] & 0xfc) >> 2;
   return reg;
@@ -133,50 +135,66 @@ float Encoder::get_absoulute_angle() const{
   return this->absolute_angle;
 }
 
-void Encoder::set_resolution(uint16_t resolution){
+bool Encoder::is_connected() const{
+  return this->encoder_connected;
+}
+
+Encoder& Encoder::set_resolution(uint16_t resolution){
   this->resolution = resolution;
+  return *this;
 }
   
-void Encoder::set_offset(float offset){
+Encoder& Encoder::set_offset(float offset){
   this->offset = offset;
+  return *this;
 }
 
-void Encoder::set_reverse(bool reverse){
+Encoder& Encoder::set_reverse(bool reverse){
   this->reverse = reverse;
+  return *this;
 }
   
-void Encoder::set_address(uint8_t address){
+Encoder& Encoder::set_address(uint8_t address){
   this->address = address;
+  return *this;
 }
   
-void Encoder::set_angle_register(uint8_t angle_register){
+Encoder& Encoder::set_angle_register(uint8_t angle_register){
   this->angle_register = angle_register;
+  return *this;
 }
   
-void Encoder::set_magnes_detection_register(uint8_t magnes_detection_register){
+Encoder& Encoder::set_magnes_detection_register(uint8_t magnes_detection_register){
   this->magnes_detection_register = magnes_detection_register;
+  return *this;
 }
   
-void Encoder::set_enable_pos_filter(bool enable_filter){
+Encoder& Encoder::set_enable_pos_filter(bool enable_filter){
   this->enable_filter = enable_filter;
+  return *this;
 }
 
-void Encoder::set_enable_velocity(bool enable_velocity){
+Encoder& Encoder::set_enable_velocity(bool enable_velocity){
   this->enable_velocity = enable_velocity;
+  return *this;
 }
   
-void Encoder::set_enable_velocity_filter(bool enable_velocity_filter){
+Encoder& Encoder::set_enable_velocity_filter(bool enable_velocity_filter){
   this->enable_velocity_filter = enable_velocity_filter;
+  return *this;
 }
 
-void Encoder::set_velocity_sample_amount(uint16_t velocity_samples_amount){
+Encoder& Encoder::set_velocity_sample_amount(uint16_t velocity_samples_amount){
   this->velocity_samples_amount = velocity_samples_amount;
+  return *this;
 }
 
-void Encoder::set_dead_zone_correction_angle(float dead_zone_correction_angle){
+Encoder& Encoder::set_dead_zone_correction_angle(float dead_zone_correction_angle){
   this->dead_zone_correction_angle = abs(dead_zone_correction_angle);
+  return *this;
 }
 
-void Encoder::set_function_to_read_angle(uint16_t (*function)(uint8_t,uint8_t)){
+Encoder& Encoder::set_function_to_read_angle(uint16_t (*function)(uint8_t,uint8_t)){
   this->translate_reg_to_angle_function = function;
+  return *this;
 }

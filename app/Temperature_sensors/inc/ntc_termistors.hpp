@@ -11,11 +11,15 @@
 
 namespace NTCTERMISTORS{
 
-static float termistor_supply_voltage = 3.3f;
-static float termistor_divider_resisitor = 100000.0f;
+class NtcTermistors {
+private:
+  const float termistor_supply_voltage;
+  const float termistor_divider_resisitor;
+public:
+  NtcTermistors(float termistor_supply_voltage,float termistor_divider_resistance);
+  float get_temperature(float voltage_value);
+};
 
-  
-float get_temperature(float voltage_value);
 
 } // namespace NTCTERMISOTRS
 

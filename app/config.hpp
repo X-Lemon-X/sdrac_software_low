@@ -2,6 +2,8 @@
 #ifndef CONFIG_PROG_H
 #define CONFIG_PROG_H
 
+// #include <cstddef>
+// #include <cstdint>
 #include <limits>
 #include "logger.hpp"
 #include "Timing.hpp"
@@ -20,6 +22,7 @@
 #include "filter.hpp"
 #include "filter_moving_avarage.hpp"
 #include "filter_alfa_beta.hpp"
+#include "ntc_termistors.hpp"
 
 //**************************************************************************************************
 // log levels 
@@ -55,14 +58,20 @@
 #define UC_SUPPLY_VOLTAGE 3.3f
 #define ADC_VSENSE_MULTIPLIER 43.830646314f
 #define TERMISTOR_RESISTANCE 100000.0f
+#define ERRORS_MAX_VCC_VOLTAGE 49.0f
+#define ERRORS_MIN_VCC_VOLTAGE 10.0f
+#define ERRORS_MAX_TEMP_BOARD 45.0f
+#define ERRORS_MAX_TEMP_DRIVER 50.0f
+#define ERRORS_MAX_TEMP_ENGINE 100.0f
 
 extern uint32_t adc_dma_buffer[ADC_DMA_BUFFER_SIZE+1];
 
 //**************************************************************************************************
 // TIMING CONSTANTS
+// update frequency of the components
 
 #define TIMING_LED_BLINK_FQ 2
-#define TIMING_LED_ERROR_BLINK_FQ 7
+#define TIMING_LED_ERROR_BLINK_FQ 2
 #define TIMING_ENCODER_UPDATE_FQ 1000
 #define TIMING_USB_RECIVED_DATA_FQ 5
 #define TIMING_USB_SEND_DATA_FQ 50
@@ -119,6 +128,45 @@ float movement_limit_lower;
 /// @brief lower limit position of the arm
 float movement_limit_upper;
 };
+
+/// @brief struct for the error data that represents the state of the system
+/// Max amount of errors is equal to max length of the CAN frame so 8 x 8 = 64 (max)
+/// The errors are represented as bool values
+/// 0 - no error
+/// 1 - error
+/// you can retrieve the amount of errors by calling get_amount_of_errors()
+class ErrorData
+{
+public:
+  ErrorData(){};
+  // temperature errors
+  bool temp_engine_overheating = false;
+  bool temp_driver_overheating = false;
+  bool temp_board_overheating = false;
+  bool temp_engine_sensor_disconnect = false;
+  bool temp_driver_sensor_disconnect = false;
+  bool temp_board_sensor_disconnect = false;
+
+  // encoder errors
+  bool encoder_arm_disconnect = false;
+  bool encoder_motor_disconnect = false;
+
+  // board errors
+  bool baord_overvoltage = false;
+  bool baord_undervoltage = false;
+
+  // can errors
+  bool can_disconnect = false;
+  bool can_error = false;
+
+  // other errors
+  bool controler_motor_limit_position = false;
+
+  /// @brief get the amount of errors
+  /// @return the amount of errors
+  unsigned int get_amount_of_errors() const;
+};
+
 
 extern ID_CONFIG config;
 extern const ID_CONFIG config_id_default;
@@ -209,8 +257,9 @@ extern STEPER_MOTOR::SteperMotor stp_motor;
 extern CAN_CONTROL::CanControl can_controler;
 extern USB_PROGRAMER::UsbProgramer usb_programer;
 extern MOVEMENT_CONTROLER::MovementControler movement_controler;
-
-
+extern NTCTERMISTORS::NtcTermistors temp_steper_driver;
+extern NTCTERMISTORS::NtcTermistors temp_steper_motor;
+extern ErrorData error_data;
 
 //**************************************************************************************************
 // debug loging options

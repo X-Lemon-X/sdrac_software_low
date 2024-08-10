@@ -24,6 +24,7 @@
 #include <string>
 #include <charconv>
 #include <vector>
+#include <cmath>
 
 
 
@@ -35,7 +36,6 @@ float temoperature_board = 0;
 float temoperature_steper_driver = 0;
 float temoperature_steper_motor = 0; 
 float voltage_vcc = 0;
-bool board_error = false;
 
 //**************************************************************************************************
 void main_prog(){
@@ -49,8 +49,6 @@ void main_prog(){
 
 void pre_periferal_config(){
   log_debug("\"state\":\"pre_perifial_config\"");
-  NTCTERMISTORS::termistor_supply_voltage = UC_SUPPLY_VOLTAGE;
-  NTCTERMISTORS::termistor_divider_resisitor = TERMISTOR_RESISTANCE;
   encoder_arm.set_address(ENCODER_MT6701_I2C_ADDRESS);
   encoder_arm.set_resolution(ENCODER_MT6702_RESOLUTION);
   encoder_arm.set_angle_register(ENCODER_MT6701_ANGLE_REG);
@@ -88,7 +86,6 @@ void id_config(){
   info += "Description: SDRACboard from SDRAC project https://nihilia.xyz  https://konar.pwr.edu.pl\n";
   usb_programer.set_info(info);
 
-
   switch (board_id.get_id()){
   case BOARD_ID_1: config = config_id_1; break;
   case BOARD_ID_2: config = config_id_2; break;
@@ -111,14 +108,14 @@ void id_config(){
 
   //-------------------ENCODER STEPER MOTOR POSITION CONFIGURATION-------------------
   // to do
-  encoder_motor.set_function_to_read_angle(ENCODER::translate_reg_to_angle_AS5600);
-  encoder_motor.set_offset(config.encoder_motor_offset);
-  encoder_motor.set_reverse(config.encoder_motor_reverse);
-  encoder_motor.set_enable_pos_filter(false);
-  encoder_motor.set_enable_velocity(true);
-  encoder_motor.set_enable_velocity_filter(false);
-  encoder_motor.set_velocity_sample_amount(config.encoder_motor_velocity_sample_amount);
-  encoder_motor.set_dead_zone_correction_angle(config.encoder_motor_dead_zone_correction_angle);
+  encoder_motor.set_function_to_read_angle(ENCODER::translate_reg_to_angle_AS5600)
+               .set_offset(config.encoder_motor_offset)
+               .set_reverse(config.encoder_motor_reverse)
+               .set_enable_pos_filter(false)
+               .set_enable_velocity(true)
+               .set_enable_velocity_filter(false)
+               .set_velocity_sample_amount(config.encoder_motor_velocity_sample_amount)
+               .set_dead_zone_correction_angle(config.encoder_motor_dead_zone_correction_angle);
   encoder_motor.init(hi2c1,main_clock,nullptr,nullptr);
 
 
@@ -175,10 +172,30 @@ void post_id_config(){
 
 void analog_values_assigning(){
   temoperature_board = MCP9700AT::get_temperature(VOLTAGE_VALUE(pin_temp_board));
-  temoperature_steper_driver = NTCTERMISTORS::get_temperature(VOLTAGE_VALUE(pin_temp_steper_board));
-  temoperature_steper_motor = NTCTERMISTORS::get_temperature(VOLTAGE_VALUE(pin_temp_motor));
+  temoperature_steper_driver = temp_steper_driver.get_temperature(VOLTAGE_VALUE(pin_temp_steper_board)); 
+  temoperature_steper_motor = temp_steper_motor.get_temperature(VOLTAGE_VALUE(pin_temp_motor));
   voltage_vcc = VOLTAGE_VALUE(pin_vsense) * ADC_VSENSE_MULTIPLIER;
 }
+
+void error_checks(){
+  error_data.temp_board_overheating = !std::isnan(temoperature_board) && temoperature_board > ERRORS_MAX_TEMP_BOARD? true : false;
+  error_data.temp_driver_overheating = !std::isnan(temoperature_steper_driver) && temoperature_steper_driver > ERRORS_MAX_TEMP_DRIVER? true : false;
+  error_data.temp_engine_overheating = !std::isnan(temoperature_steper_motor) && temoperature_steper_motor > ERRORS_MAX_TEMP_ENGINE? true : false;
+  error_data.temp_board_sensor_disconnect = std::isnan(temoperature_board)? true : false;
+  error_data.temp_driver_sensor_disconnect = std::isnan(temoperature_steper_driver)? true : false;
+  error_data.temp_engine_sensor_disconnect = std::isnan(temoperature_steper_motor)? true : false;
+
+  error_data.encoder_arm_disconnect = !encoder_arm.is_connected();
+  error_data.encoder_motor_disconnect = !encoder_motor.is_connected();
+
+  error_data.baord_overvoltage = voltage_vcc > ERRORS_MAX_VCC_VOLTAGE? true : false;
+  error_data.baord_undervoltage = voltage_vcc < ERRORS_MIN_VCC_VOLTAGE? true : false;
+
+  // can errors are handled in the handle_can_rx function
+
+  error_data.controler_motor_limit_position = movement_controler.get_limit_position_achieved();
+}
+
 
 void handle_can_rx(){
   __disable_irq();
@@ -218,6 +235,9 @@ void handle_can_rx(){
   }
   else if (recived_msg.frame_id == config.can_konarm_clear_errors_frame_id){
   }
+  else{
+    error_data.can_error = true;
+  }
 
   // delete recived_msg;
   // free(recived_msg);
@@ -239,11 +259,10 @@ void main_loop(){
   tim_can_disconnected.set_behaviour(TIMING_CAN_DISCONNECTED_PERIOD, false);
   tim_caculate_temp.set_behaviour(TIMING::frequency_to_period(TIMING_READ_TEMPERATURE_FQ), true);
 
-  while (1){
+  while (true){
     handle_can_rx();
     can_controler.handle();
     
-
     if(tim_encoder.triggered()){
       encoder_arm.handle();
       encoder_motor.handle();
@@ -253,6 +272,9 @@ void main_loop(){
       movement_controler.set_enable(false);
       movement_controler.set_velocity(0);
       movement_controler.set_position(movement_controler.get_current_position());
+      error_data.can_disconnect = true;
+    }else{
+      error_data.can_disconnect = false;
     }
     
     movement_controler.handle();
@@ -277,14 +299,17 @@ void main_loop(){
       TOGGLE_GPIO(pin_user_led_1);
     }
 
-    if(tim_blink_error.triggered()){
-      if(board_error) TOGGLE_GPIO(pin_user_led_2); 
-      else WRITE_GPIO(pin_user_led_2,GPIO_PIN_RESET);
-    }
     
     if(tim_caculate_temp.triggered()){
       analog_values_assigning();
     }
 
+    error_checks();
+    if(tim_blink_error.triggered()){
+      auto errors_count = error_data.get_amount_of_errors();
+      tim_blink_error.set_behaviour(TIMING::frequency_to_period(TIMING_LED_ERROR_BLINK_FQ/errors_count), true);
+      if(errors_count) TOGGLE_GPIO(pin_user_led_2); 
+      else WRITE_GPIO(pin_user_led_2,GPIO_PIN_RESET);
+    }
   }
 }
