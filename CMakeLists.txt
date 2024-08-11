@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.16)
+cmake_minimum_required(VERSION 3.22)
 
 #
 # This file is generated only once,
@@ -20,6 +20,8 @@ endif()
 
 # Set the project name
 set(CMAKE_PROJECT_NAME sdrac_cubemx)
+set(PROEJCT_MAJOR_VERSION 3)
+
 
 # Include toolchain file
 include("cmake/gcc-arm-none-eabi.cmake")
@@ -119,4 +121,6 @@ add_custom_command(
 	COMMAND ${CMAKE_SIZE} ${CMAKE_PROJECT_NAME}.elf
   COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_PROJECT_NAME}.elf firmware.elf
   # COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/compile_commands.json ${CMAKE_SOURCE_DIR}/compile_commands.json
-)
+  # COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/update-software-version.sh ${CMAKE_SOURCE_DIR}/.git/hooks/post-commit
+  COMMAND ${CMAKE_SOURCE_DIR}/update-software-version.sh ${CMAKE_SOURCE_DIR} ${PROEJCT_MAJOR_VERSION}
+ )

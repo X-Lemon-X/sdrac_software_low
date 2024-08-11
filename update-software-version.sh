@@ -2,10 +2,10 @@
 
 # Get the number of commits in the repository
 minor_version=$(git rev-list --all --count)
-major_version=2
+major_version=$2
 
 # Define the destination file
-dst_file="app/version.hpp"
+dst_file="$1/app/version.hpp"
 
 # Generate the version.hpp file
 echo "#ifndef VERSION_HPP" > $dst_file
