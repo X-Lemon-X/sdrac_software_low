@@ -133,10 +133,10 @@ const IdConfig config_id_2 = {
   0.01f,
   false,
 
-  -4.219981f,
+  -2.617355f,
   false,
   PI,
-  0,
+  10,
 
   0.0f,
   false,
