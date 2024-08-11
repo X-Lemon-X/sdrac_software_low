@@ -3,6 +3,7 @@
 # Get the number of commits in the repository
 minor_version=$(git rev-list --all --count)
 major_version=$2
+echo "Software version: [$major_version.$minor_version]"
 
 # Define the destination file
 dst_file="$1/app/version.hpp"
