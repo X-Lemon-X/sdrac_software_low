@@ -13,7 +13,7 @@
 #include "board_id.hpp"
 #include "CanDB.h"
 #include "movement_controler.hpp"
-#include "pd_controler.hpp"
+#include "pid_controler.hpp"
 #include "pin.hpp"
 #include "ntc_termistors.hpp"
 #include "version.hpp"
@@ -28,7 +28,7 @@
 
 
 
-PDCONTROLER::PdControler pid_pos(main_clock);
+PDCONTROLER::PIDControler pid_pos(main_clock);
 FILTERS::Filter_moving_avarage encoder_arm_moving_avarage(main_clock);
 TIMING::Timing tim_can_disconnected(main_clock);
 
@@ -195,7 +195,6 @@ void error_checks(){
 
   error_data.controler_motor_limit_position = movement_controler.get_limit_position_achieved();
 }
-
 
 void handle_can_rx(){
   __disable_irq();
