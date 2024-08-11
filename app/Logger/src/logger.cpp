@@ -43,6 +43,7 @@ void Logger::transmit(std::string msg,std::string prefix){
   // HAL_Delay(1);
 }
 
-std::string Logger::parse_to_json_format(std::string key, std::string value,bool add_coma){
-  return "\""+key+"\":\""+value+"\""+(add_coma?",":"");
+std::string Logger::parse_to_json_format(std::string key, std::string value,bool add_coma,bool as_list){
+  if(as_list) return "\""+key+"\": {"+value+"}"+(add_coma?",":"");
+  else return "\""+key+"\":\""+value+"\""+(add_coma?",":"");
 }

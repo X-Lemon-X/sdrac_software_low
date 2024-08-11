@@ -71,7 +71,7 @@ extern uint32_t adc_dma_buffer[ADC_DMA_BUFFER_SIZE+1];
 // update frequency of the components
 
 #define TIMING_LED_BLINK_FQ 2
-#define TIMING_LED_ERROR_BLINK_FQ 0.5
+#define TIMING_LED_ERROR_BLINK_FQ 1
 #define TIMING_ENCODER_UPDATE_FQ 1000
 #define TIMING_USB_RECIVED_DATA_FQ 5
 #define TIMING_USB_SEND_DATA_FQ 50

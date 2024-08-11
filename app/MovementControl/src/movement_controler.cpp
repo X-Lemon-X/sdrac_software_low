@@ -41,6 +41,7 @@ void MovementControler::handle(){
   current_velocity = encoder_vel->get_velocity();
   
   float new_velocity = movement_equation->calculate(current_position, target_position, current_velocity, target_velocity);
+  current_velocity = new_velocity;
   
   if (std::abs(new_velocity) > max_velocity)
     new_velocity = (new_velocity > 0) ? max_velocity : -max_velocity;

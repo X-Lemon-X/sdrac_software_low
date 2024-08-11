@@ -1,7 +1,7 @@
 #include "movement_controler.hpp"
 
 
-namespace PDCONTROLER{
+namespace CONTROLER{
 
 class PIDControler: public MOVEMENT_CONTROLER::MovementEquation{
 private:
@@ -22,4 +22,4 @@ public:
   void set_Ki(float Ki){this->Ki = Ki;};
 };
   
-} // namespace PD_Controler
+} // namespace CONTROLER

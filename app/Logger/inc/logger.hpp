@@ -13,6 +13,8 @@ enum class LOG_LEVEL {
   LOG_LEVEL_ERROR=3
 };
 
+#define BOOL_TO_STRING(b) (b ? "1" : "0")
+
 class Logger {
 private:
   LOG_LEVEL log_level;
@@ -32,7 +34,13 @@ public:
   void info(std::string msg);
   void debug(std::string msg);
 
-  std::string parse_to_json_format(std::string key, std::string value,bool add_coma=true);
+  /// @brief  parse the key value pair to json format
+  /// @param key - key of the json field
+  /// @param value - value of the json field
+  /// @param add_coma - if set to true the function will add coma at the end of the json field
+  /// @param as_list - if set to true the function will add the value as a json field with name "key" : { value }
+  /// @return std::string - json field
+  std::string parse_to_json_format(std::string key, std::string value,bool add_coma=true, bool as_list=false);
 };
 
 }

@@ -14,6 +14,7 @@
 #include "CanDB.h"
 #include "movement_controler.hpp"
 #include "pid_controler.hpp"
+#include "basic_controler.hpp"
 #include "pin.hpp"
 #include "ntc_termistors.hpp"
 #include "version.hpp"
@@ -28,7 +29,8 @@
 
 
 
-PDCONTROLER::PIDControler pid_pos(main_clock);
+CONTROLER::PIDControler pid_pos(main_clock);
+CONTROLER::BasicControler bacis_controler(main_clock);
 FILTERS::Filter_moving_avarage encoder_arm_moving_avarage(main_clock);
 TIMING::Timing tim_can_disconnected(main_clock);
 
@@ -136,10 +138,14 @@ void id_config(){
   //-------------------MOVEMENT CONTROLER CONFIGURATION-------------------
   pid_pos.set_Kp(config.pid_p);
   pid_pos.set_Ki(config.pid_i);
-  pid_pos.set_Kd(config.pid_d);
+  // pid_pos.set_Kd(config.pid_d);
+  bacis_controler.set_max_acceleration(1.5f);
+  bacis_controler.set_max_velocity(1.3f);
+  bacis_controler.set_target_pos_max_error(0.001f);
+
   movement_controler.set_limit_position(config.movement_limit_lower, config.movement_limit_upper);
   movement_controler.set_max_velocity(config.movement_max_velocity);
-  movement_controler.init(main_clock, stp_motor, encoder_arm, encoder_motor, pid_pos);
+  movement_controler.init(main_clock, stp_motor, encoder_arm, encoder_motor, bacis_controler);
 
 }
 
@@ -288,7 +294,24 @@ void main_loop(){
         loger.parse_to_json_format("Vvel",std::to_string(encoder_arm.get_velocity()))+
         loger.parse_to_json_format("Pos",std::to_string(movement_controler.get_current_position()))+
         loger.parse_to_json_format("Vel",std::to_string(movement_controler.get_current_velocity()))+
-        loger.parse_to_json_format("Ers",std::to_string(error_data.get_amount_of_errors()),false)
+        loger.parse_to_json_format("Err",std::to_string(error_data.get_amount_of_errors()),false)
+      );
+      log_debug(
+        loger.parse_to_json_format("Errs",
+          loger.parse_to_json_format("teng",BOOL_TO_STRING(error_data.temp_engine_overheating))+
+          loger.parse_to_json_format("tdri",BOOL_TO_STRING(error_data.temp_driver_overheating))+
+          loger.parse_to_json_format("tboa",BOOL_TO_STRING(error_data.temp_board_overheating))+
+          loger.parse_to_json_format("tengdis",BOOL_TO_STRING(error_data.temp_engine_sensor_disconnect))+
+          loger.parse_to_json_format("tdrivdis",BOOL_TO_STRING(error_data.temp_driver_sensor_disconnect))+
+          loger.parse_to_json_format("tborddis",BOOL_TO_STRING(error_data.temp_board_sensor_disconnect))+
+          loger.parse_to_json_format("encarmmdis",BOOL_TO_STRING(error_data.encoder_arm_disconnect))+
+          loger.parse_to_json_format("encmotdis",BOOL_TO_STRING(error_data.encoder_motor_disconnect))+
+          loger.parse_to_json_format("bovolt",BOOL_TO_STRING(error_data.baord_overvoltage))+
+          loger.parse_to_json_format("buvolt",BOOL_TO_STRING(error_data.baord_undervoltage))+
+          loger.parse_to_json_format("candis",BOOL_TO_STRING(error_data.can_disconnect))+
+          loger.parse_to_json_format("canerr",BOOL_TO_STRING(error_data.can_error))+
+          loger.parse_to_json_format("motlimit",BOOL_TO_STRING(error_data.controler_motor_limit_position),false)
+        ,false,true)
       );
     }
 
@@ -306,9 +329,9 @@ void main_loop(){
     }
 
     error_checks();
+    auto errors_count = error_data.get_amount_of_errors();
+    tim_blink_error.set_behaviour(TIMING::frequency_to_period((float)TIMING_LED_ERROR_BLINK_FQ*errors_count), true);
     if(tim_blink_error.triggered()){
-      auto errors_count = error_data.get_amount_of_errors();
-      tim_blink_error.set_behaviour(TIMING::frequency_to_period(TIMING_LED_ERROR_BLINK_FQ/errors_count), true);
       if(errors_count) TOGGLE_GPIO(pin_user_led_2); 
       else WRITE_GPIO(pin_user_led_2,GPIO_PIN_RESET);
     }
