@@ -10,7 +10,7 @@
 #define TOGGLE_GPIO(gpio_pin) HAL_GPIO_TogglePin(gpio_pin.port, gpio_pin.pin)
 #define VOLTAGE_VALUE(gpio_pin) (float)gpio_pin.analog_value * 0.000805861f
 
-struct GPIO_PIN {
+struct GpioPin {
   uint16_t pin;
   GPIO_TypeDef *port;
   uint16_t analog_value;

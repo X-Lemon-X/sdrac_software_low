@@ -42,3 +42,7 @@ void Logger::transmit(std::string msg,std::string prefix){
   CDC_Transmit_FS((uint8_t*)msg.c_str(), msg.length());
   // HAL_Delay(1);
 }
+
+std::string Logger::parse_to_json_format(std::string key, std::string value,bool add_coma){
+  return "\""+key+"\":\""+value+"\""+(add_coma?",":"");
+}

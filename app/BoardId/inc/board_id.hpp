@@ -27,13 +27,13 @@ namespace BOARD_ID{
 
 class Board_id{
 private:
-  const GPIO_PIN &id_0;
-  const GPIO_PIN &id_1;
-  const GPIO_PIN &id_2;
+  const GpioPin &id_0;
+  const GpioPin &id_1;
+  const GpioPin &id_2;
   uint8_t id;
   bool id_set;
 public:
-  Board_id(const GPIO_PIN &id_0,const GPIO_PIN &id_1,const GPIO_PIN &id_2);
+  Board_id(const GpioPin &id_0,const GpioPin &id_1,const GpioPin &id_2);
   uint8_t get_id();
 };
   

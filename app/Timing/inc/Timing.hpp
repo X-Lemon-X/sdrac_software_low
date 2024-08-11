@@ -9,7 +9,7 @@ namespace TIMING
 /// @brief Convert frequency to period in microseconds
 /// what for becouse i can
 /// @param frequency frequency in Hz
-uint32_t frequency_to_period(uint32_t frequency);
+uint32_t frequency_to_period(float frequency);
 
 class Ticker{
 private:

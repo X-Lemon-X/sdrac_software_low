@@ -31,6 +31,8 @@ public:
   void warning(std::string msg);
   void info(std::string msg);
   void debug(std::string msg);
+
+  std::string parse_to_json_format(std::string key, std::string value,bool add_coma=true);
 };
 
 }

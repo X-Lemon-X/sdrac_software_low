@@ -38,8 +38,8 @@ private:
   CIRCULAR_BUFFOR::static_circular_buffor<CAN_MSG,CAN_QUEUE_SIZE> rx_msg_buffor;
   CIRCULAR_BUFFOR::static_circular_buffor<CAN_MSG,CAN_QUEUE_SIZE> tx_msg_buffor;
 
-  const GPIO_PIN *pin_tx_led;
-  const GPIO_PIN *pin_rx_led;
+  const GpioPin *pin_tx_led;
+  const GpioPin *pin_rx_led;
   uint32_t last_tx_mailbox;
 
   uint32_t filter_mask;
@@ -67,7 +67,7 @@ public:
   /// @param ticker  main system ticker object
   /// @param pin_tx_led  pin object for the TX led
   /// @param pin_rx_led  pin object for the RX led
-  void init(CAN_HandleTypeDef &can_interface,uint32_t can_fifo,TIMING::Ticker &ticker,const GPIO_PIN &pin_tx_led,const GPIO_PIN &pin_rx_led);
+  void init(CAN_HandleTypeDef &can_interface,uint32_t can_fifo,TIMING::Ticker &ticker,const GpioPin &pin_tx_led,const GpioPin &pin_rx_led);
 
   /// @brief  Add a filter to the CAN interface. Why because i can't get the hardware filters to work properly!
   /// @param base_id  base id of the filter

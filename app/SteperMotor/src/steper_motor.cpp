@@ -7,7 +7,7 @@ using namespace STEPER_MOTOR;
 #define PIM2 6.28318530717958647692f
 
 
-SteperMotor::SteperMotor(TIM_HandleTypeDef &_htim,unsigned int _timer_channel,const GPIO_PIN &_direction_pin,const GPIO_PIN &_enable_pin):
+SteperMotor::SteperMotor(TIM_HandleTypeDef &_htim,unsigned int _timer_channel,const GpioPin &_direction_pin,const GpioPin &_enable_pin):
 htim(_htim),
 direction_pin(_direction_pin),
 timer_channel(_timer_channel),

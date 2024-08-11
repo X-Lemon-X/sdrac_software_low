@@ -5,8 +5,8 @@
 
 using namespace TIMING;
 
-uint32_t TIMING::frequency_to_period(uint32_t frequency){
-  return 1000000/frequency;
+uint32_t TIMING::frequency_to_period(float frequency){
+  return (uint32_t)(1000000.0f/frequency);
 }
 
 Ticker::Ticker(){

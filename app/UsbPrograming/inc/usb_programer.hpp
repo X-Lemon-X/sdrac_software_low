@@ -19,11 +19,11 @@ namespace USB_PROGRAMER{
 class UsbProgramer
 {
 private:
-  const GPIO_PIN &boot_device;
+  const GpioPin &boot_device;
   uint8_t buffer[USB_PROGRAMER_BUFFER_SIZE];
   std::string usb_programer_info;
 public:
-  UsbProgramer(const GPIO_PIN &boot_device);
+  UsbProgramer(const GpioPin &boot_device);
 
   /// @brief should be called in the main loop to handle the usb programing
   void handler();

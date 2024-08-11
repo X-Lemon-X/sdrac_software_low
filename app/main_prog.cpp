@@ -281,14 +281,25 @@ void main_loop(){
 
     if(tim_data_usb_send.triggered()){
       log_info(
-         "\"Vsen\":\"" + std::to_string(voltage_vcc) +
-         "\",\"Tste\":\"" + std::to_string(temoperature_steper_motor) + 
-         "\",\"Tbor\":\"" + std::to_string(temoperature_board) + 
-         "\",\"Tmot\":\"" + std::to_string(temoperature_steper_driver) + 
-         "\",\"Eang\":\"" + std::to_string(encoder_arm.get_angle()) + 
-         "\",\"Vvel\":\"" + std::to_string(encoder_arm.get_velocity()) + 
-         "\",\"Pos\":\"" + std::to_string(movement_controler.get_current_position()) + 
-         "\",\"Vel\":\"" + std::to_string(movement_controler.get_current_velocity()));
+        loger.parse_to_json_format("Vsen",std::to_string(voltage_vcc))+
+        loger.parse_to_json_format("Tste",std::to_string(temoperature_steper_motor))+
+        loger.parse_to_json_format("Tbor",std::to_string(temoperature_board))+
+        loger.parse_to_json_format("Tmot",std::to_string(temoperature_steper_driver))+
+        loger.parse_to_json_format("Eang",std::to_string(encoder_arm.get_angle()))+
+        loger.parse_to_json_format("Vvel",std::to_string(encoder_arm.get_velocity()))+
+        loger.parse_to_json_format("Pos",std::to_string(movement_controler.get_current_position()))+
+        loger.parse_to_json_format("Vel",std::to_string(movement_controler.get_current_velocity()))+
+        loger.parse_to_json_format("Err",std::to_string(error_data.get_amount_of_errors()),false)
+      );
+      // log_info(
+      //    "\"Vsen\":\"" + std::to_string(voltage_vcc) +
+      //    "\",\"Tste\":\"" + std::to_string(temoperature_steper_motor) + 
+      //    "\",\"Tbor\":\"" + std::to_string(temoperature_board) + 
+      //    "\",\"Tmot\":\"" + std::to_string(temoperature_steper_driver) + 
+      //    "\",\"Eang\":\"" + std::to_string(encoder_arm.get_angle()) + 
+      //    "\",\"Vvel\":\"" + std::to_string(encoder_arm.get_velocity()) + 
+      //    "\",\"Pos\":\"" + std::to_string(movement_controler.get_current_position()) + 
+      //    "\",\"Vel\":\"" + std::to_string(movement_controler.get_current_velocity()));
     }
 
     if(tim_usb.triggered()){

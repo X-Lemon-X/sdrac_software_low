@@ -22,7 +22,7 @@ CanControl::~CanControl(){
   delete timing_led_tx;
 }
 
-void CanControl::init(CAN_HandleTypeDef &_can_interface, uint32_t _can_fifo,TIMING::Ticker &_ticker,const GPIO_PIN &_pin_tx_led,const GPIO_PIN &_pin_rx_led){
+void CanControl::init(CAN_HandleTypeDef &_can_interface, uint32_t _can_fifo,TIMING::Ticker &_ticker,const GpioPin &_pin_tx_led,const GpioPin &_pin_rx_led){
   can_interface = &_can_interface;
   can_fifo = _can_fifo;
   ticker = &_ticker;

@@ -71,7 +71,7 @@ extern uint32_t adc_dma_buffer[ADC_DMA_BUFFER_SIZE+1];
 // update frequency of the components
 
 #define TIMING_LED_BLINK_FQ 2
-#define TIMING_LED_ERROR_BLINK_FQ 2
+#define TIMING_LED_ERROR_BLINK_FQ 0.5
 #define TIMING_ENCODER_UPDATE_FQ 1000
 #define TIMING_USB_RECIVED_DATA_FQ 5
 #define TIMING_USB_SEND_DATA_FQ 50
@@ -83,7 +83,7 @@ extern uint32_t adc_dma_buffer[ADC_DMA_BUFFER_SIZE+1];
 //**************************************************************************************************
 // ID CONFIG
 
-struct ID_CONFIG {
+struct IdConfig {
 // CAN 
 uint32_t can_filter_mask_high;
 uint32_t can_filter_mask_low;
@@ -168,42 +168,42 @@ public:
 };
 
 
-extern ID_CONFIG config;
-extern const ID_CONFIG config_id_default;
-extern const ID_CONFIG config_id_1;
-extern const ID_CONFIG config_id_2;
-extern const ID_CONFIG config_id_3;
-extern const ID_CONFIG config_id_4;
-extern const ID_CONFIG config_id_5;
-extern const ID_CONFIG config_id_6;
+extern IdConfig config;
+extern const IdConfig config_id_default;
+extern const IdConfig config_id_1;
+extern const IdConfig config_id_2;
+extern const IdConfig config_id_3;
+extern const IdConfig config_id_4;
+extern const IdConfig config_id_5;
+extern const IdConfig config_id_6;
 
 
 //**************************************************************************************************
 // PINOUT
-extern GPIO_PIN pin_user_led_1;
-extern GPIO_PIN pin_user_led_2;
-extern GPIO_PIN pin_user_btn_1;
-extern GPIO_PIN pin_tx_led;
-extern GPIO_PIN pin_rx_led;
-extern GPIO_PIN pin_encoder;
-extern GPIO_PIN pin_poz_zero_sensor;
-extern GPIO_PIN pin_inout_ca1;
-extern GPIO_PIN pin_inout_ca2;
-extern GPIO_PIN pin_inout_crx;
-extern GPIO_PIN pin_inout_ctx;
-extern GPIO_PIN pin_sync_puls;
-extern GPIO_PIN pin_sync_dir;
-extern GPIO_PIN pin_temp_steper_board;
-extern GPIO_PIN pin_temp_board;
-extern GPIO_PIN pin_temp_motor;
-extern GPIO_PIN pin_vsense;
-extern GPIO_PIN pin_steper_direction;
-extern GPIO_PIN pin_steper_enable ;
-extern GPIO_PIN pin_steper_step ;
-extern GPIO_PIN pin_boot_device;
-extern GPIO_PIN pin_cid_0;
-extern GPIO_PIN pin_cid_1;
-extern GPIO_PIN pin_cid_2;
+extern GpioPin pin_user_led_1;
+extern GpioPin pin_user_led_2;
+extern GpioPin pin_user_btn_1;
+extern GpioPin pin_tx_led;
+extern GpioPin pin_rx_led;
+extern GpioPin pin_encoder;
+extern GpioPin pin_poz_zero_sensor;
+extern GpioPin pin_inout_ca1;
+extern GpioPin pin_inout_ca2;
+extern GpioPin pin_inout_crx;
+extern GpioPin pin_inout_ctx;
+extern GpioPin pin_sync_puls;
+extern GpioPin pin_sync_dir;
+extern GpioPin pin_temp_steper_board;
+extern GpioPin pin_temp_board;
+extern GpioPin pin_temp_motor;
+extern GpioPin pin_vsense;
+extern GpioPin pin_steper_direction;
+extern GpioPin pin_steper_enable ;
+extern GpioPin pin_steper_step ;
+extern GpioPin pin_boot_device;
+extern GpioPin pin_cid_0;
+extern GpioPin pin_cid_1;
+extern GpioPin pin_cid_2;
 
 //**************************************************************************************************
 // all the global variables, peripherals, and buffors are declared here

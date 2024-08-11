@@ -258,11 +258,18 @@ static int8_t CDC_Control_FS(uint8_t cmd, uint8_t* pbuf, uint16_t length)
   * @param  Len: Number of data received (in bytes)
   * @retval Result of the operation: USBD_OK if all operations are OK else USBD_FAIL
   */
-static int8_t CDC_Receive_FS(uint8_t* Buf, uint32_t *Len)
-{
+static int8_t CDC_Receive_FS(uint8_t* Buf, uint32_t *Len){
   /* USER CODE BEGIN 6 */
   USBD_CDC_SetRxBuffer(&hUsbDeviceFS, &Buf[0]);
   USBD_CDC_ReceivePacket(&hUsbDeviceFS);
+  // this is external buffer whitch can be found in usb_programer.hpp
+  extern uint8_t usb_programer_buffer[APP_RX_DATA_SIZE];
+  extern uint32_t usb_programer_buffer_len;
+  extern uint8_t usb_programer_data_recived;
+  memset(usb_programer_buffer, 0, APP_RX_DATA_SIZE);
+  memcpy(usb_programer_buffer, Buf, *Len);
+  usb_programer_buffer_len = *Len;
+  usb_programer_data_recived = 1;
   return (USBD_OK);
   /* USER CODE END 6 */
 }

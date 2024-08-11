@@ -24,6 +24,16 @@ set(CMAKE_PROJECT_NAME sdrac_cubemx)
 # Include toolchain file
 include("cmake/gcc-arm-none-eabi.cmake")
 
+# aditional compiler flags
+set(CMAKE_ASM_FLAGS "${CMAKE_C_FLAGS}")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -u_printf_float")
+set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS}  -u_printf_float")
+
+# aditional linker flags
+set(CMAKE_C_LINK_FLAGS "${CMAKE_C_LINK_FLAGS}  -u_printf_float")
+set(CMAKE_CXX_LINK_FLAGS "${CMAKE_C_LINK_FLAGS}  -u_printf_float")
+
+
 # Enable compile command to ease indexing with e.g. clangd
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
@@ -92,11 +102,15 @@ target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE
 
 
 
+
 # Add linked libraries
 target_link_libraries(${CMAKE_PROJECT_NAME}
   stm32cubemx
   # Add user defined libraries
 )
+
+
+
 
 add_custom_command(
 	TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
