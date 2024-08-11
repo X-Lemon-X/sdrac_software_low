@@ -140,7 +140,6 @@ void id_config(){
   pid_pos.set_Ki(config.pid_i);
   // pid_pos.set_Kd(config.pid_d);
   bacis_controler.set_max_acceleration(1.5f);
-  bacis_controler.set_max_velocity(1.3f);
   bacis_controler.set_target_pos_max_error(0.001f);
 
   movement_controler.set_limit_position(config.movement_limit_lower, config.movement_limit_upper);

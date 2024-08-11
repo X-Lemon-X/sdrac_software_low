@@ -10,7 +10,7 @@ private:
   float previous_velocity;
   float previous_position;
   float previous_time;
-  float max_velocity;
+  float get_sign(float value);
 public:
   BasicControler(TIMING::Ticker &ticker);
   
@@ -19,7 +19,6 @@ public:
   
   void set_max_acceleration(float max_acceleration);
   void set_target_pos_max_error(float target_pos_max_error);
-  void set_max_velocity(float max_velocity);
 };
   
 } // namespace CONTROLER
