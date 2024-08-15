@@ -56,7 +56,7 @@ const IdConfig config_id_default ={
   0x604,
 
   400.0f,
-  75.0f,
+  40.0f,
   0.0f,
   0.0f,
   false,
@@ -92,7 +92,7 @@ const IdConfig config_id_1 ={
   CAN_KONARM_1_CLEAR_ERRORS_FRAME_ID,
 
   400.0f,
-  75.0f,
+  40.0f,
   PI,
   0.01f,
   false,
@@ -164,7 +164,7 @@ const IdConfig config_id_3 = {
   CAN_KONARM_3_CLEAR_ERRORS_FRAME_ID,
 
   400.0f,
-  75.0f,
+  40.0f,
   PI,
   0.01f,
   false,
