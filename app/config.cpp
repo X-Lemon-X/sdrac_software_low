@@ -128,8 +128,8 @@ const IdConfig config_id_2 = {
   CAN_KONARM_2_CLEAR_ERRORS_FRAME_ID,
 
   400.0f,
-  75.0f,
-  PI,
+  40.0f,
+  2.0f,
   0.01f,
   true,
 

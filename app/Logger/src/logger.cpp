@@ -35,7 +35,7 @@ void Logger::transmit(std::string msg,std::string prefix){
         "\",\"level\":\""+prefix+
         "\",\"ver\":\"" + std::to_string(VERSION_MAJOR) + "." + std::to_string(VERSION_MINOR)+
         "\",\"id\":\"" + std::to_string(board_id.get_id())+
-        "\",\"msg\":{" + msg + "\"}}\n";
+        "\",\"msg\":{" + msg + "}}\n";
   }else{
     msg += "\n";
   }

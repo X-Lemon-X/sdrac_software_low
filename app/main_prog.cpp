@@ -139,7 +139,7 @@ void id_config(){
   pid_pos.set_Kp(config.pid_p);
   pid_pos.set_Ki(config.pid_i);
   // pid_pos.set_Kd(config.pid_d);
-  bacis_controler.set_max_acceleration(1.5f);
+  bacis_controler.set_max_acceleration(1.0f);
   bacis_controler.set_target_pos_max_error(0.001f);
 
   movement_controler.set_limit_position(config.movement_limit_lower, config.movement_limit_upper);
@@ -293,9 +293,7 @@ void main_loop(){
         loger.parse_to_json_format("Vvel",std::to_string(encoder_arm.get_velocity()))+
         loger.parse_to_json_format("Pos",std::to_string(movement_controler.get_current_position()))+
         loger.parse_to_json_format("Vel",std::to_string(movement_controler.get_current_velocity()))+
-        loger.parse_to_json_format("Err",std::to_string(error_data.get_amount_of_errors()),false)
-      );
-      log_debug(
+        loger.parse_to_json_format("Err",std::to_string(error_data.get_amount_of_errors()))+
         loger.parse_to_json_format("Errs",
           loger.parse_to_json_format("teng",BOOL_TO_STRING(error_data.temp_engine_overheating))+
           loger.parse_to_json_format("tdri",BOOL_TO_STRING(error_data.temp_driver_overheating))+

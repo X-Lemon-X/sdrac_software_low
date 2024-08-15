@@ -3,6 +3,7 @@ import matplotlib
 import math
 matplotlib.use('Qt5Agg')
 import matplotlib.pyplot as plt
+import matplotlib.widgets as widgets
 
 class PID:
   def __init__(self, kp, ki, kd, dt,t1,t2):
@@ -58,6 +59,9 @@ class Bsci_accelarator:
       value += decrease_by
     return value
 
+  def get_sing(self, value) -> float:
+    return 1.0 if value > 0.0 else -1.0
+
   def update(self, target_position,current_position):
     self.time_sec += self.dt
     self.current_position = current_position
@@ -67,12 +71,16 @@ class Bsci_accelarator:
     deacceleretion_distance = abs((self.current_velocity * deacel_time)) - (0.5 * self.max_acceleration * deacel_time*deacel_time)
     deacceleretion_distance = abs(deacceleretion_distance)
 
-
+    # if(abs(error) > deacceleretion_distance):      
+    #   self.current_velocity += self.max_acceleration * self.dt if error > 0 else -self.max_acceleration * self.dt
+    # else:
+    #   self.current_velocity = self.decrease_value(self.current_velocity,self.max_acceleration * self.dt)    
 
     if(abs(error) > deacceleretion_distance):      
-      self.current_velocity += self.max_acceleration * self.dt if error > 0 else -self.max_acceleration * self.dt
+      self.current_velocity += self.get_sing(error) * self.max_acceleration * self.dt
     else:
-      self.current_velocity = self.decrease_value(self.current_velocity,self.max_acceleration * self.dt)    
+      self.current_velocity -= self.get_sing(self.current_velocity)*self.max_acceleration * self.dt    
+    
 
     # if(error > deacceleretion_distance):      
     #   if(error > 0):
@@ -95,8 +103,8 @@ class Bsci_accelarator:
     # ratio_curent = 0.99
     # self.current_velocity = (self.previous_velocity * (1-ratio_curent)) + (self.current_velocity * ratio_curent)
     # self.previous_velocity = self.current_velocity
-    if(abs(error) < 0.0001):
-      self.current_velocity = 0
+    # if(abs(error) < 0.001):
+    #   self.current_velocity = 0
 
     self.current_position += self.current_velocity * self.dt
     return self.current_velocity, self.current_position, max_velocity_achieved
@@ -124,7 +132,7 @@ def simulate_pid():
     current_velocity = 0
     target_velocity = 1.3
     pid = PID(kp, ki, kd, dt,t1,t2)
-    bc = Bsci_accelarator(1.3, 2, dt,current_position)
+    bc = Bsci_accelarator(1.0, 1, dt,current_position)
 
     veloci = []
     tim = []
@@ -134,7 +142,7 @@ def simulate_pid():
     pos_V = current_position
 
     target_position = 4
-    for i in np.arange(0, 2, dt):
+    for i in np.arange(0, 10, dt):
       current_velocity, pos_V, mva = bc.update(target_position, pos_V)
       veloci.append(current_velocity)
       tim.append(i)
@@ -142,8 +150,8 @@ def simulate_pid():
       target_pos.append(target_position)
       max_velocity_achieved.append(mva)
 
-    target_position = 2.0
-    for i in np.arange(2,3.3, dt):
+    target_position = 0
+    for i in np.arange(10,20, dt):
       current_velocity, pos_V, mva = bc.update(target_position, pos_V)
       veloci.append(current_velocity)
       tim.append(i)
@@ -151,36 +159,55 @@ def simulate_pid():
       target_pos.append(target_position)
       max_velocity_achieved.append(mva)
 
-    target_position = 2.3
-    for i in np.arange(3.3, 30, dt):
+    target_position = -4
+    for i in np.arange(20, 30, dt):
       current_velocity, pos_V, mva = bc.update(target_position, pos_V)
       veloci.append(current_velocity)
       tim.append(i)
       pos.append(pos_V)
       target_pos.append(target_position)
       max_velocity_achieved.append(mva)
+
+    target_position = 0
+    for i in np.arange(30, 40, dt):
+      current_velocity, pos_V, mva = bc.update(target_position, pos_V)
+      veloci.append(current_velocity)
+      tim.append(i)
+      pos.append(pos_V)
+      target_pos.append(target_position)
+      max_velocity_achieved.append(mva)
+
 
     return tim, veloci, pos,target_pos, max_velocity_achieved
 
 if __name__ == "__main__":
   tim , vel, pos, target_pos, max_velocity_achieved = simulate_pid()
-  #diplay chart the velocity
-  plt.plot(tim, vel, 'b')
-  plt.plot(tim, pos, 'r')
-  plt.plot(tim, target_pos, 'g')
-  # Check target position for changes and insert vertical lines
+
+  fig = plt.figure()
+  ax = fig.subplots()
+  ax.plot(tim, target_pos, label='target_pos')
+  ax.plot(tim, vel, label='Velocity')
+  ax.plot(tim, pos, label='Position')
+
   previous_target = target_pos[0]
   for target in target_pos:
     if target != previous_target:
-      plt.axvline(x=tim[target_pos.index(target)], color='gray', linestyle='--')
+      ax.axvline(x=tim[target_pos.index(target)], color='gray', linestyle='--')
       previous_target = target
 
   previous_velocity = max_velocity_achieved[0]
   for i in range(len(max_velocity_achieved)):
     if previous_velocity != max_velocity_achieved[i]:
-      plt.axvline(x=tim[i], color='black', linestyle='--')
+      ax.axvline(x=tim[i], color='black', linestyle='--')
       previous_velocity = max_velocity_achieved[i]
-  plt.xlabel('Time')
-  plt.ylabel('Pos [rad]')
-  plt.legend(['Velocity','Position',"target_pos"])
+      
+
+
+  ax.set_xlabel('Time')
+  ax.set_ylabel('Pos [rad]')
+  ax.set_title('Data Visualization')
+  ax.legend()
+  # ax.grid()
+
+  cursor = widgets.Cursor(ax, vertOn=True, horizOn=True, color='red', linewidth=1,useblit=True)
   plt.show()

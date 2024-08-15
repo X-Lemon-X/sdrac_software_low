@@ -20,20 +20,20 @@ float BasicControler::calculate(float current_position, float target_position, f
   const float current_time = ticker.get_seconds();
   float dt = current_time - previous_time;
   previous_time = current_time;
-  current_velocity = previous_velocity;
+
+  current_velocity = previous_velocity; // delete this line after velocity is implemented in the movement controler
+
   float error_position= target_position - current_position;
   float deacceleration_time = std::abs(current_velocity / max_acceleration);  
   float deacceleration_distance = std::abs((current_velocity * deacceleration_time) - (0.5 * max_acceleration * deacceleration_time * deacceleration_time));
 
-
-  if(std::abs(error_position) > deacceleration_distance) 
-    current_velocity += get_sign(error_position) * max_acceleration * dt;
+  if(std::abs(error_position) > deacceleration_distance) current_velocity += get_sign(error_position) * max_acceleration * dt;
   else current_velocity -= get_sign(current_velocity) * max_acceleration * dt;
 
   if(current_velocity > target_velocity) current_velocity = target_velocity;
   else if(current_velocity < -target_velocity) current_velocity = -target_velocity;
   
-  if(std::abs(error_position) < target_pos_max_error) current_velocity = 0;
+  // if(std::abs(error_position) < target_pos_max_error) current_velocity = 0;
 
   previous_velocity = current_velocity;
   return current_velocity;
