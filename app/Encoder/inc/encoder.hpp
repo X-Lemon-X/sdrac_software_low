@@ -1,8 +1,7 @@
 #ifndef ENCODERS_H
 #define ENCODERS_H
 
-#include "main.h"
-// #include <deque>
+#include "stm32f4xx_hal.h"
 #include "Timing.hpp"
 #include "filter.hpp"
 

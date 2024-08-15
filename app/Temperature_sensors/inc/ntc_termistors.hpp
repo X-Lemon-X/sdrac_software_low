@@ -1,4 +1,3 @@
-#include "main.h"
 
 #ifndef __NTC_TERMISTORS_HPP
 #define __NTC_TERMISTORS_HPP

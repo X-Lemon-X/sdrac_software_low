@@ -1,6 +1,5 @@
 #include "pin.hpp"
 #include "stm32f4xx_hal.h"
-#include "main.h"
 
 #ifndef BOARD_ID_HPP
 #define BOARD_ID_HPP
@@ -15,14 +14,7 @@
 
 namespace BOARD_ID{
 
-#define BOARD_ID_0 0x0
-#define BOARD_ID_1 0x1
-#define BOARD_ID_2 0x2
-#define BOARD_ID_3 0x3
-#define BOARD_ID_4 0x4
-#define BOARD_ID_5 0x5
-#define BOARD_ID_6 0x6
-#define BOARD_ID_7 0x7
+
 
 
 class Board_id{

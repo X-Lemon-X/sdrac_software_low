@@ -62,6 +62,7 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     # Add user sources here
   "app/main_prog_callbacks.cpp"
   "app/main_prog.cpp"
+  "app/config.cpp"
   "app/Encoder/src/encoder.cpp"
   "app/Logger/src/logger.cpp"
   "app/Timing/src/Timing.cpp"
@@ -80,10 +81,12 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
   "app/Contolers/src/basic_controler.cpp"
   "app/Temperature_sensors/src/ntc_termistors.cpp"
   "app/Temperature_sensors/src/MCP9700AT.cpp"
-  "app/config.cpp"
-)
+  )
+
+
 
 # Add include paths
+
 target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE
   "app"
   "app/Encoder/inc"
@@ -101,7 +104,7 @@ target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE
   "app/Temperature_sensors/inc"
   "app/list/inc"
   "app/Gpio/inc"
-)
+  )
 
 
 
@@ -111,6 +114,7 @@ target_link_libraries(${CMAKE_PROJECT_NAME}
   stm32cubemx
   # Add user defined libraries
 )
+
 
 
 
