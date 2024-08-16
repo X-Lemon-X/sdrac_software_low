@@ -1,0 +1,29 @@
+CompileFlags:                     # Tweak the parse settings
+  Add: 
+    - "-std=gnu++17"
+    - "-I/home/lemonx/.local/share/gccarm/arm-none-eabi/include"
+    - "-I/home/lemonx/.local/share/gccarm/arm-none-eabi/include/c++/10.3.1/"
+    - "-I/home/lemonx/.local/share/gccarm/arm-none-eabi/include/c++/10.3.1/arm-none-eabi"
+    - "-I/home/lemonx/.local/share/gccarm/arm-none-eabi/include/c++/10.3.1/arm-none-eabi/thumb/v7e-m/"
+    - "-I/home/lemonx/.local/share/gccarm/arm-none-eabi/include/c++/10.3.1/arm-none-eabi/thumb/v7e-m/nofp/"
+    
+    # - "-std=c++17"
+    # - "-std=c++11"
+    # - "-query-driver=/home/lemonx/.local/share/gccarm/bin"
+  # Remove: [-std=gnu++17,-std=gnu11]
+
+Index:
+  Background: Build     # Disable slow background indexing of these files.
+
+Diagnostics:
+  ClangTidy:
+    Add: modernize*
+    FastCheckFilter: Strict
+  UnusedIncludes: Strict
+InlayHints:
+  BlockEnd: No
+  Designators: Yes
+  Enabled: Yes
+  ParameterNames: Yes
+  DeducedTypes: Yes
+  TypeNameLimit: 40

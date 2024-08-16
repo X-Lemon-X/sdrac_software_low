@@ -22,6 +22,7 @@
 #include "MCP9700AT.hpp"
 #include "Timing.hpp"
 #include "config.hpp"
+#include <limits>
 #include <string>
 #include <charconv>
 #include <vector>
@@ -105,8 +106,7 @@ void id_config(){
   stp_motor.set_min_velocity(config.stepper_motor_min_velocity);
   stp_motor.set_reverse(config.stepper_motor_reverse);
   stp_motor.init();
-  stp_motor.set_enable(false);
-
+  stp_motor.set_enable(false);  
 
   //-------------------ENCODER STEPER MOTOR POSITION CONFIGURATION-------------------
   // to do
@@ -124,14 +124,14 @@ void id_config(){
   //-------------------ENCODER ARM POSITION CONFIGURATION-------------------
   
   encoder_arm_moving_avarage.set_size(60); // 15 for smooth movement but delay with sampling to 50
-  encoder_arm.set_function_to_read_angle(ENCODER::translate_reg_to_angle_MT6701)
-             .set_offset(config.encoder_arm_offset)
-             .set_reverse(config.encoder_arm_reverse)
-             .set_enable_pos_filter(false)
-             .set_enable_velocity(true)
-             .set_enable_velocity_filter(true)
-             .set_velocity_sample_amount(config.encoder_arm_velocity_sample_amount)
-             .set_dead_zone_correction_angle(config.encoder_arm_dead_zone_correction_angle);
+  encoder_arm.set_function_to_read_angle(ENCODER::translate_reg_to_angle_MT6701);
+  encoder_arm.set_offset(config.encoder_arm_offset);
+  encoder_arm.set_reverse(config.encoder_arm_reverse);
+  encoder_arm.set_enable_pos_filter(false);
+  encoder_arm.set_enable_velocity(true);
+  encoder_arm.set_enable_velocity_filter(true);
+  encoder_arm.set_velocity_sample_amount(config.encoder_arm_velocity_sample_amount);
+  encoder_arm.set_dead_zone_correction_angle(config.encoder_arm_dead_zone_correction_angle);
   encoder_arm.init(hi2c1,main_clock,nullptr,&encoder_arm_moving_avarage);
   
 
