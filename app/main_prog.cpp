@@ -15,6 +15,7 @@
 #include "movement_controler.hpp"
 #include "pid_controler.hpp"
 #include "basic_controler.hpp"
+#include "pass_through_controler.hpp"
 #include "pin.hpp"
 #include "ntc_termistors.hpp"
 #include "version.hpp"
@@ -32,7 +33,8 @@
 
 CONTROLER::PIDControler pid_pos(main_clock);
 CONTROLER::BasicControler bacis_controler(main_clock);
-FILTERS::Filter_moving_avarage encoder_arm_moving_avarage(main_clock);
+CONTROLER::PassThroughControler pass_through_controler(main_clock);
+FILTERS::Filter_moving_avarage encoder_motor_moving_avarage(main_clock);
 TIMING::Timing tim_can_disconnected(main_clock);
 
 float temoperature_board = 0;
@@ -42,7 +44,8 @@ float voltage_vcc = 0;
 
 //**************************************************************************************************
 void main_prog(){
-  log_debug("\"state\":\"Start main_prog\"");
+  log_debug(loger.parse_to_json_format("state","start"));
+
   pre_periferal_config();
   periferal_config();
   id_config();
@@ -51,18 +54,11 @@ void main_prog(){
 }
 
 void pre_periferal_config(){
-  log_debug("\"state\":\"pre_perifial_config\"");
-  encoder_arm.set_address(ENCODER_MT6701_I2C_ADDRESS);
-  encoder_arm.set_resolution(ENCODER_MT6702_RESOLUTION);
-  encoder_arm.set_angle_register(ENCODER_MT6701_ANGLE_REG);
-
-  encoder_motor.set_address(ENCODER_AS5600_I2C_ADDRESS);
-  encoder_motor.set_resolution(ENCODER_AS5600_RESOLUTION);
-  encoder_motor.set_angle_register(ENCODER_AS5600_ANGLE_REG);
+  log_debug(loger.parse_to_json_format("state","pre_perifial_config"));
 }
 
 void periferal_config(){
-  log_debug("\"state\":\"periferal_config\"");
+  log_debug(loger.parse_to_json_format("state","periferal_config"));
   // dma adc1 settings
   HAL_ADC_Start_DMA(&hadc1, adc_dma_buffer, ADC_DMA_BUFFER_SIZE);
 
@@ -81,7 +77,7 @@ void periferal_config(){
 }
 
 void id_config(){
-  log_debug("\"state\":\"id_config\"");
+  log_debug(loger.parse_to_json_format("state","id_config"));
 
   std::string info = "SDRACboard\n";
   info += "Software version:" + std::to_string(VERSION_MAJOR) + "." + std::to_string(VERSION_MINOR) + "\n";
@@ -113,33 +109,33 @@ void id_config(){
   encoder_motor.set_function_to_read_angle(ENCODER::translate_reg_to_angle_AS5600);
   encoder_motor.set_offset(config.encoder_motor_offset);
   encoder_motor.set_reverse(config.encoder_motor_reverse);
-  encoder_motor.set_enable_pos_filter(false);
+  encoder_motor.set_enable_position_filter(false);
   encoder_motor.set_enable_velocity(true);
-  encoder_motor.set_enable_velocity_filter(false);
+  encoder_motor.set_enable_velocity_filter(true);
   encoder_motor.set_velocity_sample_amount(config.encoder_motor_velocity_sample_amount);
   encoder_motor.set_resolution(ENCODER_AS5600_RESOLUTION);
   encoder_motor.set_angle_register(ENCODER_AS5600_ANGLE_REG);
   encoder_motor.set_address(ENCODER_AS5600_I2C_ADDRESS); 
   encoder_motor.set_dead_zone_correction_angle(config.encoder_motor_dead_zone_correction_angle);
               
-  encoder_motor.init(hi2c1,main_clock,nullptr,nullptr);
+  encoder_motor_moving_avarage.set_size(10); // 15 for smooth movement but delay with sampling to 50
+  encoder_motor.init(hi2c1,main_clock,nullptr,&encoder_motor_moving_avarage);
 
 
   //-------------------ENCODER ARM POSITION CONFIGURATION-------------------
   
-  encoder_arm_moving_avarage.set_size(60); // 15 for smooth movement but delay with sampling to 50
   encoder_arm.set_function_to_read_angle(ENCODER::translate_reg_to_angle_MT6701);
   encoder_arm.set_offset(config.encoder_arm_offset);
   encoder_arm.set_reverse(config.encoder_arm_reverse);
-  encoder_arm.set_enable_pos_filter(false);
-  encoder_arm.set_enable_velocity(true);
-  encoder_arm.set_enable_velocity_filter(true);
+  encoder_arm.set_enable_position_filter(false);
+  encoder_arm.set_enable_velocity(false);
+  encoder_arm.set_enable_velocity_filter(false);
   encoder_arm.set_velocity_sample_amount(config.encoder_arm_velocity_sample_amount);
   encoder_arm.set_dead_zone_correction_angle(config.encoder_arm_dead_zone_correction_angle);
   encoder_arm.set_angle_register(ENCODER_MT6701_ANGLE_REG);
   encoder_arm.set_resolution(ENCODER_MT6702_RESOLUTION);
   encoder_arm.set_address(ENCODER_MT6701_I2C_ADDRESS);
-  encoder_arm.init(hi2c1,main_clock,nullptr,&encoder_arm_moving_avarage);
+  encoder_arm.init(hi2c1,main_clock,nullptr,nullptr);
   
 
   //-------------------MOVEMENT CONTROLER CONFIGURATION-------------------
@@ -149,14 +145,14 @@ void id_config(){
   bacis_controler.set_max_acceleration(1.0f);
   bacis_controler.set_target_pos_max_error(0.001f);
 
+
   movement_controler.set_limit_position(config.movement_limit_lower, config.movement_limit_upper);
   movement_controler.set_max_velocity(config.movement_max_velocity);
-  movement_controler.init(main_clock, stp_motor, encoder_arm, encoder_motor, bacis_controler);
-
+  movement_controler.init(main_clock, stp_motor, encoder_arm, encoder_motor, pass_through_controler);
 }
 
 void post_id_config(){
-  log_debug("\"state\":\"post_id_config\"");
+  log_debug(loger.parse_to_json_format("state","post_id_config"));
   CAN_FilterTypeDef can_filter;
   can_filter.FilterBank = 1;
   can_filter.FilterFIFOAssignment = CAN_FILTER_FIFO0;
@@ -275,7 +271,6 @@ void main_loop(){
     can_controler.handle();
     
     if(tim_encoder.triggered()){
-      bool ping =encoder_motor.ping_encoder();
       encoder_arm.handle();
       encoder_motor.handle();
     }
@@ -298,10 +293,9 @@ void main_loop(){
         loger.parse_to_json_format("Tbor",std::to_string(temoperature_board))+
         loger.parse_to_json_format("Tmot",std::to_string(temoperature_steper_driver))+
         loger.parse_to_json_format("Eang",std::to_string(encoder_arm.get_angle()))+
-        loger.parse_to_json_format("Vvel",std::to_string(encoder_arm.get_velocity()))+
         loger.parse_to_json_format("Pos",std::to_string(movement_controler.get_current_position()))+
-        loger.parse_to_json_format("EPos",std::to_string(encoder_motor.get_absoulute_angle()))+
         loger.parse_to_json_format("Vel",std::to_string(movement_controler.get_current_velocity()))+
+        loger.parse_to_json_format("EPos",std::to_string(encoder_motor.get_absoulute_angle()))+
         loger.parse_to_json_format("Err",std::to_string(error_data.get_amount_of_errors()))+
         loger.parse_to_json_format("Errs",
           loger.parse_to_json_format("teng",BOOL_TO_STRING(error_data.temp_engine_overheating))+

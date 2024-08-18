@@ -80,6 +80,7 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
   "app/BoardId/src/board_id.cpp"
   "app/Contolers/src/pid_controler.cpp"
   "app/Contolers/src/basic_controler.cpp"
+  "app/Contolers/src/pass_through_controler.cpp"
   "app/Temperature_sensors/src/ntc_termistors.cpp"
   "app/Temperature_sensors/src/MCP9700AT.cpp"
   )

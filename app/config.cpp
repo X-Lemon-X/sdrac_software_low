@@ -165,7 +165,7 @@ const IdConfig config_id_3 = {
   CAN_KONARM_3_CLEAR_ERRORS_FRAME_ID,
 
   400.0f,
-  40.0f,
+  1.0f,
   2.0f,
   0.01f,
   false,
@@ -178,15 +178,15 @@ const IdConfig config_id_3 = {
   0.0f,
   false,
   0.0f,
-  10,
+  1,
 
   0.9f,
   0.0f,
   0.1f,
 
   PI,
-  -1.089126f,
-  4.236856f,
+  -std::numeric_limits<float>::max(),
+  std::numeric_limits<float>::max(),
 };
 
 const IdConfig config_id_4 = {

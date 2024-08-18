@@ -171,7 +171,7 @@ Encoder& Encoder::set_magnes_detection_register(uint8_t magnes_detection_registe
   return *this;
 }
   
-Encoder& Encoder::set_enable_pos_filter(bool enable_filter){
+Encoder& Encoder::set_enable_position_filter(bool enable_filter){
   this->enable_filter = enable_filter;
   return *this;
 }

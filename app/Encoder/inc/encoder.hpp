@@ -133,7 +133,7 @@ public:
   
   /// @brief sets the enable filter of the encoder 
   /// @param enable_filter true if the filter is enabled
-  Encoder& set_enable_pos_filter(bool enable_filter);
+  Encoder& set_enable_position_filter(bool enable_filter);
   
   /// @brief sets the enable velocity of the encoder 
   /// @param enable_velocity true if the you wnat the velocity to be calculated
