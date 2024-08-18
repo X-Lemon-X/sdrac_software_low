@@ -46,6 +46,8 @@ void Encoder::init(I2C_HandleTypeDef &hi2c, TIMING::Ticker &ticker, FILTERS::Fil
   this->current_velocity = 0;
   this->over_drive_angle = 0;
 
+  bool connected = ping_encoder();
+
   float angle = read_angle_rads();
   // correct the angle begin value to avoid false rotation dircetion 
   // after first starting after power down

@@ -8,6 +8,7 @@
 #include "filter_alfa_beta.hpp"
 #include "ntc_termistors.hpp"
 #include "pin.hpp"
+#include <limits>
 
 //**************************************************************************************************
 // Gpio assigments
@@ -165,14 +166,14 @@ const IdConfig config_id_3 = {
 
   400.0f,
   40.0f,
-  PI,
+  2.0f,
   0.01f,
   false,
 
-  -0.240067f,
-  true,
-  PI_m3d2,
-  0,
+  -2.617355f,
+  false,
+  PI,
+  10,
 
   0.0f,
   false,

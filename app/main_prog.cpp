@@ -110,14 +110,18 @@ void id_config(){
 
   //-------------------ENCODER STEPER MOTOR POSITION CONFIGURATION-------------------
   // to do
-  encoder_motor.set_function_to_read_angle(ENCODER::translate_reg_to_angle_AS5600)
-               .set_offset(config.encoder_motor_offset)
-               .set_reverse(config.encoder_motor_reverse)
-               .set_enable_pos_filter(false)
-               .set_enable_velocity(true)
-               .set_enable_velocity_filter(false)
-               .set_velocity_sample_amount(config.encoder_motor_velocity_sample_amount)
-               .set_dead_zone_correction_angle(config.encoder_motor_dead_zone_correction_angle);
+  encoder_motor.set_function_to_read_angle(ENCODER::translate_reg_to_angle_AS5600);
+  encoder_motor.set_offset(config.encoder_motor_offset);
+  encoder_motor.set_reverse(config.encoder_motor_reverse);
+  encoder_motor.set_enable_pos_filter(false);
+  encoder_motor.set_enable_velocity(true);
+  encoder_motor.set_enable_velocity_filter(false);
+  encoder_motor.set_velocity_sample_amount(config.encoder_motor_velocity_sample_amount);
+  encoder_motor.set_resolution(ENCODER_AS5600_RESOLUTION);
+  encoder_motor.set_angle_register(ENCODER_AS5600_ANGLE_REG);
+  encoder_motor.set_address(ENCODER_AS5600_I2C_ADDRESS); 
+  encoder_motor.set_dead_zone_correction_angle(config.encoder_motor_dead_zone_correction_angle);
+              
   encoder_motor.init(hi2c1,main_clock,nullptr,nullptr);
 
 
@@ -132,6 +136,9 @@ void id_config(){
   encoder_arm.set_enable_velocity_filter(true);
   encoder_arm.set_velocity_sample_amount(config.encoder_arm_velocity_sample_amount);
   encoder_arm.set_dead_zone_correction_angle(config.encoder_arm_dead_zone_correction_angle);
+  encoder_arm.set_angle_register(ENCODER_MT6701_ANGLE_REG);
+  encoder_arm.set_resolution(ENCODER_MT6702_RESOLUTION);
+  encoder_arm.set_address(ENCODER_MT6701_I2C_ADDRESS);
   encoder_arm.init(hi2c1,main_clock,nullptr,&encoder_arm_moving_avarage);
   
 
@@ -268,6 +275,7 @@ void main_loop(){
     can_controler.handle();
     
     if(tim_encoder.triggered()){
+      bool ping =encoder_motor.ping_encoder();
       encoder_arm.handle();
       encoder_motor.handle();
     }
@@ -292,6 +300,7 @@ void main_loop(){
         loger.parse_to_json_format("Eang",std::to_string(encoder_arm.get_angle()))+
         loger.parse_to_json_format("Vvel",std::to_string(encoder_arm.get_velocity()))+
         loger.parse_to_json_format("Pos",std::to_string(movement_controler.get_current_position()))+
+        loger.parse_to_json_format("EPos",std::to_string(encoder_motor.get_absoulute_angle()))+
         loger.parse_to_json_format("Vel",std::to_string(movement_controler.get_current_velocity()))+
         loger.parse_to_json_format("Err",std::to_string(error_data.get_amount_of_errors()))+
         loger.parse_to_json_format("Errs",

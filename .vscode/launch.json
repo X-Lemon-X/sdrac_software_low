@@ -13,12 +13,13 @@
     {
       "name": "Cortex Debug",
       "cwd": "${workspaceFolder}",
-      "preLaunchTask": "CMake:build",
-      "executable": "./build/firmware.elf",
+      "executable": "build/firmware.elf",
       "request": "launch",
       "type": "cortex-debug",
       "runToEntryPoint": "main",
-      "servertype": "stlink"
+      "servertype": "stlink",
+      "showDevDebugOutput": "raw"
     }
   ]
 }
+      // "preLaunchTask": "CMake:build",
