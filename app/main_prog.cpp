@@ -23,6 +23,7 @@
 #include "MCP9700AT.hpp"
 #include "Timing.hpp"
 #include "config.hpp"
+#include <cstddef>
 #include <limits>
 #include <string>
 #include <charconv>
@@ -111,14 +112,14 @@ void id_config(){
   encoder_motor.set_reverse(config.encoder_motor_reverse);
   encoder_motor.set_enable_position_filter(false);
   encoder_motor.set_enable_velocity(true);
-  encoder_motor.set_enable_velocity_filter(true);
+  encoder_motor.set_enable_velocity_filter(false);
   encoder_motor.set_velocity_sample_amount(config.encoder_motor_velocity_sample_amount);
   encoder_motor.set_resolution(ENCODER_AS5600_RESOLUTION);
   encoder_motor.set_angle_register(ENCODER_AS5600_ANGLE_REG);
   encoder_motor.set_address(ENCODER_AS5600_I2C_ADDRESS); 
   encoder_motor.set_dead_zone_correction_angle(config.encoder_motor_dead_zone_correction_angle);
               
-  encoder_motor_moving_avarage.set_size(10); // 15 for smooth movement but delay with sampling to 50
+  encoder_motor_moving_avarage.set_size(50); // 15 for smooth movement but delay with sampling to 50
   encoder_motor.init(hi2c1,main_clock,nullptr,&encoder_motor_moving_avarage);
 
 

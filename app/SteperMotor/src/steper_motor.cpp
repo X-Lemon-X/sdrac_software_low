@@ -27,6 +27,11 @@ void SteperMotor::init(){
   uint32_t prescaler = htim.Instance->PSC;
   this->radians_to_frequency = core_freq / prescaler / ((this->steps_per_revolution * this->gear_ratio) / PIM2  );
 
+  // equaions to get frequency that will give us desired velocity
+  // base frequency
+  // frequency = velocity * steps_pre_revolutions * gear_ratio
+  // 
+
   if (this->reverse){
     this->direction_positive = GPIO_PIN_RESET;
     this->direction_negative = GPIO_PIN_SET;

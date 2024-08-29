@@ -27,7 +27,7 @@ def read_serial_data(port):
       try:
         json_data = json.loads(line)
         time = json_data['time']
-        pos = json_data['msg']['Pos']
+        pos = json_data['msg']['EPos']
         velocity = json_data['msg']['Vel']
         print(f"{time};{pos};{velocity}")
         # Process the JSON data and print it in a nice-looking format

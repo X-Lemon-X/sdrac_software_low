@@ -95,7 +95,7 @@ const IdConfig config_id_1 ={
   400.0f,
   40.0f,
   PI,
-  0.01f,
+  0.03f,
   false,
 
   -5.23547649f,
@@ -131,7 +131,7 @@ const IdConfig config_id_2 = {
   400.0f,
   40.0f,
   2.0f,
-  0.01f,
+  0.03f,
   true,
 
   -2.617355f,
@@ -166,25 +166,25 @@ const IdConfig config_id_3 = {
 
   400.0f,
   1.0f,
-  2.0f,
-  0.01f,
+  PI_m2,
+  0.03f,
   false,
 
   -2.617355f,
   false,
   PI,
-  10,
+  1,
 
   0.0f,
   false,
   0.0f,
-  1,
+  20,
 
   0.9f,
   0.0f,
   0.1f,
 
-  PI,
+  PI_m2,
   -std::numeric_limits<float>::max(),
   std::numeric_limits<float>::max(),
 };
@@ -203,7 +203,7 @@ const IdConfig config_id_4 = {
   400.0f,
   71.9f,
   PI,
-  0.01f,
+  0.03f,
   false,
 
   0.0f,
@@ -239,7 +239,7 @@ const IdConfig config_id_5 = {
   400.0f,
   71.9f,
   PI,
-  0.01f,
+  0.03f,
   false,
 
   0.0f,
@@ -275,7 +275,7 @@ const IdConfig config_id_6 = {
   400.0f,
   71.9f,
   PI,
-  0.01f,
+  0.03f,
   false,
 
   0.0f,
