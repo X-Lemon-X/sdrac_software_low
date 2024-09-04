@@ -13,10 +13,13 @@ RUN apt-get install -y \
   build-essential \
   curl 
 
-
+# Set the environment variable for the version
+ARG VERSION
+ENV VERSION=${VERSION}
 # Download and unpack the ARM GNU toolchain
 RUN curl -o arm-gnu-toolchain.tar.xz  -O https://armkeil.blob.core.windows.net/developer/Files/downloads/gnu/13.3.rel1/binrel/arm-gnu-toolchain-13.3.rel1-x86_64-arm-none-eabi.tar.xz &&\
-  tar -xf arm-gnu-toolchain.tar.xz && \
+  mkdir -p /agt/arm-gnu-toolchain && \  
+  tar -xf arm-gnu-toolchain.tar.xz -C /agt/arm-gnu-toolchain --strip-components=1 && \
   rm arm-gnu-toolchain.tar.xz
 
 # Add the toolchain to the PATH
