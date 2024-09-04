@@ -23,7 +23,7 @@ jobs:
       - name: Save binary file
         run: cp build/firmware.bin ${{ github.workspace }}/firmware.bin
 
-build-docker:
+  build-docker:
     runs-on: self-hosted
     container:
       image: xlemonx/arm-gnu-toolchain:13.3.1
