@@ -40,6 +40,11 @@ jobs:
 
       - name: Save binary file
         run: cp build/firmware.bin firmware.bin
+      
+      - uses: actions/upload-artifact@v2
+        with:
+          name: Executable
+          path: firmware.bin
 
 
   # deploy:
