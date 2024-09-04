@@ -39,7 +39,7 @@ jobs:
         run: cmake --build build 
 
       - name: Save binary file
-        run: cp build/firmware.bin ${{ github.workspace }}/firmware.bin
+        run: cp build/firmware.bin firmware.bin
 
 
   deploy:
