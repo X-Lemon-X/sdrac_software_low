@@ -42,12 +42,12 @@ jobs:
         run: cp build/firmware.bin firmware.bin
 
 
-  deploy:
-    needs: build
-    runs-on: [self-hosted, linux]
-    steps:
-      - name: Upload artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: Executable
-          path: ${{ github.workspace }}/firmware.bin
+  # deploy:
+  #   needs: build
+  #   runs-on: [self-hosted, linux]
+  #   steps:
+  #     - name: Upload artifact
+  #       uses: actions/upload-artifact@v2
+  #       with:
+  #         name: Executable
+  #         path: ${{ github.workspace }}/firmware.bin
