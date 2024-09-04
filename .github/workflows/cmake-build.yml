@@ -41,10 +41,17 @@ jobs:
       - name: Save binary file
         run: cp build/firmware.bin firmware.bin
       
-      - uses: actions/upload-artifact@v2
+      - name: Archive bianry files
+        uses: actions/upload-artifact@v4
         with:
-          name: Executable
-          path: firmware.bin
+          name: Firmware bin
+          path: build/firmware.bin
+      - name: Archive bianry files
+        uses: actions/upload-artifact@v4
+        with:
+          name: Firmware elf
+          path: build/firmware.elf
+
 
 
   # deploy:

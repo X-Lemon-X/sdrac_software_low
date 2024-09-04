@@ -1,5 +1,18 @@
 
-<img align="right" src="https://github.com/X-Lemon-X/sdrac_software_low/actions/workflows/cmake-build.yml/badge.svg" />
+<!-- <img align="right" src="https://github.com/X-Lemon-X/sdrac_software_low/actions/workflows/cmake-build.yml/badge.svg" /> -->
+
+| Build Type | Build Status |
+|-|-|
+| Docker build | [![Build](https://github.com/X-Lemon-X/sdrac_software_low/actions/workflows/cmake-build.yml/badge.svg)](https://github.com/X-Lemon-X/sdrac_software_low/actions/workflows/cmake-build.yml) |
+
+<!-- <img align="right" src="https://github.com/X-Lemon-X/sdrac_software_low/actions/workflows/cmake-build.yml/badge.svg" /> -->
+
+| Firmware | File |
+|-|-|
+| bin | []() |
+| elf | []() |
+
+
 
 # SDRAC
 This is a a low level software for SDRACboards from SDRAC project (6DOF Manipulator). It is written in C++ and uses STM32CubeMX HAL library.
