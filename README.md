@@ -9,8 +9,7 @@
 
 | Firmware | File |
 |-|-|
-| bin | []() |
-| elf | []() |
+| SDRAC | [latest firmware](https://github.com/X-Lemon-X/sdrac_software_low/releases/latest) |
 
 
 
