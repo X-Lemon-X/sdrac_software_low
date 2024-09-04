@@ -23,6 +23,25 @@ jobs:
       - name: Save binary file
         run: cp build/firmware.bin ${{ github.workspace }}/firmware.bin
 
+build-docker:
+    runs-on: self-hosted
+    container:
+      image: xlemonx/arm-gnu-toolchain:13.3.1
+      volumes:
+        - builds:/builds
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure CMake
+        run: cmake -B build
+
+      - name: Build project
+        run: cmake --build build 
+
+      - name: Save binary file
+        run: cp build/firmware.bin ${{ github.workspace }}/firmware.bin
+
+
   deploy:
     needs: build
     runs-on: [self-hosted, linux]
