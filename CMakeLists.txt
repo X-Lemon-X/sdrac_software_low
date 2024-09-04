@@ -22,6 +22,7 @@ endif()
 # Set the project name
 set(CMAKE_PROJECT_NAME sdrac_cubemx)
 set(PROEJCT_MAJOR_VERSION 3)
+option(COPY_COMPILE_COMMANDS "Copy compile_commands.json to project root" OFF)
 
 
 # Include toolchain file
@@ -118,16 +119,23 @@ target_link_libraries(${CMAKE_PROJECT_NAME}
 )
 
 
-
-
-
 add_custom_command(
 	TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
 	COMMAND ${CMAKE_OBJCOPY} -O binary ${CMAKE_PROJECT_NAME}.elf firmware.bin
 	COMMAND ${CMAKE_OBJCOPY} -O ihex ${CMAKE_PROJECT_NAME}.elf firmware.hex
 	COMMAND ${CMAKE_SIZE} ${CMAKE_PROJECT_NAME}.elf
   COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_PROJECT_NAME}.elf firmware.elf
-  COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/compile_commands.json ${CMAKE_SOURCE_DIR}/compile_commands.json
+  # COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/compile_commands.json ${CMAKE_SOURCE_DIR}/compile_commands.json
   # COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/update-software-version.sh ${CMAKE_SOURCE_DIR}/.git/hooks/post-commit
   COMMAND ${CMAKE_SOURCE_DIR}/update-software-version.sh ${CMAKE_SOURCE_DIR} ${PROEJCT_MAJOR_VERSION}
  )
+
+if( COPY_COMPILE_COMMANDS )
+  message(STATUS "Copying compile_commands.json")
+  add_custom_command(
+    TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/compile_commands.json ${CMAKE_SOURCE_DIR}/compile_commands.json
+  )
+else()
+  message(STATUS "Not copying compile_commands.json")
+endif()
