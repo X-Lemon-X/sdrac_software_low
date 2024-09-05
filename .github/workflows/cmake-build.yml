@@ -20,8 +20,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          clean: false
-          set-safe-directory: false
+          fetch-depth: 50
+          submodules: true
 
       - name: Init environment
         run: ./init-build.sh
