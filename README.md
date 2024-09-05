@@ -3,7 +3,7 @@
 
 | Build Type | Build Status |
 |-|-|
-| Docker build | [![Build](https://github.com/X-Lemon-X/sdrac_software_low/actions/workflows/cmake-build.yml/badge.svg)](https://github.com/X-Lemon-X/sdrac_software_low/actions/workflows/cmake-build.yml) |
+| Build firmware | [![Build](https://github.com/X-Lemon-X/sdrac_software_low/actions/workflows/cmake-build.yml/badge.svg)](https://github.com/X-Lemon-X/sdrac_software_low/actions/workflows/cmake-build.yml) |
 
 <!-- <img align="right" src="https://github.com/X-Lemon-X/sdrac_software_low/actions/workflows/cmake-build.yml/badge.svg" /> -->
 
