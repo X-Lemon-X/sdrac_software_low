@@ -17,7 +17,7 @@ jobs:
       volumes:
         - builds:/builds
     steps:
-      - uses: actions/checkout@v4
+      # - uses: actions/checkout@v4
 
       - name: Init environment
         run: ./init-build.sh
