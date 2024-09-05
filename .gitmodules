@@ -1,0 +1,3 @@
+[submodule "ariadna_constants"]
+	path = submodules/ariadna_constants
+	url = ../ariadna_constants.git
