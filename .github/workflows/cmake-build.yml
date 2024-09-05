@@ -24,7 +24,7 @@ jobs:
           submodules: true
 
       - name: Init environment
-        run: ./init-build.sh
+        run: git config --global --add safe.directory "*" && ./init-build.sh
 
       - name: Configure CMake
         run: cmake -B build
