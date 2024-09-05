@@ -9,19 +9,6 @@ on:
       - main
 
 jobs:
-  # build:
-  #   runs-on: self-hosted
-  #   steps:
-  #     - uses: actions/checkout@v4
-
-  #     - name: Configure CMake
-  #       run: cmake -B build
-
-  #     - name: Build project
-  #       run: cmake --build build 
-
-  #     - name: Save binary file
-  #       run: cp build/firmware.bin ${{ github.workspace }}/firmware.bin
 
   build-docker:
     runs-on: self-hosted
@@ -31,6 +18,9 @@ jobs:
         - builds:/builds
     steps:
       - uses: actions/checkout@v4
+
+      - name: Init environment
+        run: ./init-build.sh
 
       - name: Configure CMake
         run: cmake -B build
