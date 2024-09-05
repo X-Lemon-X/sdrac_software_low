@@ -18,6 +18,9 @@ jobs:
         - builds:/builds
     steps:
       - uses: actions/checkout@v4
+        with:
+          clean: false
+          set-safe-directory: false
 
       - name: Init environment
         run: ./init-build.sh
