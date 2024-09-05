@@ -11,7 +11,7 @@
 #include "filter_moving_avarage.hpp"
 #include "can_control.hpp"
 #include "board_id.hpp"
-#include "CanDB.h"
+#include "can.h"
 #include "movement_controler.hpp"
 #include "pid_controler.hpp"
 #include "basic_controler.hpp"
@@ -36,7 +36,7 @@ CONTROLER::PIDControler pid_pos(main_clock);
 CONTROLER::BasicControler bacis_controler(main_clock);
 CONTROLER::PassThroughControler pass_through_controler(main_clock);
 FILTERS::Filter_moving_avarage encoder_motor_moving_avarage(main_clock);
-TIMING::Timing tim_can_disconnected(main_clock);
+TIMING::Timing tim_can_disconnecteded(main_clock);
 
 float temoperature_board = 0;
 float temoperature_steper_driver = 0;
@@ -211,7 +211,7 @@ void handle_can_rx(){
   uint8_t status =  can_controler.get_message(&recived_msg);
   __enable_irq();
   if(status != 0) return;
-  tim_can_disconnected.reset();
+  tim_can_disconnecteded.reset();
 
   if(recived_msg.frame_id == config.can_konarm_set_pos_frame_id){
     can_konarm_1_set_pos_t signals;
@@ -264,7 +264,7 @@ void main_loop(){
   tim_encoder.set_behaviour(TIMING::frequency_to_period(TIMING_ENCODER_UPDATE_FQ), true);
   tim_usb.set_behaviour(TIMING::frequency_to_period(TIMING_USB_RECIVED_DATA_FQ), true);
   tim_data_usb_send.set_behaviour(TIMING::frequency_to_period(TIMING_USB_SEND_DATA_FQ), true);
-  tim_can_disconnected.set_behaviour(TIMING_CAN_DISCONNECTED_PERIOD, false);
+  tim_can_disconnecteded.set_behaviour(TIMING_CAN_DISCONNECTED_PERIOD, false);
   tim_caculate_temp.set_behaviour(TIMING::frequency_to_period(TIMING_READ_TEMPERATURE_FQ), true);
 
   while (true){
@@ -276,13 +276,13 @@ void main_loop(){
       encoder_motor.handle();
     }
 
-    if(tim_can_disconnected.triggered()){      
+    if(tim_can_disconnecteded.triggered()){      
       movement_controler.set_enable(false);
       movement_controler.set_velocity(0);
       movement_controler.set_position(movement_controler.get_current_position());
-      error_data.can_disconnect = true;
+      error_data.can_disconnected = true;
     }else{
-      error_data.can_disconnect = false;
+      error_data.can_disconnected = false;
     }
     
     movement_controler.handle();
@@ -309,7 +309,7 @@ void main_loop(){
           loger.parse_to_json_format("encmotdis",BOOL_TO_STRING(error_data.encoder_motor_disconnect))+
           loger.parse_to_json_format("bovolt",BOOL_TO_STRING(error_data.baord_overvoltage))+
           loger.parse_to_json_format("buvolt",BOOL_TO_STRING(error_data.baord_undervoltage))+
-          loger.parse_to_json_format("candis",BOOL_TO_STRING(error_data.can_disconnect))+
+          loger.parse_to_json_format("candis",BOOL_TO_STRING(error_data.can_disconnected))+
           loger.parse_to_json_format("canerr",BOOL_TO_STRING(error_data.can_error))+
           loger.parse_to_json_format("motlimit",BOOL_TO_STRING(error_data.controler_motor_limit_position),false)
         ,false,true)

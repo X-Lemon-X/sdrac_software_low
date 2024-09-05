@@ -330,7 +330,7 @@ unsigned int ErrorData::get_amount_of_errors() const {
          (uint8_t)encoder_motor_disconnect + 
          (uint8_t)baord_overvoltage +
          (uint8_t)baord_undervoltage + 
-         (uint8_t)can_disconnect + 
+         (uint8_t)can_disconnected + 
          (uint8_t)can_error + 
          (uint8_t)controler_motor_limit_position;
 }

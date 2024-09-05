@@ -166,7 +166,7 @@ public:
   bool baord_undervoltage = false;
 
   // can errors
-  bool can_disconnect = false;
+  bool can_disconnected = false;
   bool can_error = false;
 
   // other errors
@@ -275,7 +275,7 @@ extern ErrorData error_data;
 // debug loging options
 
 
-#define _LOG_LVL 4
+// #define _LOG_LVL 4
 
 #ifdef LOG_DEBUG
   #define _LOG_LVL 0

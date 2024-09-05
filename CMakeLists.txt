@@ -62,51 +62,55 @@ add_subdirectory(cmake/stm32cubemx)
 # Add sources to executable
 target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     # Add user sources here
-  "app/main_prog_callbacks.cpp"
-  "app/main_prog.cpp"
-  "app/config.cpp"
-  "app/Encoder/src/encoder.cpp"
-  "app/Logger/src/logger.cpp"
-  "app/Timing/src/Timing.cpp"
-  "app/UsbPrograming/src/usb_programer.cpp"
-  "app/SteperMotor/src/steper_motor.cpp"
-  "app/Filter/src/filter.cpp"
-  "app/Filter/src/filter_alfa_beta.cpp"
-  "app/Filter/src/filter_moving_avarage.cpp"
-  "app/Memory/src/fram_menager.cpp"
-  "app/CanControl/src/can_control.cpp"
-  "app/MovementControl/src/movement_controler.cpp"
-  "app/CanControl/src/CanDB.c"
-  "app/CanControl/src/can_control.cpp"
-  "app/BoardId/src/board_id.cpp"
-  "app/Contolers/src/pid_controler.cpp"
-  "app/Contolers/src/basic_controler.cpp"
-  "app/Contolers/src/pass_through_controler.cpp"
-  "app/Temperature_sensors/src/ntc_termistors.cpp"
-  "app/Temperature_sensors/src/MCP9700AT.cpp"
+  "lib/main_prog_callbacks.cpp"
+  "lib/main_prog.cpp"
+  "lib/config.cpp"
+  "lib/Encoder/src/encoder.cpp"
+  "lib/Logger/src/logger.cpp"
+  "lib/Timing/src/Timing.cpp"
+  "lib/UsbPrograming/src/usb_programer.cpp"
+  "lib/SteperMotor/src/steper_motor.cpp"
+  "lib/Filter/src/filter.cpp"
+  "lib/Filter/src/filter_alfa_beta.cpp"
+  "lib/Filter/src/filter_moving_avarage.cpp"
+  "lib/Memory/src/fram_menager.cpp"
+  "lib/CanControl/src/can_control.cpp"
+  "lib/MovementControl/src/movement_controler.cpp"
+  
+  "lib/CanControl/src/can_control.cpp"
+  "lib/BoardId/src/board_id.cpp"
+  "lib/Contolers/src/pid_controler.cpp"
+  "lib/Contolers/src/basic_controler.cpp"
+  "lib/Contolers/src/pass_through_controler.cpp"
+  "lib/Temperature_sensors/src/ntc_termistors.cpp"
+  "lib/Temperature_sensors/src/MCP9700AT.cpp"
+  
+  "submodules/ariadna_constants/can_messages/output/can.c"
   )
-
+# "lib/CanControl/src/CanDB.c"
 
 
 # Add include paths
 
 target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE
-  "app"
-  "app/Encoder/inc"
-  "app/Logger/inc"
-  "app/Memory/inc"
-  "app/Timing/inc"
-  "app/UsbPrograming/inc"
-  "app/SteperMotor/inc"
-  "app/Filter/inc"
-  "app/Memory/inc"
-  "app/CanControl/inc"
-  "app/MovementControl/inc"
-  "app/BoardId/inc"
-  "app/Contolers/inc"
-  "app/Temperature_sensors/inc"
-  "app/list/inc"
-  "app/Gpio/inc"
+  "lib"
+  "lib/Encoder/inc"
+  "lib/Logger/inc"
+  "lib/Memory/inc"
+  "lib/Timing/inc"
+  "lib/UsbPrograming/inc"
+  "lib/SteperMotor/inc"
+  "lib/Filter/inc"
+  "lib/Memory/inc"
+  "lib/CanControl/inc"
+  "lib/MovementControl/inc"
+  "lib/BoardId/inc"
+  "lib/Contolers/inc"
+  "lib/Temperature_sensors/inc"
+  "lib/list/inc"
+  "lib/Gpio/inc"
+
+  "submodules/ariadna_constants/can_messages/output"
   )
 
 
@@ -127,7 +131,7 @@ add_custom_command(
   COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_PROJECT_NAME}.elf firmware.elf
   # COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/compile_commands.json ${CMAKE_SOURCE_DIR}/compile_commands.json
   # COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/update-software-version.sh ${CMAKE_SOURCE_DIR}/.git/hooks/post-commit
-  COMMAND ${CMAKE_SOURCE_DIR}/update-software-version.sh ${CMAKE_SOURCE_DIR} ${PROEJCT_MAJOR_VERSION}
+  COMMAND ${CMAKE_SOURCE_DIR}/scripts/shell/update-software-version.sh ${CMAKE_SOURCE_DIR} ${PROEJCT_MAJOR_VERSION}
  )
 
 if( COPY_COMPILE_COMMANDS )
