@@ -243,6 +243,27 @@ void handle_can_rx(){
   }
   else if (recived_msg.frame_id == config.can_konarm_clear_errors_frame_id){
   }
+  else if (recived_msg.frame_id == config.can_konarm_get_errors_frame_id) {
+    CAN_CONTROL::CAN_MSG send_msg;
+    can_konarm_1_get_errors_t src_p;
+    send_msg.frame_id = config.can_konarm_get_errors_frame_id;
+    src_p.temp_engine_overheating = can_konarm_1_get_errors_temp_engine_overheating_encode(error_data.temp_engine_overheating);
+    src_p.temp_driver_overheating = can_konarm_1_get_errors_temp_driver_overheating_encode(error_data.temp_driver_overheating);
+    src_p.temp_board_overheating = can_konarm_1_get_errors_temp_board_overheating_encode(error_data.temp_board_overheating);
+    src_p.temp_engine_sensor_disconnect = can_konarm_1_get_errors_temp_engine_sensor_disconnect_encode(error_data.temp_engine_sensor_disconnect);
+    src_p.temp_driver_sensor_disconnect = can_konarm_1_get_errors_temp_driver_sensor_disconnect_encode(error_data.temp_driver_sensor_disconnect);
+    src_p.temp_board_sensor_disconnect = can_konarm_1_get_errors_temp_board_sensor_disconnect_encode(error_data.temp_board_sensor_disconnect);
+    src_p.encoder_arm_disconnect = can_konarm_1_get_errors_encoder_arm_disconnect_encode(error_data.encoder_arm_disconnect);
+    src_p.encoder_motor_disconnect = can_konarm_1_get_errors_encoder_motor_disconnect_encode(error_data.encoder_motor_disconnect);
+    src_p.board_overvoltage = can_konarm_1_get_errors_board_overvoltage_encode(error_data.baord_overvoltage);
+    src_p.board_undervoltage = can_konarm_1_get_errors_board_undervoltage_encode(error_data.baord_undervoltage);
+    src_p.can_disconnected = can_konarm_1_get_errors_can_disconnected_encode(error_data.can_disconnected);
+    src_p.can_error = can_konarm_1_get_errors_can_error_encode(error_data.can_error);
+    src_p.controler_motor_limit_position = can_konarm_1_get_errors_controler_motor_limit_position_encode(error_data.controler_motor_limit_position);
+    send_msg.data_size = CAN_KONARM_1_GET_ERRORS_LENGTH;
+    can_konarm_1_get_errors_pack(send_msg.data, &src_p, send_msg.data_size);
+    can_controler.send_msg_to_queue(send_msg);
+  }
   else{
     error_data.can_error = true;
   }

@@ -33,7 +33,8 @@
 #define LOG_SHOW_TIMESTAMP true
 
 //**************************************************************************************************
-// BOARD IDs
+// BOARD IDs  else if()
+
 #define BOARD_ID_0 0x0
 #define BOARD_ID_1 0x1
 #define BOARD_ID_2 0x2
@@ -104,6 +105,8 @@ uint32_t can_konarm_status_frame_id;
 uint32_t can_konarm_set_pos_frame_id;
 uint32_t can_konarm_get_pos_frame_id;
 uint32_t can_konarm_clear_errors_frame_id;
+uint32_t can_konarm_get_errors_frame_id;
+
 
 // Steper motor config
 float stepper_motor_steps_per_rev;
