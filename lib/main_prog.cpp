@@ -263,13 +263,13 @@ void handle_can_rx(){
     send_msg.data_size = CAN_KONARM_1_GET_ERRORS_LENGTH;
     can_konarm_1_get_errors_pack(send_msg.data, &src_p, send_msg.data_size);
     can_controler.send_msg_to_queue(send_msg);
+    // we reset can errors after sending the frame wth erro so we can se if its repraing itself
+    error_data.can_error = false;
   }
   else{
+    // trigeerd when the frame is not recognized
     error_data.can_error = true;
   }
-
-  // delete recived_msg;
-  // free(recived_msg);
 }
 
 void main_loop(){
