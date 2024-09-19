@@ -100,23 +100,23 @@ const IdConfig config_id_1 ={
   0.03f,
   false,
 
-  -5.23547649f,
-  true,
   0.0f,
+  true,
+  PI,
   0,
 
   0.0f,
   false,
   0.0f,
-  10,
+  0,
 
   0.9f,
   0.0f,
   0.1f,
 
   PI,
-  -PI,
-  PI,
+  -std::numeric_limits<float>::max(),
+  std::numeric_limits<float>::max(),
 };
 
 const IdConfig config_id_2 = {
@@ -137,7 +137,7 @@ const IdConfig config_id_2 = {
   0.03f,
   true,
 
-  -2.617355f,
+  0.0f,
   false,
   PI,
   10,
@@ -145,7 +145,7 @@ const IdConfig config_id_2 = {
   0.0f,
   false,
   0.0f,
-  10,
+  0,
 
   0.9f,
   0.0f,
@@ -169,20 +169,20 @@ const IdConfig config_id_3 = {
   CAN_KONARM_3_GET_ERRORS_FRAME_ID,
 
   400.0f,
-  1.0f,
+  40.0f,
   PI_m2,
   0.03f,
   false,
 
-  -2.617355f,
+  0.0f,
   false,
   PI,
   1,
 
   0.0f,
   false,
-  0.0f,
-  20,
+  -PI_d2,
+  0,
 
   0.9f,
   0.0f,

@@ -55,7 +55,8 @@
 //**************************************************************************************************
 // I2C CONSTANTS
 #define ENCODER_MT6701_ANGLE_REG 0x03
-#define ENCODER_MT6701_I2C_ADDRESS 0xC // ds:b0000110 << 1 =  0b0001100 = 0xC
+#define ENCODER_MT6701_I2C_ADDRESS 0xC // 0x06 ds:b0000110  << 1 =  0b00001100 = 0xC
+#define ENCODER_MT6701_I2C_ADDRESS_2 0x8C // 0x46 ds:b01000110  << 1 =  0b10001100 = 0x8C
 #define ENCODER_MT6702_RESOLUTION 16384
 
 #define ENCODER_AS5600_I2C_ADDRESS 0x6C // ds:0x36 << 1 = 0b0110 1100 = 0x6C 

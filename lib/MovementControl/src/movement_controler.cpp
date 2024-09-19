@@ -53,7 +53,7 @@ void MovementControler::handle(){
     limit_positon_achieved = false;
   }
 
-  current_velocity = new_velocity;
+  // current_velocity = new_velocity;
   steper_motor->set_enable(enable);
   steper_motor->set_velocity(new_velocity);
 }

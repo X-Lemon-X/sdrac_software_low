@@ -106,17 +106,16 @@ void id_config(){
   stp_motor.set_enable(false);  
 
   //-------------------ENCODER STEPER MOTOR POSITION CONFIGURATION-------------------
-  // to do
-  encoder_motor.set_function_to_read_angle(ENCODER::translate_reg_to_angle_AS5600);
+  encoder_motor.set_function_to_read_angle(ENCODER::translate_reg_to_angle_MT6701);
   encoder_motor.set_offset(config.encoder_motor_offset);
   encoder_motor.set_reverse(config.encoder_motor_reverse);
   encoder_motor.set_enable_position_filter(false);
   encoder_motor.set_enable_velocity(true);
   encoder_motor.set_enable_velocity_filter(false);
   encoder_motor.set_velocity_sample_amount(config.encoder_motor_velocity_sample_amount);
-  encoder_motor.set_resolution(ENCODER_AS5600_RESOLUTION);
-  encoder_motor.set_angle_register(ENCODER_AS5600_ANGLE_REG);
-  encoder_motor.set_address(ENCODER_AS5600_I2C_ADDRESS); 
+  encoder_motor.set_resolution(ENCODER_MT6702_RESOLUTION);
+  encoder_motor.set_angle_register(ENCODER_MT6701_ANGLE_REG);
+  encoder_motor.set_address(ENCODER_MT6701_I2C_ADDRESS_2); 
   encoder_motor.set_dead_zone_correction_angle(config.encoder_motor_dead_zone_correction_angle);
               
   encoder_motor_moving_avarage.set_size(50); // 15 for smooth movement but delay with sampling to 50
@@ -124,7 +123,6 @@ void id_config(){
 
 
   //-------------------ENCODER ARM POSITION CONFIGURATION-------------------
-  
   encoder_arm.set_function_to_read_angle(ENCODER::translate_reg_to_angle_MT6701);
   encoder_arm.set_offset(config.encoder_arm_offset);
   encoder_arm.set_reverse(config.encoder_arm_reverse);
@@ -190,9 +188,9 @@ void error_checks(){
   error_data.temp_board_overheating = !std::isnan(temoperature_board) && temoperature_board > ERRORS_MAX_TEMP_BOARD? true : false;
   error_data.temp_driver_overheating = !std::isnan(temoperature_steper_driver) && temoperature_steper_driver > ERRORS_MAX_TEMP_DRIVER? true : false;
   error_data.temp_engine_overheating = !std::isnan(temoperature_steper_motor) && temoperature_steper_motor > ERRORS_MAX_TEMP_ENGINE? true : false;
-  error_data.temp_board_sensor_disconnect = std::isnan(temoperature_board)? true : false;
-  error_data.temp_driver_sensor_disconnect = std::isnan(temoperature_steper_driver)? true : false;
-  error_data.temp_engine_sensor_disconnect = std::isnan(temoperature_steper_motor)? true : false;
+  error_data.temp_board_sensor_disconnect = std::isnan(temoperature_board);
+  error_data.temp_driver_sensor_disconnect = std::isnan(temoperature_steper_driver);
+  error_data.temp_engine_sensor_disconnect = std::isnan(temoperature_steper_motor);
 
   error_data.encoder_arm_disconnect = !encoder_arm.is_connected();
   error_data.encoder_motor_disconnect = !encoder_motor.is_connected();
