@@ -17,21 +17,6 @@
 This is a a low level software for SDRACboards from SDRAC project (6DOF Manipulator). It is written in C++ and uses STM32CubeMX HAL library.
 The project is based on the STM32F412RGT6 microcontroller.
 
-## TO DO:
- - simple arm control alogrithm ( PID ?  P is working for velocity control)
- - reading/writing data to FRAM
- - IO control from CAN ?
-## DONE:
- - reading ADC (sort of working)
- - USB data reciving/sending
- - distingushing between different baords
- - CAN reciving/sending data
- - steper motor interface
- - ADC interface
- - reading angles from encoder
- - Timing and timers main system clock with microsecond precision
-
-
 ## After cloning the project
 After cloning the project you have to bind a git hook to the project. In order to have the automatic software version generation.
 To do that you have to run the following command in the project directory
