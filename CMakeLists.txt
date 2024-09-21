@@ -32,7 +32,6 @@ if(CCACHE_PROGRAM)
 endif()
 
 
-
 # Include toolchain file
 include("cmake/gcc-arm-none-eabi.cmake")
 
@@ -63,7 +62,7 @@ add_executable(${CMAKE_PROJECT_NAME})
 add_subdirectory(cmake/stm32cubemx)
 
 
-#include ${UPPER_PROJECT_NAME} library
+#include StmEpic library (whekk its not  a library)
 set(STMEPIC_BARD_ID ON)
 set(STMEPIC_CAN_CONTROLER ON)
 set(STMEPIC_ENCODERS ON)
@@ -71,13 +70,8 @@ set(STMEPIC_LOGGER ON)
 set(STMEPIC_MOVEMENT ON)
 set(STMEPIC_SENSORS ON)
 set(STMEPIC_USB_PROGRAMING ON)
-add_subdirectory(src/Stm_Epic)
+add_subdirectory(src/StmEpic)
 
-
-# Link directories setup
-# target_link_directories(${CMAKE_PROJECT_NAME} PRIVATE
-#     # Add user defined library search paths
-# )
 
 # Add sources to executable
 target_sources(${CMAKE_PROJECT_NAME} PRIVATE
@@ -96,14 +90,12 @@ target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE
 )
 
 
-
-
 target_link_libraries(${CMAKE_PROJECT_NAME}
   stm32cubemx
   # Add user defined libraries
 )
 
-
+# Add post build commands
 add_custom_command(
 	TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
 	COMMAND ${CMAKE_OBJCOPY} -O binary ${CMAKE_PROJECT_NAME}.elf firmware.bin

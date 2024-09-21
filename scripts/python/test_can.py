@@ -5,7 +5,7 @@ import time
 
 can_bus = can.interface.Bus('can0', bustype='socketcan', bitrate=250000)
 
-db = cantools.database.load_file('canbus/can.dbc')
+db = cantools.database.load_file('../../src/ariadna_constants/can_messages/output/can.dbc')
 
 msg_status = db.get_message_by_name('konarm_1_status')
 msg_set_pos = db.get_message_by_name('konarm_1_set_pos')
