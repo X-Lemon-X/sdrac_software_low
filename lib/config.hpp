@@ -251,11 +251,6 @@ extern TIM_HandleTypeDef htim3;
 
 /// @brief TIM handler for the IO use
 extern TIM_HandleTypeDef htim8;
-
-/// @brief TIM handler for the [us] precision clock
-extern TIM_HandleTypeDef htim10;
-
-/// @brief UART handler for the IO use
 extern UART_HandleTypeDef huart3;
 
 /// @brief USB handler for on board USB-C
@@ -264,6 +259,7 @@ extern USBD_HandleTypeDef hUsbDeviceFS;
 //**************************************************************************************************
 // GLOBAL OBEJCTS
 
+extern std::string version_string;
 extern LOGGER::Logger loger;
 extern TIMING::Ticker main_clock;
 extern BOARD_ID::Board_id board_id;

@@ -2,13 +2,14 @@
 #include "steper_motor.hpp"
 #include "movement_controler.hpp"
 #include "usb_programer.hpp"
-#include "pid_controler.hpp"
+#include "controler_pid.hpp"
 #include "filter.hpp"
 #include "filter_moving_avarage.hpp"
 #include "filter_alfa_beta.hpp"
 #include "ntc_termistors.hpp"
 #include "pin.hpp"
 #include <limits>
+#include <string>
 
 //**************************************************************************************************
 // Gpio assigments
@@ -316,10 +317,11 @@ const IdConfig config_id_6 = {
 //**************************************************************************************************
 // Global stuff
 
+std::string version_string = std::to_string(VERSION_MAJOR)+"."+std::to_string(VERSION_MINOR) + "." + std::to_string(VERSION_BUILD);
 uint32_t adc_dma_buffer[ADC_DMA_BUFFER_SIZE+1];
 IdConfig config;
 TIMING::Ticker main_clock;
-LOGGER::Logger loger(LOG_LOGER_LEVEL,LOG_SHOW_TIMESTAMP);
+LOGGER::Logger loger(LOG_LOGER_LEVEL,LOG_SHOW_TIMESTAMP, version_string);
 BOARD_ID::Board_id board_id(pin_cid_0, pin_cid_1, pin_cid_2);
 
 STEPER_MOTOR::SteperMotor stp_motor(htim3, TIM_CHANNEL_1, pin_steper_direction, pin_steper_enable);
@@ -327,7 +329,7 @@ CAN_CONTROL::CanControl can_controler;
 MOVEMENT_CONTROLER::MovementControler movement_controler;
 ENCODER::Encoder encoder_arm;
 ENCODER::Encoder encoder_motor;
-USB_PROGRAMER::UsbProgramer usb_programer(pin_boot_device);
+USB_PROGRAMER::UsbProgramer usb_programer(pin_boot_device,loger);
 NTCTERMISTORS::NtcTermistors temp_steper_driver(UC_SUPPLY_VOLTAGE,TERMISTOR_RESISTANCE);
 NTCTERMISTORS::NtcTermistors temp_steper_motor(UC_SUPPLY_VOLTAGE,TERMISTOR_RESISTANCE);
 ErrorData error_data;

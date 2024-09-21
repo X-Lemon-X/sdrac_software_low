@@ -13,9 +13,9 @@
 #include "board_id.hpp"
 #include "can.h"
 #include "movement_controler.hpp"
-#include "pid_controler.hpp"
-#include "basic_controler.hpp"
-#include "pass_through_controler.hpp"
+#include "controler_pid.hpp"
+#include "controler_linear.hpp"
+#include "controler_pass_through.hpp"
 #include "pin.hpp"
 #include "ntc_termistors.hpp"
 #include "version.hpp"
@@ -66,7 +66,7 @@ void periferal_config(){
   // timer 10 settings
   HAL_NVIC_SetPriority(TIM1_TRG_COM_TIM11_IRQn,6,0);
   HAL_NVIC_EnableIRQ(TIM1_TRG_COM_TIM11_IRQn);
-  HAL_TIM_Base_Start_IT(&htim10);
+  HAL_TIM_Base_Start_IT(&htim1);
 
   // timer 3 settings
   HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_1);
@@ -81,7 +81,7 @@ void id_config(){
   log_debug(loger.parse_to_json_format("state","id_config"));
 
   std::string info = "SDRACboard\n";
-  info += "Software version:" + std::to_string(VERSION_MAJOR) + "." + std::to_string(VERSION_MINOR) + "." + std::to_string(VERSION_BUILD) + "\n";
+  info += "Software version:" + version_string + "\n";
   info += "Board id: " + std::to_string(board_id.get_id()) + "\n";
   info += "Description: SDRACboard from SDRAC project https://nihilia.xyz  https://konar.pwr.edu.pl\n";
   usb_programer.set_info(info);
