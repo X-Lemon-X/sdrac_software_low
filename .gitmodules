@@ -1,6 +1,3 @@
 [submodule "ariadna_constants"]
 	path = src/ariadna_constants
 	url = https://github.com/X-Lemon-X/ariadna_constants.git
-[submodule "lib/Stm_Epic"]
-	path = src/Stm_Epic
-	url = git@github.com:X-Lemon-X/Stm_Epic.git
