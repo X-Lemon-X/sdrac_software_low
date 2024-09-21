@@ -29,10 +29,10 @@ def read_serial_data(port):
         time = json_data['time']
         pos = json_data['msg']['EPos']
         velocity = json_data['msg']['Vel']
-        print(f"{time};{pos};{velocity}")
+        # print(f"{time};{pos};{velocity}")
         # Process the JSON data and print it in a nice-looking format
-        # json_str = json.dumps(json_data, indent=2)
-        # print(json_str)
+        json_str = json.dumps(json_data, indent=2)
+        print(json_str)
         # Process the JSON data and update the chart
         # data_serial.append(json_data)
         # # Print the JSON data in a table format

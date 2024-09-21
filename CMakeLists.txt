@@ -24,6 +24,13 @@ set(CMAKE_PROJECT_NAME sdrac_cubemx)
 set(PROEJCT_MAJOR_VERSION 3)
 option(COPY_COMPILE_COMMANDS "Copy compile_commands.json to project root" OFF)
 
+## enable ccache if available
+find_program(CCACHE_PROGRAM ccache)
+if(CCACHE_PROGRAM)
+    set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "${CCACHE_PROGRAM}")
+    set_property(GLOBAL PROPERTY RULE_LAUNCH_LINK "${CCACHE_PROGRAM}")
+endif()
+
 
 # Include toolchain file
 include("cmake/gcc-arm-none-eabi.cmake")
@@ -107,7 +114,7 @@ target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE
   "lib/BoardId/inc"
   "lib/Contolers/inc"
   "lib/Temperature_sensors/inc"
-  "lib/list/inc"
+  "lib/containers/inc"
   "lib/Gpio/inc"
 
   "submodules/ariadna_constants/can_messages/output"
@@ -132,6 +139,8 @@ add_custom_command(
   # COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/compile_commands.json ${CMAKE_SOURCE_DIR}/compile_commands.json
   # COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/update-software-version.sh ${CMAKE_SOURCE_DIR}/.git/hooks/post-commit
   COMMAND ${CMAKE_SOURCE_DIR}/scripts/shell/update-software-version.sh ${CMAKE_SOURCE_DIR} ${PROEJCT_MAJOR_VERSION}
+  # Show ccache statistics
+  COMMAND ${CCACHE_PROGRAM} -s
  )
 
 if( COPY_COMPILE_COMMANDS )

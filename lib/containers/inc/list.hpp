@@ -1,5 +1,4 @@
-#include "stm32f4xx_hal.h"
-#include "stdlib.h"
+#include <cstdlib>
 
 #ifndef LIST_HPP
 #define LIST_HPP

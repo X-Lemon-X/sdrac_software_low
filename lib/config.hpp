@@ -7,6 +7,7 @@
 #include <limits>
 #include "logger.hpp"
 #include "Timing.hpp"
+#include "can.h"
 #include "main.h"
 #include "stm32f4xx_hal.h"
 #include "usb_device.h"
@@ -115,6 +116,7 @@ float stepper_motor_gear_ratio;
 float stepper_motor_max_velocity;
 float stepper_motor_min_velocity;
 bool stepper_motor_reverse;
+bool stepper_motor_enable_reversed;
 
 // Encoder pos arm
 float encoder_arm_offset;

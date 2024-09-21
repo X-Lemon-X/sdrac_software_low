@@ -36,6 +36,7 @@ private:
   float prev_angle_velocity;
   float over_drive_angle;
   float absolute_angle;
+  float ratio;
 
   uint16_t resolution;
   float offset;
@@ -162,6 +163,11 @@ public:
   /// @param function the function that will be used to read the angle
   /// @return the angle in uint16_t in binary format for example 0-4095 or 0-16383
   Encoder& set_function_to_read_angle(uint16_t (*function)(uint8_t,uint8_t));
+
+  /// @brief set the ratio that will be multiplayed by value of the angle and velocity
+  /// @param ratio the ratio that will be multiplayed by value of the angle and velocity
+  Encoder& set_ratio(float ratio);
+
 };
 
 

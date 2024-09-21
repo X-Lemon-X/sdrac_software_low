@@ -81,7 +81,7 @@ void id_config(){
   log_debug(loger.parse_to_json_format("state","id_config"));
 
   std::string info = "SDRACboard\n";
-  info += "Software version:" + std::to_string(VERSION_MAJOR) + "." + std::to_string(VERSION_MINOR) + "\n";
+  info += "Software version:" + std::to_string(VERSION_MAJOR) + "." + std::to_string(VERSION_MINOR) + "." + std::to_string(VERSION_BUILD) + "\n";
   info += "Board id: " + std::to_string(board_id.get_id()) + "\n";
   info += "Description: SDRACboard from SDRAC project https://nihilia.xyz  https://konar.pwr.edu.pl\n";
   usb_programer.set_info(info);
@@ -102,6 +102,7 @@ void id_config(){
   stp_motor.set_max_velocity(config.stepper_motor_max_velocity);
   stp_motor.set_min_velocity(config.stepper_motor_min_velocity);
   stp_motor.set_reverse(config.stepper_motor_reverse);
+  stp_motor.set_enable_reversed(config.stepper_motor_enable_reversed);
   stp_motor.init();
   stp_motor.set_enable(false);  
 
@@ -117,7 +118,7 @@ void id_config(){
   encoder_motor.set_angle_register(ENCODER_MT6701_ANGLE_REG);
   encoder_motor.set_address(ENCODER_MT6701_I2C_ADDRESS_2); 
   encoder_motor.set_dead_zone_correction_angle(config.encoder_motor_dead_zone_correction_angle);
-              
+  encoder_motor.set_ratio(1.0f / stp_motor.get_gear_ratio());
   encoder_motor_moving_avarage.set_size(50); // 15 for smooth movement but delay with sampling to 50
   encoder_motor.init(hi2c1,main_clock,nullptr,&encoder_motor_moving_avarage);
 
@@ -168,7 +169,6 @@ void post_id_config(){
   can_controler.init(hcan1, CAN_FILTER_FIFO0, main_clock, pin_tx_led, pin_rx_led);
   HAL_CAN_Start(&hcan1);
   HAL_CAN_ActivateNotification(&hcan1, CAN_IT_RX_FIFO0_MSG_PENDING ); //| CAN_IT_RX_FIFO1_MSG_PENDING); 
-
 
   // init the movement controler should be done after the encoder and the steper motor are initialized
   movement_controler.set_position(encoder_arm.get_angle());
@@ -308,6 +308,7 @@ void main_loop(){
 
     if(tim_data_usb_send.triggered()){
       log_info(
+        loger.parse_to_json_format("ID",std::to_string(board_id.get_id()))+
         loger.parse_to_json_format("Vsen",std::to_string(voltage_vcc))+
         loger.parse_to_json_format("Tste",std::to_string(temoperature_steper_motor))+
         loger.parse_to_json_format("Tbor",std::to_string(temoperature_board))+

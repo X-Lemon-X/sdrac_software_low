@@ -4,6 +4,21 @@
 
 #include <string>
 
+// you can define the version of the software by defineing this 3 values
+#ifndef VERSION_MAJOR
+#define VERSION_MAJOR 0
+#endif
+
+#ifndef VERSION_MINOR
+#define VERSION_MINOR 0
+#endif
+
+#ifndef VERSION_BUILD
+#define VERSION_BUILD 0
+#endif
+
+#define BOOL_TO_STRING(b) (b ? "1" : "0")
+
 namespace LOGGER {
 
 enum class LOG_LEVEL {
@@ -13,7 +28,7 @@ enum class LOG_LEVEL {
   LOG_LEVEL_ERROR=3
 };
 
-#define BOOL_TO_STRING(b) (b ? "1" : "0")
+
 
 class Logger {
 private:

@@ -1,8 +1,7 @@
 #include "logger.hpp"
-#include "main.h"
 #include "usbd_cdc_if.h"
-#include "config.hpp"
 using namespace LOGGER;
+
 
 
 Logger::Logger(LOG_LEVEL level, bool _print_info): log_level(level),print_info(_print_info) {}
@@ -33,8 +32,7 @@ void Logger::transmit(std::string msg,std::string prefix){
     msg = 
         "{\"time\":\""+std::to_string(HAL_GetTick())+ 
         "\",\"level\":\""+prefix+
-        "\",\"ver\":\"" + std::to_string(VERSION_MAJOR) + "." + std::to_string(VERSION_MINOR)+
-        "\",\"id\":\"" + std::to_string(board_id.get_id())+
+        "\",\"ver\":\"" + std::to_string(VERSION_MAJOR) + "." + std::to_string(VERSION_MINOR)+ "." + std::to_string(VERSION_BUILD)+
         "\",\"msg\":{" + msg + "}}\n";
   }else{
     msg += "\n";

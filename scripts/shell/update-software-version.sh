@@ -8,11 +8,31 @@ echo "Software version: [$major_version.$minor_version]"
 # Define the destination file
 dst_file="$1/lib/version.hpp"
 
+# read versions from the file
+file_major_version=$(cat $dst_file | grep "VERSION_MAJOR" | cut -d' ' -f3)
+file_minor_version=$(cat $dst_file | grep "VERSION_MINOR" | cut -d' ' -f3)
+file_build_number=$(cat $dst_file | grep "VERSION_BUILD" | cut -d' ' -f3)
+
+# if build number is empty, set it to 0
+if [ -z "$file_build_number" ]; then
+  build_number=0
+fi
+
+# if current minor version is greater than the one in the file, set build number to 0
+if [ $minor_version -eq $file_minor_version ]; then
+  build_number=$(($file_build_number+1))
+else
+  build_number=0
+fi
+
 # Generate the version.hpp file
-echo "#ifndef VERSION_HPP" > $dst_file
-echo "#define VERSION_HPP" >> $dst_file
-echo "" >> $dst_file
-echo "#define VERSION_MAJOR $major_version" >> $dst_file
-echo "#define VERSION_MINOR $minor_version" >> $dst_file
-echo "" >> $dst_file
-echo "#endif // VERSION_HPP" >> $dst_file
+cat <<EOF > $dst_file
+#ifndef VERSION_HPP
+#define VERSION_HPP
+
+#define VERSION_MAJOR $major_version
+#define VERSION_MINOR $minor_version
+#define VERSION_BUILD $build_number
+
+#endif // VERSION_HPP
+EOF

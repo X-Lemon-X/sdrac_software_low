@@ -1,14 +1,8 @@
 
 #include "can_control.hpp"
-#include "can.h"
-#include "stm32f4xx_hal.h"
-#include "main.h"
-#include "main_prog.hpp"
-#include <string.h>
-#include "stdlib.h"
 #include "list.hpp"
 #include "circular_buffor.hpp"
-
+#include <cstring>
 
 using namespace CAN_CONTROL;
 
@@ -55,16 +49,16 @@ void CanControl::blink_rx_led(){
 
 void CanControl::irq_handle_rx(){
   blink_rx_led();
-  if (HAL_CAN_GetRxMessage(can_interface, can_fifo, &header, data) != HAL_OK)
-    return;
-  if ((header.StdId & filter_mask) != filter_base_id)
-    return;
-
+  if (HAL_CAN_GetRxMessage(can_interface, can_fifo, &header, data) != HAL_OK) return;
+  if (((header.StdId & filter_mask) != filter_base_id) && ((header.ExtId & filter_mask) != filter_base_id)) return;
   CAN_MSG msg;
-  msg.frame_id = header.StdId;
+  if(header.IDE == CAN_ID_EXT)
+    msg.frame_id = header.ExtId;
+  else
+    msg.frame_id = header.StdId;
   msg.remote_request = header.RTR == CAN_RTR_REMOTE;
   msg.data_size = header.DLC;
-  memcpy(msg.data,data,msg.data_size);
+  if(!msg.remote_request) memcpy(msg.data,data,msg.data_size);
   (void)rx_msg_buffor.push_back(msg);
 }
 

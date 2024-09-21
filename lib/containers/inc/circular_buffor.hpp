@@ -1,8 +1,7 @@
 #ifndef __CIRCUALR_BUFFOR_HPP__
 #define __CIRCUALR_BUFFOR_HPP__
 
-#include <stdint.h>
-#include <string.h>
+#include <cstdint>
 
 
 namespace CIRCULAR_BUFFOR{

@@ -38,7 +38,7 @@ void MovementControler::init(TIMING::Ticker &_ticker, STEPER_MOTOR::SteperMotor 
 void MovementControler::handle(){
   if (!initialized) return;
   current_position = encoder_pos->get_absoulute_angle();
-  current_velocity = encoder_vel->get_velocity();
+  // current_velocity = encoder_vel->get_velocity();
   
   float new_velocity = movement_equation->calculate(current_position, target_position, current_velocity, target_velocity);
   // current_velocity = new_velocity;
@@ -53,7 +53,7 @@ void MovementControler::handle(){
     limit_positon_achieved = false;
   }
 
-  // current_velocity = new_velocity;
+  current_velocity = new_velocity;
   steper_motor->set_enable(enable);
   steper_motor->set_velocity(new_velocity);
 }

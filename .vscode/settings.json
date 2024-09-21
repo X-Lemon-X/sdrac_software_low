@@ -66,5 +66,6 @@
     "list": "cpp",
     "cfloat": "cpp"
   },
-  "ros.distro": "humble"
+  "ros.distro": "humble",
+  "cortex-debug.variableUseNaturalFormat": false
 }

@@ -1,8 +1,5 @@
 
-#include "main.h"
 #include "encoder.hpp"
-#include "stm32f4xx_hal.h"
-// #include <stdexcept>
 #include <cmath>
 
 using namespace ENCODER;
@@ -45,6 +42,7 @@ void Encoder::init(I2C_HandleTypeDef &hi2c, TIMING::Ticker &ticker, FILTERS::Fil
   this->last_time = ticker.get_seconds();
   this->current_velocity = 0;
   this->over_drive_angle = 0;
+  this->ratio = 1;
 
   bool connected = ping_encoder();
 
@@ -92,7 +90,7 @@ float Encoder::calculate_velocity(float angle){
 }
 
 float Encoder::read_angle_rads(){
-  float angle =  (float)read_raw_angle()*PI_m2 / (float)this->resolution;
+  float angle =  (float)read_raw_angle()*PI_m2 / (float)this->resolution * this->ratio;
   if(this->reverse) angle = PI_m2 - angle;
   angle += this->offset;
   if (angle > PI_m2) angle -= PI_m2;
@@ -192,11 +190,16 @@ Encoder& Encoder::set_velocity_sample_amount(uint16_t velocity_samples_amount){
 }
 
 Encoder& Encoder::set_dead_zone_correction_angle(float dead_zone_correction_angle){
-  this->dead_zone_correction_angle = abs(dead_zone_correction_angle);
+  this->dead_zone_correction_angle = std::abs(dead_zone_correction_angle);
   return *this;
 }
 
 Encoder& Encoder::set_function_to_read_angle(uint16_t (*function)(uint8_t,uint8_t)){
   this->translate_reg_to_angle_function = function;
+  return *this;
+}
+
+Encoder& Encoder::set_ratio(float ratio){
+  this->ratio = ratio;
   return *this;
 }

@@ -62,6 +62,7 @@ const IdConfig config_id_default ={
   0.0f,
   0.0f,
   false,
+  false,
 
   0.0f,
   false,
@@ -98,6 +99,7 @@ const IdConfig config_id_1 ={
   40.0f,
   PI,
   0.03f,
+  false,
   false,
 
   0.0f,
@@ -136,6 +138,7 @@ const IdConfig config_id_2 = {
   2.0f,
   0.03f,
   true,
+  false,
 
   0.0f,
   false,
@@ -172,6 +175,7 @@ const IdConfig config_id_3 = {
   40.0f,
   PI_m2,
   0.03f,
+  false,
   false,
 
   0.0f,
@@ -210,6 +214,7 @@ const IdConfig config_id_4 = {
   PI,
   0.03f,
   false,
+  true,
 
   0.0f,
   true,
@@ -247,6 +252,7 @@ const IdConfig config_id_5 = {
   PI,
   0.03f,
   false,
+  true,
 
   0.0f,
   true,
@@ -273,10 +279,10 @@ const IdConfig config_id_6 = {
   0x660,
   0x000,
 
-  CAN_KONARM_5_STATUS_FRAME_ID,
-  CAN_KONARM_5_SET_POS_FRAME_ID,
-  CAN_KONARM_5_GET_POS_FRAME_ID,
-  CAN_KONARM_5_CLEAR_ERRORS_FRAME_ID,
+  CAN_KONARM_6_STATUS_FRAME_ID,
+  CAN_KONARM_6_SET_POS_FRAME_ID,
+  CAN_KONARM_6_GET_POS_FRAME_ID,
+  CAN_KONARM_6_CLEAR_ERRORS_FRAME_ID,
   CAN_KONARM_6_GET_ERRORS_FRAME_ID,
 
   400.0f,
@@ -284,6 +290,7 @@ const IdConfig config_id_6 = {
   PI,
   0.03f,
   false,
+  true,
 
   0.0f,
   true,
