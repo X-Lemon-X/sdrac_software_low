@@ -71,7 +71,7 @@ set(STMEPIC_LOGGER ON)
 set(STMEPIC_MOVEMENT ON)
 set(STMEPIC_SENSORS ON)
 set(STMEPIC_USB_PROGRAMING ON)
-add_subdirectory(lib/Stm_Epic)
+add_subdirectory(src/Stm_Epic)
 
 
 # Link directories setup
@@ -82,67 +82,24 @@ add_subdirectory(lib/Stm_Epic)
 # Add sources to executable
 target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     # Add user sources here
-  "lib/main_prog_callbacks.cpp"
-  "lib/main_prog.cpp"
-  "lib/config.cpp"
-  
-  "submodules/ariadna_constants/can_messages/output/can.c"
-  )
-  # "lib/Encoder/src/encoder.cpp"
-  # "lib/Logger/src/logger.cpp"
-  # "lib/Timing/src/Timing.cpp"
-  # "lib/UsbPrograming/src/usb_programer.cpp"
-  # "lib/SteperMotor/src/steper_motor.cpp"
-  # "lib/Filter/src/filter.cpp"
-  # "lib/Filter/src/filter_alfa_beta.cpp"
-  # "lib/Filter/src/filter_moving_avarage.cpp"
-  # "lib/Memory/src/fram_menager.cpp"
-  # "lib/CanControl/src/can_control.cpp"
-  # "lib/MovementControl/src/movement_controler.cpp"
-  
-  # "lib/CanControl/src/can_control.cpp"
-  # "lib/BoardId/src/board_id.cpp"
-  # "lib/Contolers/src/pid_controler.cpp"
-  # "lib/Contolers/src/basic_controler.cpp"
-  # "lib/Contolers/src/pass_through_controler.cpp"
-  # "lib/Temperature_sensors/src/ntc_termistors.cpp"
-  # "lib/Temperature_sensors/src/MCP9700AT.cpp"
-
+  "src/main_prog_callbacks.cpp"
+  "src/main_prog.cpp"
+  "src/config.cpp"
+  "src/ariadna_constants/can_messages/output/can.c"
+)
 
 # Add include paths
 
 target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE
-  "lib"
-  
-  "submodules/ariadna_constants/can_messages/output"
-  )
-  # "lib/Encoder/inc"
-  # "lib/Logger/inc"
-  # "lib/Memory/inc"
-  # "lib/Timing/inc"
-  # "lib/UsbPrograming/inc"
-  # "lib/SteperMotor/inc"
-  # "lib/Filter/inc"
-  # "lib/Memory/inc"
-  # "lib/CanControl/inc"
-  # "lib/MovementControl/inc"
-  # "lib/BoardId/inc"
-  # "lib/Contolers/inc"
-  # "lib/Temperature_sensors/inc"
-  # "lib/containers/inc"
-  # "lib/Gpio/inc"
-
-
-# link_directories(lib/Stm_Epic)
-
-# Add linked libraries
+  "src"
+  "src/ariadna_constants/can_messages/output"
+)
 
 
 
 
-target_link_libraries(sdrac_cubemx
+target_link_libraries(${CMAKE_PROJECT_NAME}
   stm32cubemx
-  ${UPPER_PROJECT_NAME}
   # Add user defined libraries
 )
 

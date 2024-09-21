@@ -6,7 +6,7 @@ major_version=$2
 echo "Software version: [$major_version.$minor_version]"
 
 # Define the destination file
-dst_file="$1/lib/version.hpp"
+dst_file="$1/src/version.hpp"
 
 # read versions from the file
 file_major_version=$(cat $dst_file | grep "VERSION_MAJOR" | cut -d' ' -f3)
