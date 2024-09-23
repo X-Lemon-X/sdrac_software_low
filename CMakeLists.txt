@@ -79,6 +79,7 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
   "src/main_prog_callbacks.cpp"
   "src/main_prog.cpp"
   "src/config.cpp"
+  
   "src/ariadna_constants/can_messages/output/can.c"
 )
 

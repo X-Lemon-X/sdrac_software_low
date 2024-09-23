@@ -129,6 +129,7 @@ float encoder_motor_offset;
 bool  encoder_motor_reverse;
 float encoder_motor_dead_zone_correction_angle;
 uint16_t encoder_motor_velocity_sample_amount;
+bool encoder_motor_enable;
 
 // pid config
 float pid_p;
@@ -251,6 +252,10 @@ extern TIM_HandleTypeDef htim3;
 
 /// @brief TIM handler for the IO use
 extern TIM_HandleTypeDef htim8;
+
+/// @brief TIM handler for the [us] precision clock
+extern TIM_HandleTypeDef htim10;
+
 extern UART_HandleTypeDef huart3;
 
 /// @brief USB handler for on board USB-C

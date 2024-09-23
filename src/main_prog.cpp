@@ -66,7 +66,7 @@ void periferal_config(){
   // timer 10 settings
   HAL_NVIC_SetPriority(TIM1_TRG_COM_TIM11_IRQn,6,0);
   HAL_NVIC_EnableIRQ(TIM1_TRG_COM_TIM11_IRQn);
-  HAL_TIM_Base_Start_IT(&htim1);
+  HAL_TIM_Base_Start_IT(&htim10);
 
   // timer 3 settings
   HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_1);
@@ -106,22 +106,6 @@ void id_config(){
   stp_motor.init();
   stp_motor.set_enable(false);  
 
-  //-------------------ENCODER STEPER MOTOR POSITION CONFIGURATION-------------------
-  encoder_motor.set_function_to_read_angle(ENCODER::translate_reg_to_angle_MT6701);
-  encoder_motor.set_offset(config.encoder_motor_offset);
-  encoder_motor.set_reverse(config.encoder_motor_reverse);
-  encoder_motor.set_enable_position_filter(false);
-  encoder_motor.set_enable_velocity(true);
-  encoder_motor.set_enable_velocity_filter(false);
-  encoder_motor.set_velocity_sample_amount(config.encoder_motor_velocity_sample_amount);
-  encoder_motor.set_resolution(ENCODER_MT6702_RESOLUTION);
-  encoder_motor.set_angle_register(ENCODER_MT6701_ANGLE_REG);
-  encoder_motor.set_address(ENCODER_MT6701_I2C_ADDRESS_2); 
-  encoder_motor.set_dead_zone_correction_angle(config.encoder_motor_dead_zone_correction_angle);
-  encoder_motor.set_ratio(1.0f / stp_motor.get_gear_ratio());
-  encoder_motor_moving_avarage.set_size(50); // 15 for smooth movement but delay with sampling to 50
-  encoder_motor.init(hi2c1,main_clock,nullptr,&encoder_motor_moving_avarage);
-
 
   //-------------------ENCODER ARM POSITION CONFIGURATION-------------------
   encoder_arm.set_function_to_read_angle(ENCODER::translate_reg_to_angle_MT6701);
@@ -135,7 +119,25 @@ void id_config(){
   encoder_arm.set_angle_register(ENCODER_MT6701_ANGLE_REG);
   encoder_arm.set_resolution(ENCODER_MT6702_RESOLUTION);
   encoder_arm.set_address(ENCODER_MT6701_I2C_ADDRESS);
+  encoder_arm.set_enable_encoder(true);
   encoder_arm.init(hi2c1,main_clock,nullptr,nullptr);
+  
+  //-------------------ENCODER STEPER MOTOR POSITION CONFIGURATION-------------------
+  encoder_motor.set_function_to_read_angle(ENCODER::translate_reg_to_angle_MT6701);
+  encoder_motor.set_offset(config.encoder_motor_offset);
+  encoder_motor.set_reverse(config.encoder_motor_reverse);
+  encoder_motor.set_enable_position_filter(false);
+  encoder_motor.set_enable_velocity(true);
+  encoder_motor.set_enable_velocity_filter(false);
+  encoder_motor.set_velocity_sample_amount(config.encoder_motor_velocity_sample_amount);
+  encoder_motor.set_resolution(ENCODER_MT6702_RESOLUTION);
+  encoder_motor.set_angle_register(ENCODER_MT6701_ANGLE_REG);
+  encoder_motor.set_address(ENCODER_MT6701_I2C_ADDRESS_2); 
+  encoder_motor.set_dead_zone_correction_angle(config.encoder_motor_dead_zone_correction_angle);
+  encoder_motor.set_ratio(1.0f / stp_motor.get_gear_ratio());
+  encoder_motor.set_enable_encoder(config.encoder_motor_enable);
+  encoder_motor_moving_avarage.set_size(50); // 15 for smooth movement but delay with sampling to 50
+  encoder_motor.init(hi2c1,main_clock,nullptr,&encoder_motor_moving_avarage);
   
 
   //-------------------MOVEMENT CONTROLER CONFIGURATION-------------------
@@ -148,7 +150,12 @@ void id_config(){
 
   movement_controler.set_limit_position(config.movement_limit_lower, config.movement_limit_upper);
   movement_controler.set_max_velocity(config.movement_max_velocity);
-  movement_controler.init(main_clock, stp_motor, encoder_arm, encoder_motor, pass_through_controler);
+  movement_controler.set_position(config.movement_limit_upper);
+  if(config.encoder_motor_enable){
+    movement_controler.init(main_clock, stp_motor, encoder_arm, pass_through_controler,&encoder_motor);
+  }else{
+    movement_controler.init(main_clock, stp_motor, encoder_arm, pass_through_controler);
+  }
 }
 
 void post_id_config(){
@@ -292,7 +299,8 @@ void main_loop(){
     
     if(tim_encoder.triggered()){
       encoder_arm.handle();
-      encoder_motor.handle();
+      if(config.encoder_motor_enable)
+        encoder_motor.handle();
     }
 
     if(tim_can_disconnecteded.triggered()){      

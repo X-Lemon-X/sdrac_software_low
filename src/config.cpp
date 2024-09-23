@@ -74,6 +74,7 @@ const IdConfig config_id_default ={
   false,
   0.0f,
   0,
+  false,
 
   0.0f,
   0.0f,
@@ -112,7 +113,8 @@ const IdConfig config_id_1 ={
   false,
   0.0f,
   0,
-
+  true,
+  
   0.9f,
   0.0f,
   0.1f,
@@ -150,7 +152,8 @@ const IdConfig config_id_2 = {
   false,
   0.0f,
   0,
-
+  true,
+  
   0.9f,
   0.0f,
   0.1f,
@@ -188,7 +191,8 @@ const IdConfig config_id_3 = {
   false,
   -PI_d2,
   0,
-
+  true,
+  
   0.9f,
   0.0f,
   0.1f,
@@ -226,6 +230,7 @@ const IdConfig config_id_4 = {
   false,
   0.0f,
   10,
+  false,
 
   0.9f,
   0.0f,
@@ -264,6 +269,7 @@ const IdConfig config_id_5 = {
   false,
   0.0f,
   10,
+  false,
 
   0.9f,
   0.0f,
@@ -302,6 +308,7 @@ const IdConfig config_id_6 = {
   false,
   0.0f,
   10,
+  false,
 
   0.9f,
   0.0f,
