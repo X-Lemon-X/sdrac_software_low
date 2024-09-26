@@ -104,7 +104,7 @@ const IdConfig config_id_1 ={
   false,
   false,
 
-  0.0f,
+  0.21552419662475586f,
   true,
   PI,
   0,
@@ -120,8 +120,8 @@ const IdConfig config_id_1 ={
   0.1f,
 
   PI,
-  -std::numeric_limits<float>::max(),
-  std::numeric_limits<float>::max(),
+  -PI_m2,
+  PI_m2,
 };
 
 const IdConfig config_id_2 = {
@@ -143,8 +143,8 @@ const IdConfig config_id_2 = {
   true,
   false,
 
-  0.0f,
-  false,
+  -1.1063838005065918f,
+  true,
   PI,
   10,
 
@@ -159,8 +159,8 @@ const IdConfig config_id_2 = {
   0.1f,
 
   PI,
-  -std::numeric_limits<float>::max(),
-  std::numeric_limits<float>::max(),
+  -PI_d2,
+  PI_d2,
 };
 
 const IdConfig config_id_3 = {
@@ -182,7 +182,7 @@ const IdConfig config_id_3 = {
   false,
   false,
 
-  0.0f,
+  -1.4235341548919678f,
   false,
   PI,
   1,
@@ -197,9 +197,9 @@ const IdConfig config_id_3 = {
   0.0f,
   0.1f,
 
-  PI_m2,
-  -std::numeric_limits<float>::max(),
-  std::numeric_limits<float>::max(),
+  PI,
+  -1.1f,
+  4.28f,
 };
 
 const IdConfig config_id_4 = {
@@ -221,9 +221,9 @@ const IdConfig config_id_4 = {
   false,
   true,
 
-  0.0f,
+  -0.26422834396362305f,
   true,
-  PI_m3d2,
+  0,
   0,
 
   0.0f,
@@ -236,7 +236,7 @@ const IdConfig config_id_4 = {
   0.0f,
   0.1f,
 
-  PI,
+  1.0f,
   -std::numeric_limits<float>::max(),
   std::numeric_limits<float>::max(),
 };
@@ -260,9 +260,9 @@ const IdConfig config_id_5 = {
   false,
   true,
 
-  0.0f,
+  1.2448253631591797f,
   true,
-  PI_m3d2,
+  0,
   0,
 
   0.0f,
@@ -275,7 +275,7 @@ const IdConfig config_id_5 = {
   0.0f,
   0.1f,
 
-  PI,
+  1.0,
   -std::numeric_limits<float>::max(),
   std::numeric_limits<float>::max(),
 };
@@ -299,9 +299,9 @@ const IdConfig config_id_6 = {
   false,
   true,
 
-  0.0f,
+  -0.8528933525085449f,
   true,
-  PI_m3d2,
+  0,
   0,
 
   0.0f,
@@ -314,7 +314,7 @@ const IdConfig config_id_6 = {
   0.0f,
   0.1f,
 
-  PI,
+  1.0f,
   -std::numeric_limits<float>::max(),
   std::numeric_limits<float>::max(),
 };
