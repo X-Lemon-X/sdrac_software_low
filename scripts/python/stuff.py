@@ -1,14 +1,15 @@
 
 
 core_frequency = 96e6
-prescaler = 96 * 10
+prescaler = 32
 timer_frequency = core_frequency / prescaler
 
 PI = 3.14159265359
 
 
-velocity = 0.1
-steps_per_revolution = 400
+velocity = 0.05
+velocity2 = 2
+steps_per_revolution = 200*32
 gear_ratio = 1
 
 frequency =  steps_per_revolution * gear_ratio  / (2*PI)   * velocity
@@ -27,7 +28,8 @@ print(f"Frequency: {frequency}")
 print(f"Period: {period}")
 print(f"Single tick period: {single_tick_period}")
 print(f"Ticks per period: {ticks_per_period}")
-print(f"Ticks per period2: {ticks_per_period2(velocity)}")
+print(f"Ticks for vel:{str(velocity).ljust(10)} ticks:{ticks_per_period2(velocity)}")
+print(f"Ticks for vel:{str(velocity2).ljust(10)} ticks:{ticks_per_period2(velocity2)}")
 print(f"Tick time: {ticks_per_period * single_tick_period}")
 
 

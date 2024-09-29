@@ -64,6 +64,7 @@ const IdConfig config_id_default ={
   0.0f,
   false,
   false,
+  960,
 
   0.0f,
   false,
@@ -103,6 +104,7 @@ const IdConfig config_id_1 ={
   0.03f,
   false,
   false,
+  960,
 
   0.21552419662475586f,
   true,
@@ -142,6 +144,7 @@ const IdConfig config_id_2 = {
   0.03f,
   true,
   false,
+  960,
 
   -1.1063838005065918f,
   true,
@@ -181,6 +184,7 @@ const IdConfig config_id_3 = {
   0.03f,
   false,
   false,
+  960,
 
   -1.4235341548919678f,
   false,
@@ -214,14 +218,15 @@ const IdConfig config_id_4 = {
   CAN_KONARM_4_CLEAR_ERRORS_FRAME_ID,
   CAN_KONARM_4_GET_ERRORS_FRAME_ID,
 
-  400.0f,
+  6400.0f,
   71.9f,
   PI,
   0.03f,
   false,
   true,
+  32,
 
-  -0.26422834396362305f,
+  2.243063f,
   true,
   0,
   0,
@@ -253,14 +258,15 @@ const IdConfig config_id_5 = {
   CAN_KONARM_5_CLEAR_ERRORS_FRAME_ID,
   CAN_KONARM_5_GET_ERRORS_FRAME_ID,
 
-  400.0f,
+  6400.0f,
   71.9f,
   PI,
   0.03f,
   false,
   true,
+  32,
 
-  1.2448253631591797f,
+  2.619272f,
   true,
   0,
   0,
@@ -292,14 +298,15 @@ const IdConfig config_id_6 = {
   CAN_KONARM_6_CLEAR_ERRORS_FRAME_ID,
   CAN_KONARM_6_GET_ERRORS_FRAME_ID,
 
-  400.0f,
+  6400.0f,
   71.9f,
   PI,
   0.03f,
   false,
   true,
+  32,
 
-  -0.8528933525085449f,
+  1.159689f,
   true,
   0,
   0,
@@ -328,6 +335,7 @@ std::string version_string = std::to_string(VERSION_MAJOR)+"."+std::to_string(VE
 uint32_t adc_dma_buffer[ADC_DMA_BUFFER_SIZE+1];
 IdConfig config;
 TIMING::Ticker main_clock;
+TIMING::TimeScheduler task_timer_scheduler(main_clock);
 LOGGER::Logger loger(LOG_LOGER_LEVEL,LOG_SHOW_TIMESTAMP, version_string);
 BOARD_ID::Board_id board_id(pin_cid_0, pin_cid_1, pin_cid_2);
 

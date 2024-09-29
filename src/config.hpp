@@ -4,7 +4,9 @@
 
 // #include <cstddef>
 // #include <cstdint>
+#include <cstdint>
 #include <limits>
+#include <random>
 #include "logger.hpp"
 #include "Timing.hpp"
 #include "can.h"
@@ -117,6 +119,7 @@ float stepper_motor_max_velocity;
 float stepper_motor_min_velocity;
 bool stepper_motor_reverse;
 bool stepper_motor_enable_reversed;
+uint32_t stepper_motor_timer_prescaler;
 
 // Encoder pos arm
 float encoder_arm_offset;
@@ -267,6 +270,7 @@ extern USBD_HandleTypeDef hUsbDeviceFS;
 extern std::string version_string;
 extern LOGGER::Logger loger;
 extern TIMING::Ticker main_clock;
+extern TIMING::TimeScheduler task_timer_scheduler;
 extern BOARD_ID::Board_id board_id;
 extern ENCODER::Encoder encoder_arm;
 extern ENCODER::Encoder encoder_motor;
