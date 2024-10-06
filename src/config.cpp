@@ -106,7 +106,7 @@ const IdConfig config_id_1 ={
   false,
   960,
 
-  0.21552419662475586f,
+  -2.9145636558532715f,
   true,
   PI,
   0,
@@ -142,12 +142,12 @@ const IdConfig config_id_2 = {
   40.0f,
   2.0f,
   0.03f,
-  true,
+  false,
   false,
   960,
 
-  -1.1063838005065918f,
-  true,
+  1.1063838005065918f,
+  false,
   PI,
   10,
 
@@ -182,12 +182,12 @@ const IdConfig config_id_3 = {
   40.0f,
   PI_m2,
   0.03f,
-  false,
+  true,
   false,
   960,
 
-  -1.4235341548919678f,
-  false,
+  -1.6793255805969238f,
+  true,
   PI,
   1,
 
@@ -226,7 +226,7 @@ const IdConfig config_id_4 = {
   true,
   32,
 
-  2.243063f,
+  0.645806f,
   true,
   0,
   0,
@@ -266,7 +266,7 @@ const IdConfig config_id_5 = {
   true,
   32,
 
-  2.619272f,
+  1.164291f,
   true,
   0,
   0,
@@ -306,7 +306,7 @@ const IdConfig config_id_6 = {
   true,
   32,
 
-  1.159689f,
+  -2.034059f,
   true,
   0,
   0,

@@ -88,19 +88,10 @@ void periferal_config(){
 
   HAL_CAN_DeInit(&hcan1);
   HAL_CAN_Init(&hcan1);
-
-
 }
 
 void id_config(){
   log_debug(loger.parse_to_json_format("state","id_config"));
-
-  std::string info = "SDRACboard\n";
-  info += "Software version:" + version_string + "\n";
-  info += "Board id: " + std::to_string(board_id.get_id()) + "\n";
-  info += "Description: SDRACboard from SDRAC project https://nihilia.xyz  https://konar.pwr.edu.pl\n";
-  usb_programer.set_info(info);
-
   switch (board_id.get_id()){
   case BOARD_ID_1: config = config_id_1; break;
   case BOARD_ID_2: config = config_id_2; break;
@@ -110,7 +101,15 @@ void id_config(){
   case BOARD_ID_6: config = config_id_6; break;
   default: config = config_id_default; break;
   }
-  
+}
+
+void post_id_config(){
+  std::string info = "SDRACboard\n";
+  info += "Software version:" + version_string + "\n";
+  info += "Board id: " + std::to_string(board_id.get_id()) + "\n";
+  info += "Description: SDRACboard from SDRAC project https://nihilia.xyz  https://konar.pwr.edu.pl\n";
+  usb_programer.set_info(info);
+
   //-------------------STEPER MOTOR CONFIGURATION-------------------
   stp_motor.set_steps_per_revolution(config.stepper_motor_steps_per_rev);
   stp_motor.set_gear_ratio(config.stepper_motor_gear_ratio);
@@ -167,14 +166,15 @@ void id_config(){
   movement_controler.set_limit_position(config.movement_limit_lower, config.movement_limit_upper);
   movement_controler.set_max_velocity(config.movement_max_velocity);
   movement_controler.set_position(config.movement_limit_upper);
+
+  
   if(config.encoder_motor_enable){
     movement_controler.init(main_clock, stp_motor, encoder_arm, pass_through_controler,&encoder_motor);
   }else{
     movement_controler.init(main_clock, stp_motor, encoder_arm, pass_through_controler);
   }
-}
 
-void post_id_config(){
+
   log_debug(loger.parse_to_json_format("state","post_id_config"));
   CAN_FilterTypeDef can_filter;
   can_filter.FilterBank = 1;
