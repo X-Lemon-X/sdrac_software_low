@@ -127,7 +127,7 @@ int main(void)
   MX_TIM10_Init();
   MX_I2C3_Init();
   /* USER CODE BEGIN 2 */
-  main_prog();
+  run_main_prog();
   /* USER CODE END 2 */
 
   /* Infinite loop */

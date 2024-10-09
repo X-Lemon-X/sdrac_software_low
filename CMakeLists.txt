@@ -61,86 +61,53 @@ add_executable(${CMAKE_PROJECT_NAME})
 # Add STM32CubeMX generated sources
 add_subdirectory(cmake/stm32cubemx)
 
-# Link directories setup
-# target_link_directories(${CMAKE_PROJECT_NAME} PRIVATE
-#     # Add user defined library search paths
-# )
+
+#include StmEpic library (whekk its not  a library)
+set(STMEPIC_BARD_ID ON)
+set(STMEPIC_CAN_CONTROLER ON)
+set(STMEPIC_ENCODERS ON)
+set(STMEPIC_LOGGER ON)
+set(STMEPIC_MOVEMENT ON)
+set(STMEPIC_SENSORS ON)
+set(STMEPIC_USB_PROGRAMING ON)
+add_subdirectory(src/StmEpic)
+
 
 # Add sources to executable
 target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     # Add user sources here
-  "lib/main_prog_callbacks.cpp"
-  "lib/main_prog.cpp"
-  "lib/config.cpp"
-  "lib/Encoder/src/encoder.cpp"
-  "lib/Logger/src/logger.cpp"
-  "lib/Timing/src/Timing.cpp"
-  "lib/UsbPrograming/src/usb_programer.cpp"
-  "lib/SteperMotor/src/steper_motor.cpp"
-  "lib/Filter/src/filter.cpp"
-  "lib/Filter/src/filter_alfa_beta.cpp"
-  "lib/Filter/src/filter_moving_avarage.cpp"
-  "lib/Memory/src/fram_menager.cpp"
-  "lib/CanControl/src/can_control.cpp"
-  "lib/MovementControl/src/movement_controler.cpp"
+  "src/main_prog_callbacks.cpp"
+  "src/main_prog.cpp"
+  "src/config.cpp"
   
-  "lib/CanControl/src/can_control.cpp"
-  "lib/BoardId/src/board_id.cpp"
-  "lib/Contolers/src/pid_controler.cpp"
-  "lib/Contolers/src/basic_controler.cpp"
-  "lib/Contolers/src/pass_through_controler.cpp"
-  "lib/Temperature_sensors/src/ntc_termistors.cpp"
-  "lib/Temperature_sensors/src/MCP9700AT.cpp"
-  
-  "submodules/ariadna_constants/can_messages/output/can.c"
-  )
-# "lib/CanControl/src/CanDB.c"
-
+  "src/ariadna_constants/can_messages/output/can.c"
+)
 
 # Add include paths
 
 target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE
-  "lib"
-  "lib/Encoder/inc"
-  "lib/Logger/inc"
-  "lib/Memory/inc"
-  "lib/Timing/inc"
-  "lib/UsbPrograming/inc"
-  "lib/SteperMotor/inc"
-  "lib/Filter/inc"
-  "lib/Memory/inc"
-  "lib/CanControl/inc"
-  "lib/MovementControl/inc"
-  "lib/BoardId/inc"
-  "lib/Contolers/inc"
-  "lib/Temperature_sensors/inc"
-  "lib/containers/inc"
-  "lib/Gpio/inc"
-
-  "submodules/ariadna_constants/can_messages/output"
-  )
+  "src"
+  "src/ariadna_constants/can_messages/output"
+)
 
 
-
-
-# Add linked libraries
 target_link_libraries(${CMAKE_PROJECT_NAME}
   stm32cubemx
   # Add user defined libraries
 )
 
-
+# Add post build commands
 add_custom_command(
 	TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
 	COMMAND ${CMAKE_OBJCOPY} -O binary ${CMAKE_PROJECT_NAME}.elf firmware.bin
 	COMMAND ${CMAKE_OBJCOPY} -O ihex ${CMAKE_PROJECT_NAME}.elf firmware.hex
 	COMMAND ${CMAKE_SIZE} ${CMAKE_PROJECT_NAME}.elf
   COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_PROJECT_NAME}.elf firmware.elf
+  COMMAND ${CCACHE_PROGRAM} -s
   # COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/compile_commands.json ${CMAKE_SOURCE_DIR}/compile_commands.json
   # COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/update-software-version.sh ${CMAKE_SOURCE_DIR}/.git/hooks/post-commit
   COMMAND ${CMAKE_SOURCE_DIR}/scripts/shell/update-software-version.sh ${CMAKE_SOURCE_DIR} ${PROEJCT_MAJOR_VERSION}
   # Show ccache statistics
-  COMMAND ${CCACHE_PROGRAM} -s
  )
 
 if( COPY_COMPILE_COMMANDS )

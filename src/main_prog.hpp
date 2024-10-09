@@ -4,7 +4,7 @@
 
 //**************************************************************************************************
 /// @brief main program, this function is called from main and never returns
-void main_prog();
+void run_main_prog();
 
 /// @brief This function is used to configure things that have to be configurated before all the periferals
 void pre_periferal_config();
@@ -24,5 +24,8 @@ void id_config();
 
 /// @brief  Initites stuff after id have been configured
 void post_id_config();
+
+/// @brief This function is used to configure the tasks
+void config_tasks();
 
 #endif // MAIN_PROG_H

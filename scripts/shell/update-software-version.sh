@@ -3,10 +3,10 @@
 # Get the number of commits in the repository
 minor_version=$(git rev-list --all --count)
 major_version=$2
-echo "Software version: [$major_version.$minor_version]"
+
 
 # Define the destination file
-dst_file="$1/lib/version.hpp"
+dst_file="$1/src/version.hpp"
 
 # read versions from the file
 file_major_version=$(cat $dst_file | grep "VERSION_MAJOR" | cut -d' ' -f3)
@@ -25,6 +25,7 @@ else
   build_number=0
 fi
 
+echo "Software version: [$major_version.$minor_version.$build_number]"
 # Generate the version.hpp file
 cat <<EOF > $dst_file
 #ifndef VERSION_HPP

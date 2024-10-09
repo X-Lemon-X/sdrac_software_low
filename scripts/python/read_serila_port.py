@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 import tabulate
 import numpy as np
+import datetime
 data_serial = []
 
 # Function to search for the serial port with the SDRAC board
@@ -32,7 +33,8 @@ def read_serial_data(port):
         # print(f"{time};{pos};{velocity}")
         # Process the JSON data and print it in a nice-looking format
         json_str = json.dumps(json_data, indent=2)
-        print(json_str)
+        current_time = datetime.datetime.now().strftime("%H:%M:%S.%f")[:-3]
+        print(f"[{current_time}]>>\n{json_str}")
         # Process the JSON data and update the chart
         # data_serial.append(json_data)
         # # Print the JSON data in a table format

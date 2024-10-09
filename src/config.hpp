@@ -4,7 +4,9 @@
 
 // #include <cstddef>
 // #include <cstdint>
+#include <cstdint>
 #include <limits>
+#include <random>
 #include "logger.hpp"
 #include "Timing.hpp"
 #include "can.h"
@@ -117,6 +119,7 @@ float stepper_motor_max_velocity;
 float stepper_motor_min_velocity;
 bool stepper_motor_reverse;
 bool stepper_motor_enable_reversed;
+uint32_t stepper_motor_timer_prescaler;
 
 // Encoder pos arm
 float encoder_arm_offset;
@@ -129,6 +132,7 @@ float encoder_motor_offset;
 bool  encoder_motor_reverse;
 float encoder_motor_dead_zone_correction_angle;
 uint16_t encoder_motor_velocity_sample_amount;
+bool encoder_motor_enable;
 
 // pid config
 float pid_p;
@@ -255,7 +259,6 @@ extern TIM_HandleTypeDef htim8;
 /// @brief TIM handler for the [us] precision clock
 extern TIM_HandleTypeDef htim10;
 
-/// @brief UART handler for the IO use
 extern UART_HandleTypeDef huart3;
 
 /// @brief USB handler for on board USB-C
@@ -264,8 +267,10 @@ extern USBD_HandleTypeDef hUsbDeviceFS;
 //**************************************************************************************************
 // GLOBAL OBEJCTS
 
+extern std::string version_string;
 extern LOGGER::Logger loger;
 extern TIMING::Ticker main_clock;
+extern TIMING::TimeScheduler task_timer_scheduler;
 extern BOARD_ID::Board_id board_id;
 extern ENCODER::Encoder encoder_arm;
 extern ENCODER::Encoder encoder_motor;

@@ -2,13 +2,14 @@
 #include "steper_motor.hpp"
 #include "movement_controler.hpp"
 #include "usb_programer.hpp"
-#include "pid_controler.hpp"
+#include "controler_pid.hpp"
 #include "filter.hpp"
 #include "filter_moving_avarage.hpp"
 #include "filter_alfa_beta.hpp"
 #include "ntc_termistors.hpp"
 #include "pin.hpp"
 #include <limits>
+#include <string>
 
 //**************************************************************************************************
 // Gpio assigments
@@ -63,6 +64,7 @@ const IdConfig config_id_default ={
   0.0f,
   false,
   false,
+  960,
 
   0.0f,
   false,
@@ -73,6 +75,7 @@ const IdConfig config_id_default ={
   false,
   0.0f,
   0,
+  false,
 
   0.0f,
   0.0f,
@@ -101,8 +104,9 @@ const IdConfig config_id_1 ={
   0.03f,
   false,
   false,
+  960,
 
-  0.0f,
+  -2.9145636558532715f,
   true,
   PI,
   0,
@@ -111,14 +115,15 @@ const IdConfig config_id_1 ={
   false,
   0.0f,
   0,
-
+  true,
+  
   0.9f,
   0.0f,
   0.1f,
 
   PI,
-  -std::numeric_limits<float>::max(),
-  std::numeric_limits<float>::max(),
+  -PI_m2,
+  PI_m2,
 };
 
 const IdConfig config_id_2 = {
@@ -137,10 +142,11 @@ const IdConfig config_id_2 = {
   40.0f,
   2.0f,
   0.03f,
-  true,
   false,
+  false,
+  960,
 
-  0.0f,
+  1.1063838005065918f,
   false,
   PI,
   10,
@@ -149,14 +155,15 @@ const IdConfig config_id_2 = {
   false,
   0.0f,
   0,
-
+  true,
+  
   0.9f,
   0.0f,
   0.1f,
 
   PI,
-  -std::numeric_limits<float>::max(),
-  std::numeric_limits<float>::max(),
+  -PI_d2,
+  PI_d2,
 };
 
 const IdConfig config_id_3 = {
@@ -175,11 +182,12 @@ const IdConfig config_id_3 = {
   40.0f,
   PI_m2,
   0.03f,
+  true,
   false,
-  false,
+  960,
 
-  0.0f,
-  false,
+  -1.6793255805969238f,
+  true,
   PI,
   1,
 
@@ -187,14 +195,15 @@ const IdConfig config_id_3 = {
   false,
   -PI_d2,
   0,
-
+  true,
+  
   0.9f,
   0.0f,
   0.1f,
 
-  PI_m2,
-  -std::numeric_limits<float>::max(),
-  std::numeric_limits<float>::max(),
+  PI,
+  -1.1f,
+  4.28f,
 };
 
 const IdConfig config_id_4 = {
@@ -209,28 +218,30 @@ const IdConfig config_id_4 = {
   CAN_KONARM_4_CLEAR_ERRORS_FRAME_ID,
   CAN_KONARM_4_GET_ERRORS_FRAME_ID,
 
-  400.0f,
+  6400.0f,
   71.9f,
   PI,
   0.03f,
   false,
   true,
+  32,
 
-  0.0f,
+  0.645806f,
   true,
-  PI_m3d2,
+  0,
   0,
 
   0.0f,
   false,
   0.0f,
   10,
+  false,
 
   0.9f,
   0.0f,
   0.1f,
 
-  PI,
+  1.0f,
   -std::numeric_limits<float>::max(),
   std::numeric_limits<float>::max(),
 };
@@ -247,28 +258,30 @@ const IdConfig config_id_5 = {
   CAN_KONARM_5_CLEAR_ERRORS_FRAME_ID,
   CAN_KONARM_5_GET_ERRORS_FRAME_ID,
 
-  400.0f,
+  6400.0f,
   71.9f,
   PI,
   0.03f,
   false,
   true,
+  32,
 
-  0.0f,
+  1.164291f,
   true,
-  PI_m3d2,
+  0,
   0,
 
   0.0f,
   false,
   0.0f,
   10,
+  false,
 
   0.9f,
   0.0f,
   0.1f,
 
-  PI,
+  1.0,
   -std::numeric_limits<float>::max(),
   std::numeric_limits<float>::max(),
 };
@@ -285,28 +298,30 @@ const IdConfig config_id_6 = {
   CAN_KONARM_6_CLEAR_ERRORS_FRAME_ID,
   CAN_KONARM_6_GET_ERRORS_FRAME_ID,
 
-  400.0f,
+  6400.0f,
   71.9f,
   PI,
   0.03f,
   false,
   true,
+  32,
 
-  0.0f,
+  -2.034059f,
   true,
-  PI_m3d2,
+  0,
   0,
 
   0.0f,
   false,
   0.0f,
   10,
+  false,
 
   0.9f,
   0.0f,
   0.1f,
 
-  PI,
+  1.0f,
   -std::numeric_limits<float>::max(),
   std::numeric_limits<float>::max(),
 };
@@ -316,10 +331,12 @@ const IdConfig config_id_6 = {
 //**************************************************************************************************
 // Global stuff
 
+std::string version_string = std::to_string(VERSION_MAJOR)+"."+std::to_string(VERSION_MINOR) + "." + std::to_string(VERSION_BUILD);
 uint32_t adc_dma_buffer[ADC_DMA_BUFFER_SIZE+1];
 IdConfig config;
 TIMING::Ticker main_clock;
-LOGGER::Logger loger(LOG_LOGER_LEVEL,LOG_SHOW_TIMESTAMP);
+TIMING::TimeScheduler task_timer_scheduler(main_clock);
+LOGGER::Logger loger(LOG_LOGER_LEVEL,LOG_SHOW_TIMESTAMP, version_string);
 BOARD_ID::Board_id board_id(pin_cid_0, pin_cid_1, pin_cid_2);
 
 STEPER_MOTOR::SteperMotor stp_motor(htim3, TIM_CHANNEL_1, pin_steper_direction, pin_steper_enable);
@@ -327,7 +344,7 @@ CAN_CONTROL::CanControl can_controler;
 MOVEMENT_CONTROLER::MovementControler movement_controler;
 ENCODER::Encoder encoder_arm;
 ENCODER::Encoder encoder_motor;
-USB_PROGRAMER::UsbProgramer usb_programer(pin_boot_device);
+USB_PROGRAMER::UsbProgramer usb_programer(pin_boot_device,loger);
 NTCTERMISTORS::NtcTermistors temp_steper_driver(UC_SUPPLY_VOLTAGE,TERMISTOR_RESISTANCE);
 NTCTERMISTORS::NtcTermistors temp_steper_motor(UC_SUPPLY_VOLTAGE,TERMISTOR_RESISTANCE);
 ErrorData error_data;
