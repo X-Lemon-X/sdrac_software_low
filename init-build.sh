@@ -7,7 +7,9 @@ python3 -m venv .venv
 source .venv/bin/activate
 pip install -r scripts/python/requirements.txt
 
-sudo apt-get install -y cmake ninja-build clang ccache
+if [ "$(id -u)" -e 0 ]; then
+  sudo apt-get install -y cmake ninja-build clang ccache
+fi
 
 submodules/ariadna_constants/./generate-files.sh
 
