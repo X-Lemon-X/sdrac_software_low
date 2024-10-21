@@ -200,30 +200,30 @@ extern const IdConfig config_id_6;
 
 //**************************************************************************************************
 // PINOUT
-extern GpioPin pin_user_led_1;
-extern GpioPin pin_user_led_2;
-extern GpioPin pin_user_btn_1;
-extern GpioPin pin_tx_led;
-extern GpioPin pin_rx_led;
-extern GpioPin pin_encoder;
-extern GpioPin pin_poz_zero_sensor;
-extern GpioPin pin_inout_ca1;
-extern GpioPin pin_inout_ca2;
-extern GpioPin pin_inout_crx;
-extern GpioPin pin_inout_ctx;
-extern GpioPin pin_sync_puls;
-extern GpioPin pin_sync_dir;
-extern GpioPin pin_temp_steper_board;
-extern GpioPin pin_temp_board;
-extern GpioPin pin_temp_motor;
-extern GpioPin pin_vsense;
-extern GpioPin pin_steper_direction;
-extern GpioPin pin_steper_enable ;
-extern GpioPin pin_steper_step ;
-extern GpioPin pin_boot_device;
-extern GpioPin pin_cid_0;
-extern GpioPin pin_cid_1;
-extern GpioPin pin_cid_2;
+extern stmepic::GpioPin pin_user_led_1;
+extern stmepic::GpioPin pin_user_led_2;
+extern stmepic::GpioPin pin_user_btn_1;
+extern stmepic::GpioPin pin_tx_led;
+extern stmepic::GpioPin pin_rx_led;
+extern stmepic::GpioPin pin_encoder;
+extern stmepic::GpioPin pin_poz_zero_sensor;
+extern stmepic::GpioPin pin_inout_ca1;
+extern stmepic::GpioPin pin_inout_ca2;
+extern stmepic::GpioPin pin_inout_crx;
+extern stmepic::GpioPin pin_inout_ctx;
+extern stmepic::GpioPin pin_sync_puls;
+extern stmepic::GpioPin pin_sync_dir;
+extern stmepic::GpioPin pin_temp_steper_board;
+extern stmepic::GpioPin pin_temp_board;
+extern stmepic::GpioPin pin_temp_motor;
+extern stmepic::GpioPin pin_vsense;
+extern stmepic::GpioPin pin_steper_direction;
+extern stmepic::GpioPin pin_steper_enable ;
+extern stmepic::GpioPin pin_steper_step ;
+extern stmepic::GpioPin pin_boot_device;
+extern stmepic::GpioPin pin_cid_0;
+extern stmepic::GpioPin pin_cid_1;
+extern stmepic::GpioPin pin_cid_2;
 
 //**************************************************************************************************
 // all the global variables, peripherals, and buffors are declared here
@@ -268,18 +268,18 @@ extern USBD_HandleTypeDef hUsbDeviceFS;
 // GLOBAL OBEJCTS
 
 extern std::string version_string;
-extern LOGGER::Logger loger;
-extern TIMING::Ticker main_clock;
-extern TIMING::TimeScheduler task_timer_scheduler;
-extern BOARD_ID::Board_id board_id;
-extern ENCODER::Encoder encoder_arm;
-extern ENCODER::Encoder encoder_motor;
-extern STEPER_MOTOR::SteperMotor stp_motor;
-extern CAN_CONTROL::CanControl can_controler;
-extern USB_PROGRAMER::UsbProgramer usb_programer;
-extern MOVEMENT_CONTROLER::MovementControler movement_controler;
-extern NTCTERMISTORS::NtcTermistors temp_steper_driver;
-extern NTCTERMISTORS::NtcTermistors temp_steper_motor;
+extern stmepic::Logger loger;
+extern stmepic::Ticker main_clock;
+extern stmepic::TimeScheduler task_timer_scheduler;
+extern stmepic::Board_id board_id;
+extern stmepic::Encoder encoder_arm;
+extern stmepic::Encoder encoder_motor;
+extern stmepic::SteperMotor stp_motor;
+extern stmepic::CanControl can_controler;
+extern stmepic::UsbProgramer usb_programer;
+extern stmepic::MovementControler movement_controler;
+extern stmepic::sensors::NTCTERMISTORS::NtcTermistors temp_steper_driver;
+extern stmepic::sensors::NTCTERMISTORS::NtcTermistors temp_steper_motor;
 extern ErrorData error_data;
 
 //**************************************************************************************************
@@ -290,23 +290,23 @@ extern ErrorData error_data;
 
 #ifdef LOG_DEBUG
   #define _LOG_LVL 0
-  #define LOG_LOGER_LEVEL LOGGER::LOG_LEVEL::LOG_LEVEL_DEBUG
+  #define LOG_LOGER_LEVEL stmepic::LOG_LEVEL::LOG_LEVEL_DEBUG
 #endif // LOG_DEBUG
 
 
 #ifdef LOG_INFO
   #define _LOG_LVL 1
-  #define LOG_LOGER_LEVEL LOGGER::LOG_LEVEL::LOG_LEVEL_INFO
+  #define LOG_LOGER_LEVEL stmepic::LOG_LEVEL::LOG_LEVEL_INFO
 #endif // LOG_INFO
 
 #ifdef LOG_WARN
   #define _LOG_LVL 2
-  #define LOG_LOGER_LEVEL LOGGER::LOG_LEVEL::LOG_LEVEL_WARNING
+  #define LOG_LOGER_LEVEL stmepic::LOG_LEVEL::LOG_LEVEL_WARNING
 #endif // LOG_WARN
 
 #ifdef LOG_ERROR
   #define _LOG_LVL 3
-  #define LOG_LOGER_LEVEL LOGGER::LOG_LEVEL::LOG_LEVEL_ERROR
+  #define LOG_LOGER_LEVEL stmepic::LOG_LEVEL::LOG_LEVEL_ERROR
 #endif // LOG_ERROR
 
 #if _LOG_LVL <= 0

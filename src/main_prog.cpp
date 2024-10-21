@@ -34,21 +34,21 @@
 
 
 
-CONTROLER::PIDControler pid_pos(main_clock);
-CONTROLER::BasicControler bacis_controler(main_clock);
-CONTROLER::PassThroughControler pass_through_controler(main_clock);
-FILTERS::Filter_moving_avarage encoder_motor_moving_avarage(main_clock);
-TIMING::Timing tim_can_disconnecteded(main_clock);
+stmepic::PIDControler pid_pos(main_clock);
+stmepic::BasicControler bacis_controler(main_clock);
+stmepic::PassThroughControler pass_through_controler(main_clock);
+stmepic::filters::Filter_moving_avarage encoder_motor_moving_avarage(main_clock);
+stmepic::Timing tim_can_disconnecteded(main_clock);
 
-std::shared_ptr<TIMING::Timing> task_blink_timer;
-std::shared_ptr<TIMING::Timing> task_blink_error_timer;
-std::shared_ptr<TIMING::Timing> task_read_analog_values_timer;
-std::shared_ptr<TIMING::Timing> task_encoder_timer;
-std::shared_ptr<TIMING::Timing> task_usb_timer;
-std::shared_ptr<TIMING::Timing> task_data_usb_send_timer;
-std::shared_ptr<TIMING::Timing> task_caculate_temp_timer;
-std::shared_ptr<TIMING::Timing> task_nodelay_timer;
-std::shared_ptr<TIMING::Timing> task_can_disconnected_timer;
+std::shared_ptr<stmepic::Timing> task_blink_timer;
+std::shared_ptr<stmepic::Timing> task_blink_error_timer;
+std::shared_ptr<stmepic::Timing> task_read_analog_values_timer;
+std::shared_ptr<stmepic::Timing> task_encoder_timer;
+std::shared_ptr<stmepic::Timing> task_usb_timer;
+std::shared_ptr<stmepic::Timing> task_data_usb_send_timer;
+std::shared_ptr<stmepic::Timing> task_caculate_temp_timer;
+std::shared_ptr<stmepic::Timing> task_nodelay_timer;
+std::shared_ptr<stmepic::Timing> task_can_disconnected_timer;
 
 
 
@@ -123,7 +123,7 @@ void post_id_config(){
 
 
   //-------------------ENCODER ARM POSITION CONFIGURATION-------------------
-  encoder_arm.set_function_to_read_angle(ENCODER::translate_reg_to_angle_MT6701);
+  encoder_arm.set_function_to_read_angle(stmepic::translate_reg_to_angle_MT6701);
   encoder_arm.set_offset(config.encoder_arm_offset);
   encoder_arm.set_reverse(config.encoder_arm_reverse);
   encoder_arm.set_enable_position_filter(false);
@@ -138,7 +138,7 @@ void post_id_config(){
   encoder_arm.init(hi2c1,main_clock,nullptr,nullptr);
   
   //-------------------ENCODER STEPER MOTOR POSITION CONFIGURATION-------------------
-  encoder_motor.set_function_to_read_angle(ENCODER::translate_reg_to_angle_MT6701);
+  encoder_motor.set_function_to_read_angle(stmepic::translate_reg_to_angle_MT6701);
   encoder_motor.set_offset(config.encoder_motor_offset);
   encoder_motor.set_reverse(config.encoder_motor_reverse);
   encoder_motor.set_enable_position_filter(false);
@@ -221,7 +221,7 @@ void error_checks(){
 
 void handle_can_rx(){
   __disable_irq();
-  CAN_CONTROL::CAN_MSG recived_msg;
+  stmepic::CAN_MSG recived_msg;
   uint8_t status =  can_controler.get_message(&recived_msg);
   __enable_irq();
   if(status != 0) return;
@@ -238,7 +238,7 @@ void handle_can_rx(){
     movement_controler.set_enable(true);
   }
   else if (recived_msg.frame_id == config.can_konarm_get_pos_frame_id && recived_msg.remote_request){
-    CAN_CONTROL::CAN_MSG send_msg;
+    stmepic::CAN_MSG send_msg;
     can_konarm_1_get_pos_t src_p;
     send_msg.frame_id = config.can_konarm_get_pos_frame_id;
     src_p.position = can_konarm_1_get_pos_position_encode(movement_controler.get_current_position());
@@ -248,7 +248,7 @@ void handle_can_rx(){
     can_controler.send_msg_to_queue(send_msg);
   }
   else if (recived_msg.frame_id == config.can_konarm_status_frame_id && recived_msg.remote_request){
-    CAN_CONTROL::CAN_MSG send_msg;
+    stmepic::CAN_MSG send_msg;
     can_konarm_1_status_t src_p;
     send_msg.frame_id = config.can_konarm_status_frame_id;
     src_p.status = can_konarm_1_status_status_encode(CAN_KONARM_1_STATUS_STATUS_OK_CHOICE);
@@ -259,7 +259,7 @@ void handle_can_rx(){
   else if (recived_msg.frame_id == config.can_konarm_clear_errors_frame_id){
   }
   else if (recived_msg.frame_id == config.can_konarm_get_errors_frame_id) {
-    CAN_CONTROL::CAN_MSG send_msg;
+    stmepic::CAN_MSG send_msg;
     can_konarm_1_get_errors_t src_p;
     send_msg.frame_id = config.can_konarm_get_errors_frame_id;
     src_p.temp_engine_overheating = can_konarm_1_get_errors_temp_engine_overheating_encode(error_data.temp_engine_overheating);
@@ -287,7 +287,7 @@ void handle_can_rx(){
   }
 }
 
-void task_encoders(TIMING::Timing& task_timer){
+void task_encoders(stmepic::Timing& task_timer){
   encoder_arm.handle();
   if(config.encoder_motor_enable)
     encoder_motor.handle();
@@ -296,7 +296,7 @@ void task_encoders(TIMING::Timing& task_timer){
 // uint32_t last_time = main_clock.get_micros();
 // int32_t counter = 0;
 
-void task_nodelay(TIMING::Timing& task_timer){
+void task_nodelay(stmepic::Timing& task_timer){
   movement_controler.handle();
   handle_can_rx();
   can_controler.handle();
@@ -314,18 +314,18 @@ void task_nodelay(TIMING::Timing& task_timer){
   // }
 }
 
-void task_can_disconnect(TIMING::Timing& task_timer){
+void task_can_disconnect(stmepic::Timing& task_timer){
   movement_controler.set_enable(false);
   movement_controler.set_velocity(0);
   movement_controler.set_position(movement_controler.get_current_position());
   error_data.can_disconnected = true;
 }
 
-void task_usb_handler(TIMING::Timing& task_timer){
+void task_usb_handler(stmepic::Timing& task_timer){
   usb_programer.handler();
 }
 
-void task_usb_data_loging(TIMING::Timing& task_timer){
+void task_usb_data_loging(stmepic::Timing& task_timer){
   log_info(
         loger.parse_to_json_format("ID",std::to_string(board_id.get_id()))+
         loger.parse_to_json_format("Vsen",std::to_string(voltage_vcc))+
@@ -355,21 +355,21 @@ void task_usb_data_loging(TIMING::Timing& task_timer){
       );
 }
 
-void task_blink(TIMING::Timing& task_timer){
+void task_blink(stmepic::Timing& task_timer){
   TOGGLE_GPIO(pin_user_led_1);
 }
 
-void task_read_analog_values(TIMING::Timing& task_timer){
-  temoperature_board = MCP9700AT::get_temperature(VOLTAGE_VALUE(pin_temp_board));
+void task_read_analog_values(stmepic::Timing& task_timer){
+  temoperature_board = stmepic::sensors::MCP9700AT::get_temperature(VOLTAGE_VALUE(pin_temp_board));
   temoperature_steper_driver = temp_steper_driver.get_temperature(VOLTAGE_VALUE(pin_temp_steper_board)); 
   temoperature_steper_motor = temp_steper_motor.get_temperature(VOLTAGE_VALUE(pin_temp_motor));
   voltage_vcc = VOLTAGE_VALUE(pin_vsense) * ADC_VSENSE_MULTIPLIER;
 }
 
-void task_blink_error(TIMING::Timing& task_timer){
+void task_blink_error(stmepic::Timing& task_timer){
   // error_checks();
   auto errors_count = error_data.get_amount_of_errors();
-  task_timer.set_behaviour(TIMING::frequency_to_period((float)TIMING_LED_ERROR_BLINK_FQ*errors_count), true);
+  task_timer.set_behaviour(stmepic::frequency_to_period((float)TIMING_LED_ERROR_BLINK_FQ*errors_count), true);
   
   if(errors_count) TOGGLE_GPIO(pin_user_led_2); 
   else WRITE_GPIO(pin_user_led_2,GPIO_PIN_RESET);
@@ -377,53 +377,53 @@ void task_blink_error(TIMING::Timing& task_timer){
 
 void config_tasks(){
    
-  task_blink_timer = TIMING::Timing::Make(
+  task_blink_timer = stmepic::Timing::Make(
     main_clock,
-    TIMING::frequency_to_period(TIMING_LED_BLINK_FQ),
+    stmepic::frequency_to_period(TIMING_LED_BLINK_FQ),
     true,
     task_blink 
     );
 
-  task_blink_error_timer = TIMING::Timing::Make(
+  task_blink_error_timer = stmepic::Timing::Make(
     main_clock,
-    TIMING::frequency_to_period(TIMING_LED_ERROR_BLINK_FQ),
+    stmepic::frequency_to_period(TIMING_LED_ERROR_BLINK_FQ),
     true,
     task_blink_error
     );
-  task_encoder_timer = TIMING::Timing::Make(
+  task_encoder_timer = stmepic::Timing::Make(
     main_clock,
-    TIMING::frequency_to_period(TIMING_ENCODER_UPDATE_FQ),
+    stmepic::frequency_to_period(TIMING_ENCODER_UPDATE_FQ),
     true,
     task_encoders
     );
 
-  task_usb_timer = TIMING::Timing::Make(
+  task_usb_timer = stmepic::Timing::Make(
     main_clock,
-    TIMING::frequency_to_period(TIMING_USB_RECIVED_DATA_FQ),
+    stmepic::frequency_to_period(TIMING_USB_RECIVED_DATA_FQ),
     true,
     task_usb_handler
     );
 
-  task_data_usb_send_timer = TIMING::Timing::Make(
+  task_data_usb_send_timer = stmepic::Timing::Make(
     main_clock,
-    TIMING::frequency_to_period(TIMING_USB_SEND_DATA_FQ),
+    stmepic::frequency_to_period(TIMING_USB_SEND_DATA_FQ),
     true,
     task_usb_data_loging
     );
 
-  task_can_disconnected_timer = TIMING::Timing::Make(
+  task_can_disconnected_timer = stmepic::Timing::Make(
     main_clock,
     TIMING_CAN_DISCONNECTED_PERIOD,
     false,
     task_can_disconnect
     );
-  task_read_analog_values_timer = TIMING::Timing::Make(
+  task_read_analog_values_timer = stmepic::Timing::Make(
     main_clock,
-    TIMING::frequency_to_period(TIMING_READ_TEMPERATURE_FQ),
+    stmepic::frequency_to_period(TIMING_READ_TEMPERATURE_FQ),
     true,
     task_read_analog_values
     );
-  task_nodelay_timer = TIMING::Timing::Make(
+  task_nodelay_timer = stmepic::Timing::Make(
     main_clock,
     0,
     true,
@@ -442,109 +442,4 @@ void config_tasks(){
 void main_loop(){
   log_debug("Start main_loop\n");
   task_timer_scheduler.schedules_handle_blocking();
-
-  /*
-  // #define DABA
-  // #ifdef DABA
-  // TIMING::Timing tim_blink(main_clock);
-  // TIMING::Timing tim_blink_error(main_clock);
-  // TIMING::Timing tim_encoder(main_clock);
-  // TIMING::Timing tim_usb(main_clock);
-  // TIMING::Timing tim_data_usb_send(main_clock);
-  // TIMING::Timing tim_caculate_temp(main_clock);
- 
-
-  // tim_blink_error.set_behaviour(TIMING::frequency_to_period(TIMING_LED_ERROR_BLINK_FQ),true);
-  // tim_blink.set_behaviour(TIMING::frequency_to_period(TIMING_LED_BLINK_FQ), true);
-  // tim_encoder.set_behaviour(TIMING::frequency_to_period(TIMING_ENCODER_UPDATE_FQ), true);
-  // tim_usb.set_behaviour(TIMING::frequency_to_period(TIMING_USB_RECIVED_DATA_FQ), true);
-  // tim_data_usb_send.set_behaviour(TIMING::frequency_to_period(TIMING_USB_SEND_DATA_FQ), true);
-  // tim_can_disconnecteded.set_behaviour(TIMING_CAN_DISCONNECTED_PERIOD, false);
-  // tim_caculate_temp.set_behaviour(TIMING::frequency_to_period(TIMING_READ_TEMPERATURE_FQ), true);
-  // uint32_t last_time = main_clock.get_micros();
-  // int32_t counter = 0;
-  // while (true){
-
-  //   counter++;
-  //   if(counter > 100000){
-  //     uint32_t current_time = main_clock.get_micros();
-  //     uint32_t diff = current_time - last_time;
-  //     last_time = current_time;
-  //     float freq = 100000000000 / (float)diff;
-  //     log_error("main loop freq " + std::to_string(freq));
-  //     counter = 0;
-  //   }
-  //   handle_can_rx();
-  //   can_controler.handle();
-    
-  //   if(tim_encoder.triggered()){
-  //     encoder_arm.handle();
-  //     if(config.encoder_motor_enable)
-  //       encoder_motor.handle();
-  //   }
-
-  //   if(tim_can_disconnecteded.triggered()){      
-  //     movement_controler.set_enable(false);
-  //     movement_controler.set_velocity(0);
-  //     movement_controler.set_position(movement_controler.get_current_position());
-  //     error_data.can_disconnected = true;
-  //   }else{
-  //     // error_data.can_disconnected = false;
-  //   }
-    
-  //   movement_controler.handle();
-
-  //   if(tim_data_usb_send.triggered()){
-  //     log_info(
-  //       loger.parse_to_json_format("ID",std::to_string(board_id.get_id()))+
-  //       loger.parse_to_json_format("Vsen",std::to_string(voltage_vcc))+
-  //       loger.parse_to_json_format("Tste",std::to_string(temoperature_steper_motor))+
-  //       loger.parse_to_json_format("Tbor",std::to_string(temoperature_board))+
-  //       loger.parse_to_json_format("Tmot",std::to_string(temoperature_steper_driver))+
-  //       loger.parse_to_json_format("Eang",std::to_string(encoder_arm.get_angle()))+
-  //       loger.parse_to_json_format("Pos",std::to_string(movement_controler.get_current_position()))+
-  //       loger.parse_to_json_format("Vel",std::to_string(movement_controler.get_current_velocity()))+
-  //       loger.parse_to_json_format("EPos",std::to_string(encoder_motor.get_absoulute_angle()))+
-  //       loger.parse_to_json_format("Err",std::to_string(error_data.get_amount_of_errors()))+
-  //       loger.parse_to_json_format("Errs",
-  //         loger.parse_to_json_format("teng",BOOL_TO_STRING(error_data.temp_engine_overheating))+
-  //         loger.parse_to_json_format("tdri",BOOL_TO_STRING(error_data.temp_driver_overheating))+
-  //         loger.parse_to_json_format("tboa",BOOL_TO_STRING(error_data.temp_board_overheating))+
-  //         loger.parse_to_json_format("tengdis",BOOL_TO_STRING(error_data.temp_engine_sensor_disconnect))+
-  //         loger.parse_to_json_format("tdrivdis",BOOL_TO_STRING(error_data.temp_driver_sensor_disconnect))+
-  //         loger.parse_to_json_format("tborddis",BOOL_TO_STRING(error_data.temp_board_sensor_disconnect))+
-  //         loger.parse_to_json_format("encarmmdis",BOOL_TO_STRING(error_data.encoder_arm_disconnect))+
-  //         loger.parse_to_json_format("encmotdis",BOOL_TO_STRING(error_data.encoder_motor_disconnect))+
-  //         loger.parse_to_json_format("bovolt",BOOL_TO_STRING(error_data.baord_overvoltage))+
-  //         loger.parse_to_json_format("buvolt",BOOL_TO_STRING(error_data.baord_undervoltage))+
-  //         loger.parse_to_json_format("candis",BOOL_TO_STRING(error_data.can_disconnected))+
-  //         loger.parse_to_json_format("canerr",BOOL_TO_STRING(error_data.can_error))+
-  //         loger.parse_to_json_format("motlimit",BOOL_TO_STRING(error_data.controler_motor_limit_position),false)
-  //       ,false,true)
-  //     );
-  //   }
-
-  //   if(tim_usb.triggered()){
-  //     usb_programer.handler();
-  //   }
-
-  //   if(tim_blink.triggered()) {
-  //     TOGGLE_GPIO(pin_user_led_1);
-  //   }
-
-    
-  //   if(tim_caculate_temp.triggered()){
-  //     task_read_analog_values();
-  //   }
-
-  //   error_checks();
-  //   auto errors_count = error_data.get_amount_of_errors();
-  //   tim_blink_error.set_behaviour(TIMING::frequency_to_period((float)TIMING_LED_ERROR_BLINK_FQ*errors_count), true);
-  //   if(tim_blink_error.triggered()){
-  //     if(errors_count) TOGGLE_GPIO(pin_user_led_2); 
-  //     else WRITE_GPIO(pin_user_led_2,GPIO_PIN_RESET);
-  //   }
-  // }
-  // #endif
-  */
 }
