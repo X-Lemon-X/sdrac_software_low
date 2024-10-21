@@ -26,7 +26,9 @@ option(COPY_COMPILE_COMMANDS "Copy compile_commands.json to project root" OFF)
 
 ## enable ccache if available
 find_program(CCACHE_PROGRAM ccache)
-if(CCACHE_PROGRAM)
+if(NOT CCACHE_PROGRAM)
+    message(STATUS "ccache not found"}
+else()
     set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "${CCACHE_PROGRAM}")
     set_property(GLOBAL PROPERTY RULE_LAUNCH_LINK "${CCACHE_PROGRAM}")
 endif()
@@ -62,7 +64,7 @@ add_executable(${CMAKE_PROJECT_NAME})
 add_subdirectory(cmake/stm32cubemx)
 
 
-#include StmEpic library (whekk its not  a library)
+#include StmEpic library ( technically its not a library but it is)
 set(STMEPIC_BARD_ID ON)
 set(STMEPIC_CAN_CONTROLER ON)
 set(STMEPIC_ENCODERS ON)
@@ -79,7 +81,6 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
   "src/main_prog_callbacks.cpp"
   "src/main_prog.cpp"
   "src/config.cpp"
-  
   "src/ariadna_constants/can_messages/output/can.c"
 )
 
@@ -103,12 +104,18 @@ add_custom_command(
 	COMMAND ${CMAKE_OBJCOPY} -O ihex ${CMAKE_PROJECT_NAME}.elf firmware.hex
 	COMMAND ${CMAKE_SIZE} ${CMAKE_PROJECT_NAME}.elf
   COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_PROJECT_NAME}.elf firmware.elf
-  COMMAND ${CCACHE_PROGRAM} -s
   # COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/compile_commands.json ${CMAKE_SOURCE_DIR}/compile_commands.json
   # COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/update-software-version.sh ${CMAKE_SOURCE_DIR}/.git/hooks/post-commit
   COMMAND ${CMAKE_SOURCE_DIR}/scripts/shell/update-software-version.sh ${CMAKE_SOURCE_DIR} ${PROEJCT_MAJOR_VERSION}
   # Show ccache statistics
  )
+
+if(CCACHE_PROGRAM)
+	add_custom_command(
+		TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
+	  COMMAND ${CCACHE_PROGRAM} -s
+	 )
+ endif()
 
 if( COPY_COMPILE_COMMANDS )
   message(STATUS "Copying compile_commands.json")
