@@ -27,7 +27,7 @@ option(COPY_COMPILE_COMMANDS "Copy compile_commands.json to project root" OFF)
 ## enable ccache if available
 find_program(CCACHE_PROGRAM ccache)
 if(NOT CCACHE_PROGRAM)
-    message(STATUS "ccache not found"}
+    message(STATUS "ccache not found")
 else()
     set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "${CCACHE_PROGRAM}")
     set_property(GLOBAL PROPERTY RULE_LAUNCH_LINK "${CCACHE_PROGRAM}")
