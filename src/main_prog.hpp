@@ -1,6 +1,8 @@
 
+
 #ifndef MAIN_PROG_H
 #define MAIN_PROG_H
+#include "can_control.hpp"
 
 //**************************************************************************************************
 /// @brief main program, this function is called from main and never returns
@@ -27,5 +29,13 @@ void post_id_config();
 
 /// @brief This function is used to configure the tasks
 void config_tasks();
+
+void can_callback_default(stmepic::can_msg &recived_msg);
+void can_callback_get_errors(stmepic::can_msg &recived_msg);
+void can_callback_clear_errors(stmepic::can_msg &recived_msg);
+void can_callback_status(stmepic::can_msg &recived_msg);
+void can_callback_get_pos(stmepic::can_msg &recived_msg);
+void can_callback_set_pos(stmepic::can_msg &recived_msg);
+
 
 #endif // MAIN_PROG_H

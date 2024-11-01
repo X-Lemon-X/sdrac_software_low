@@ -1,6 +1,7 @@
 #include "main.h"
 #include "encoder.hpp"
 #include "main_prog.hpp"
+#include "stm32f4xx_hal.h"
 #include "usb_device.h"
 #include "usbd_cdc_if.h"
 #include "logger.hpp"
@@ -49,7 +50,6 @@ std::shared_ptr<stmepic::Timing> task_data_usb_send_timer;
 std::shared_ptr<stmepic::Timing> task_caculate_temp_timer;
 std::shared_ptr<stmepic::Timing> task_nodelay_timer;
 std::shared_ptr<stmepic::Timing> task_can_disconnected_timer;
-
 
 
 float temoperature_board = 0;
@@ -219,73 +219,73 @@ void error_checks(){
   error_data.controler_motor_limit_position = movement_controler.get_limit_position_achieved();
 }
 
-void handle_can_rx(){
-  __disable_irq();
-  stmepic::CAN_MSG recived_msg;
-  uint8_t status =  can_controler.get_message(&recived_msg);
-  __enable_irq();
-  if(status != 0) return;
-  task_can_disconnected_timer->reset();
-  error_data.can_disconnected = false;
+// void handle_can_rx(){
+//   __disable_irq();
+//   stmepic::can_msg recived_msg;
+//   auto status =  can_controler.get_message(&recived_msg);
+//   __enable_irq();
+//   if(!status.ok()) return;
+//   task_can_disconnected_timer->reset();
+//   error_data.can_disconnected = false;
 
-  if(recived_msg.frame_id == config.can_konarm_set_pos_frame_id){
-    can_konarm_1_set_pos_t signals;
-    can_konarm_1_set_pos_unpack(&signals, recived_msg.data, recived_msg.data_size);
-    float targetPosition = can_konarm_1_set_pos_position_decode(signals.position);
-    float targetVelocity = can_konarm_1_set_pos_velocity_decode(signals.velocity);
-    movement_controler.set_velocity(targetVelocity);
-    movement_controler.set_position(targetPosition);
-    movement_controler.set_enable(true);
-  }
-  else if (recived_msg.frame_id == config.can_konarm_get_pos_frame_id && recived_msg.remote_request){
-    stmepic::CAN_MSG send_msg;
-    can_konarm_1_get_pos_t src_p;
-    send_msg.frame_id = config.can_konarm_get_pos_frame_id;
-    src_p.position = can_konarm_1_get_pos_position_encode(movement_controler.get_current_position());
-    src_p.velocity = can_konarm_1_get_pos_velocity_encode(movement_controler.get_current_velocity());
-    send_msg.data_size = CAN_KONARM_1_GET_POS_LENGTH;
-    can_konarm_1_get_pos_pack(send_msg.data, &src_p, send_msg.data_size);
-    can_controler.send_msg_to_queue(send_msg);
-  }
-  else if (recived_msg.frame_id == config.can_konarm_status_frame_id && recived_msg.remote_request){
-    stmepic::CAN_MSG send_msg;
-    can_konarm_1_status_t src_p;
-    send_msg.frame_id = config.can_konarm_status_frame_id;
-    src_p.status = can_konarm_1_status_status_encode(CAN_KONARM_1_STATUS_STATUS_OK_CHOICE);
-    send_msg.data_size = CAN_KONARM_1_STATUS_LENGTH;
-    can_konarm_1_status_pack(send_msg.data, &src_p, send_msg.data_size);
-    can_controler.send_msg_to_queue(send_msg);
-  }
-  else if (recived_msg.frame_id == config.can_konarm_clear_errors_frame_id){
-  }
-  else if (recived_msg.frame_id == config.can_konarm_get_errors_frame_id) {
-    stmepic::CAN_MSG send_msg;
-    can_konarm_1_get_errors_t src_p;
-    send_msg.frame_id = config.can_konarm_get_errors_frame_id;
-    src_p.temp_engine_overheating = can_konarm_1_get_errors_temp_engine_overheating_encode(error_data.temp_engine_overheating);
-    src_p.temp_driver_overheating = can_konarm_1_get_errors_temp_driver_overheating_encode(error_data.temp_driver_overheating);
-    src_p.temp_board_overheating = can_konarm_1_get_errors_temp_board_overheating_encode(error_data.temp_board_overheating);
-    src_p.temp_engine_sensor_disconnect = can_konarm_1_get_errors_temp_engine_sensor_disconnect_encode(error_data.temp_engine_sensor_disconnect);
-    src_p.temp_driver_sensor_disconnect = can_konarm_1_get_errors_temp_driver_sensor_disconnect_encode(error_data.temp_driver_sensor_disconnect);
-    src_p.temp_board_sensor_disconnect = can_konarm_1_get_errors_temp_board_sensor_disconnect_encode(error_data.temp_board_sensor_disconnect);
-    src_p.encoder_arm_disconnect = can_konarm_1_get_errors_encoder_arm_disconnect_encode(error_data.encoder_arm_disconnect);
-    src_p.encoder_motor_disconnect = can_konarm_1_get_errors_encoder_motor_disconnect_encode(error_data.encoder_motor_disconnect);
-    src_p.board_overvoltage = can_konarm_1_get_errors_board_overvoltage_encode(error_data.baord_overvoltage);
-    src_p.board_undervoltage = can_konarm_1_get_errors_board_undervoltage_encode(error_data.baord_undervoltage);
-    src_p.can_disconnected = can_konarm_1_get_errors_can_disconnected_encode(error_data.can_disconnected);
-    src_p.can_error = can_konarm_1_get_errors_can_error_encode(error_data.can_error);
-    src_p.controler_motor_limit_position = can_konarm_1_get_errors_controler_motor_limit_position_encode(error_data.controler_motor_limit_position);
-    send_msg.data_size = CAN_KONARM_1_GET_ERRORS_LENGTH;
-    can_konarm_1_get_errors_pack(send_msg.data, &src_p, send_msg.data_size);
-    can_controler.send_msg_to_queue(send_msg);
-    // we reset can errors after sending the frame wth erro so we can se if its repraing itself
-    error_data.can_error = false;
-  }
-  else{
-    // trigeerd when the frame is not recognized
-    error_data.can_error = true;
-  }
-}
+//   if(recived_msg.frame_id == config.can_konarm_set_pos_frame_id){
+//     can_konarm_1_set_pos_t signals;
+//     can_konarm_1_set_pos_unpack(&signals, recived_msg.data, recived_msg.data_size);
+//     float targetPosition = can_konarm_1_set_pos_position_decode(signals.position);
+//     float targetVelocity = can_konarm_1_set_pos_velocity_decode(signals.velocity);
+//     movement_controler.set_velocity(targetVelocity);
+//     movement_controler.set_position(targetPosition);
+//     movement_controler.set_enable(true);
+//   }
+//   else if (recived_msg.frame_id == config.can_konarm_get_pos_frame_id && recived_msg.remote_request){
+//     stmepic::can_msg send_msg;
+//     can_konarm_1_get_pos_t src_p;
+//     send_msg.frame_id = config.can_konarm_get_pos_frame_id;
+//     src_p.position = can_konarm_1_get_pos_position_encode(movement_controler.get_current_position());
+//     src_p.velocity = can_konarm_1_get_pos_velocity_encode(movement_controler.get_current_velocity());
+//     send_msg.data_size = CAN_KONARM_1_GET_POS_LENGTH;
+//     can_konarm_1_get_pos_pack(send_msg.data, &src_p, send_msg.data_size);
+//     can_controler.send_msg_to_queue(send_msg);
+//   }
+//   else if (recived_msg.frame_id == config.can_konarm_status_frame_id && recived_msg.remote_request){
+//     stmepic::can_msg send_msg;
+//     can_konarm_1_status_t src_p;
+//     send_msg.frame_id = config.can_konarm_status_frame_id;
+//     src_p.status = can_konarm_1_status_status_encode(CAN_KONARM_1_STATUS_STATUS_OK_CHOICE);
+//     send_msg.data_size = CAN_KONARM_1_STATUS_LENGTH;
+//     can_konarm_1_status_pack(send_msg.data, &src_p, send_msg.data_size);
+//     can_controler.send_msg_to_queue(send_msg);
+//   }
+//   else if (recived_msg.frame_id == config.can_konarm_clear_errors_frame_id){
+//   }
+//   else if (recived_msg.frame_id == config.can_konarm_get_errors_frame_id) {
+//     stmepic::can_msg send_msg;
+//     can_konarm_1_get_errors_t src_p;
+//     send_msg.frame_id = config.can_konarm_get_errors_frame_id;
+//     src_p.temp_engine_overheating = can_konarm_1_get_errors_temp_engine_overheating_encode(error_data.temp_engine_overheating);
+//     src_p.temp_driver_overheating = can_konarm_1_get_errors_temp_driver_overheating_encode(error_data.temp_driver_overheating);
+//     src_p.temp_board_overheating = can_konarm_1_get_errors_temp_board_overheating_encode(error_data.temp_board_overheating);
+//     src_p.temp_engine_sensor_disconnect = can_konarm_1_get_errors_temp_engine_sensor_disconnect_encode(error_data.temp_engine_sensor_disconnect);
+//     src_p.temp_driver_sensor_disconnect = can_konarm_1_get_errors_temp_driver_sensor_disconnect_encode(error_data.temp_driver_sensor_disconnect);
+//     src_p.temp_board_sensor_disconnect = can_konarm_1_get_errors_temp_board_sensor_disconnect_encode(error_data.temp_board_sensor_disconnect);
+//     src_p.encoder_arm_disconnect = can_konarm_1_get_errors_encoder_arm_disconnect_encode(error_data.encoder_arm_disconnect);
+//     src_p.encoder_motor_disconnect = can_konarm_1_get_errors_encoder_motor_disconnect_encode(error_data.encoder_motor_disconnect);
+//     src_p.board_overvoltage = can_konarm_1_get_errors_board_overvoltage_encode(error_data.baord_overvoltage);
+//     src_p.board_undervoltage = can_konarm_1_get_errors_board_undervoltage_encode(error_data.baord_undervoltage);
+//     src_p.can_disconnected = can_konarm_1_get_errors_can_disconnected_encode(error_data.can_disconnected);
+//     src_p.can_error = can_konarm_1_get_errors_can_error_encode(error_data.can_error);
+//     src_p.controler_motor_limit_position = can_konarm_1_get_errors_controler_motor_limit_position_encode(error_data.controler_motor_limit_position);
+//     send_msg.data_size = CAN_KONARM_1_GET_ERRORS_LENGTH;
+//     can_konarm_1_get_errors_pack(send_msg.data, &src_p, send_msg.data_size);
+//     can_controler.send_msg_to_queue(send_msg);
+//     // we reset can errors after sending the frame wth erro so we can se if its repraing itself
+//     error_data.can_error = false;
+//   }
+//   else{
+//     // trigeerd when the frame is not recognized
+//     error_data.can_error = true;
+//   }
+// }
 
 void task_encoders(stmepic::Timing& task_timer){
   encoder_arm.handle();
@@ -293,12 +293,10 @@ void task_encoders(stmepic::Timing& task_timer){
     encoder_motor.handle();
 }
 
-// uint32_t last_time = main_clock.get_micros();
-// int32_t counter = 0;
 
 void task_nodelay(stmepic::Timing& task_timer){
   movement_controler.handle();
-  handle_can_rx();
+  // handle_can_rx();
   can_controler.handle();
   error_checks();
 
@@ -369,44 +367,52 @@ void task_read_analog_values(stmepic::Timing& task_timer){
 void task_blink_error(stmepic::Timing& task_timer){
   // error_checks();
   auto errors_count = error_data.get_amount_of_errors();
-  task_timer.set_behaviour(stmepic::frequency_to_period((float)TIMING_LED_ERROR_BLINK_FQ*errors_count), true);
+  task_timer.set_behaviour(stmepic::frequency_to_period_us((float)TIMING_LED_ERROR_BLINK_FQ*errors_count), true);
   
   if(errors_count) TOGGLE_GPIO(pin_user_led_2); 
   else WRITE_GPIO(pin_user_led_2,GPIO_PIN_RESET);
 }
 
 void config_tasks(){
+
+  can_controler.add_callback(config.can_konarm_clear_errors_frame_id, can_callback_clear_errors);
+  can_controler.add_callback(config.can_konarm_get_errors_frame_id, can_callback_get_errors);
+  can_controler.add_callback(config.can_konarm_status_frame_id, can_callback_status);
+  can_controler.add_callback(config.can_konarm_set_pos_frame_id, can_callback_set_pos);
+  can_controler.add_callback(config.can_konarm_get_pos_frame_id, can_callback_get_pos);
+  can_controler.add_callback(NULL, can_callback_default);
+
    
   task_blink_timer = stmepic::Timing::Make(
     main_clock,
-    stmepic::frequency_to_period(TIMING_LED_BLINK_FQ),
+    stmepic::frequency_to_period_us(TIMING_LED_BLINK_FQ),
     true,
     task_blink 
     );
 
   task_blink_error_timer = stmepic::Timing::Make(
     main_clock,
-    stmepic::frequency_to_period(TIMING_LED_ERROR_BLINK_FQ),
+    stmepic::frequency_to_period_us(TIMING_LED_ERROR_BLINK_FQ),
     true,
     task_blink_error
     );
   task_encoder_timer = stmepic::Timing::Make(
     main_clock,
-    stmepic::frequency_to_period(TIMING_ENCODER_UPDATE_FQ),
+    stmepic::frequency_to_period_us(TIMING_ENCODER_UPDATE_FQ),
     true,
     task_encoders
     );
 
   task_usb_timer = stmepic::Timing::Make(
     main_clock,
-    stmepic::frequency_to_period(TIMING_USB_RECIVED_DATA_FQ),
+    stmepic::frequency_to_period_us(TIMING_USB_RECIVED_DATA_FQ),
     true,
     task_usb_handler
     );
 
   task_data_usb_send_timer = stmepic::Timing::Make(
     main_clock,
-    stmepic::frequency_to_period(TIMING_USB_SEND_DATA_FQ),
+    stmepic::frequency_to_period_us(TIMING_USB_SEND_DATA_FQ),
     true,
     task_usb_data_loging
     );
@@ -419,7 +425,7 @@ void config_tasks(){
     );
   task_read_analog_values_timer = stmepic::Timing::Make(
     main_clock,
-    stmepic::frequency_to_period(TIMING_READ_TEMPERATURE_FQ),
+    stmepic::frequency_to_period_us(TIMING_READ_TEMPERATURE_FQ),
     true,
     task_read_analog_values
     );
