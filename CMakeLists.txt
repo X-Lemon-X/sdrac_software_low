@@ -65,13 +65,13 @@ add_subdirectory(cmake/stm32cubemx)
 
 
 #include StmEpic library ( technically its not a library but it is)
-set(STMEPIC_BARD_ID ON)
-set(STMEPIC_CAN_CONTROLER ON)
-set(STMEPIC_ENCODERS ON)
-set(STMEPIC_LOGGER ON)
-set(STMEPIC_MOVEMENT ON)
-set(STMEPIC_SENSORS ON)
-set(STMEPIC_USB_PROGRAMING ON)
+# set(STMEPIC_BARD_ID ON)
+# set(STMEPIC_CAN_CONTROLER ON)
+# set(STMEPIC_ENCODERS ON)
+# set(STMEPIC_LOGGER ON)
+# set(STMEPIC_MOVEMENT ON)
+# set(STMEPIC_SENSORS ON)
+# set(STMEPIC_DFU_PROGRAMING ON)
 add_subdirectory(src/StmEpic)
 
 
@@ -94,6 +94,7 @@ target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE
 
 target_link_libraries(${CMAKE_PROJECT_NAME}
   stm32cubemx
+  etl::etl
   # Add user defined libraries
 )
 

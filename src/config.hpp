@@ -21,7 +21,7 @@
 #include "version.hpp"
 #include "steper_motor.hpp"
 #include "movement_controler.hpp"
-#include "usb_programer.hpp"
+#include "dfu_usb_programer.hpp"
 #include "filter.hpp"
 #include "filter_moving_avarage.hpp"
 #include "filter_alfa_beta.hpp"

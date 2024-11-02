@@ -1,7 +1,7 @@
 #include "config.hpp"
 #include "steper_motor.hpp"
 #include "movement_controler.hpp"
-#include "usb_programer.hpp"
+#include "dfu_usb_programer.hpp"
 #include "controler_pid.hpp"
 #include "filter.hpp"
 #include "filter_moving_avarage.hpp"
@@ -340,7 +340,7 @@ stmepic::Logger loger(LOG_LOGER_LEVEL,LOG_SHOW_TIMESTAMP, version_string);
 stmepic::Board_id board_id(pin_cid_0, pin_cid_1, pin_cid_2);
 
 stmepic::SteperMotor stp_motor(htim3, TIM_CHANNEL_1, pin_steper_direction, pin_steper_enable);
-stmepic::CanControl can_controler;
+stmepic::CanControl<> can_controler;
 stmepic::MovementControler movement_controler;
 stmepic::Encoder encoder_arm;
 stmepic::Encoder encoder_motor;
