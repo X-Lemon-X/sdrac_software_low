@@ -152,3 +152,10 @@ void can_callback_get_errors(stmepic::can_msg &recived_msg){
 void can_callback_default(stmepic::can_msg &recived_msg){
   error_data.can_error = true;
 }
+
+void can_callback_set_control_mode(stmepic::can_msg &recived_msg){
+  can_konarm_1_set_control_mode_t signals;
+  can_konarm_1_set_control_mode_unpack(&signals, recived_msg.data, recived_msg.data_size);
+  uint8_t mode = can_konarm_1_set_control_mode_control_mode_decode(signals.control_mode);
+  init_and_set_movement_controler_mode(mode);
+}

@@ -1,28 +1,7 @@
-#include "encoder.hpp"
 #include "main_prog.hpp"
-#include "logger.hpp"
-#include "dfu_usb_programer.hpp"
-#include "steper_motor.hpp"
-#include "filter.hpp"
-#include "filter_alfa_beta.hpp"
-#include "filter_moving_avarage.hpp"
-#include "can_control.hpp"
-#include "board_id.hpp"
-#include "movement_controler.hpp"
-#include "controler_pid.hpp"
-#include "controler_linear.hpp"
-#include "controler_pass_through.hpp"
-#include "pin.hpp"
-#include "ntc_termistors.hpp"
-#include <cfloat>
-#include "MCP9700AT.hpp"
-#include "Timing.hpp"
-#include "config.hpp"
-#include <memory>
-#include <string>
-#include <cmath>
 
-
+//**************************************************************************************************
+// SCARY GLOBAL VARIABLES
 
 stmepic::PIDControler pid_pos(main_clock);
 stmepic::BasicControler bacis_controler(main_clock);
@@ -39,7 +18,6 @@ std::shared_ptr<stmepic::Timing> task_data_usb_send_timer;
 std::shared_ptr<stmepic::Timing> task_caculate_temp_timer;
 std::shared_ptr<stmepic::Timing> task_nodelay_timer;
 std::shared_ptr<stmepic::Timing> task_can_disconnected_timer;
-
 
 float temoperature_board = 0;
 float temoperature_steper_driver = 0;
@@ -89,6 +67,31 @@ void id_config(){
   case BOARD_ID_5: config = config_id_5; break;
   case BOARD_ID_6: config = config_id_6; break;
   default: config = config_id_default; break;
+  }
+}
+
+void init_and_set_movement_controler_mode(uint8_t mode){
+  movement_controler.set_position(movement_controler.get_current_position());
+  movement_controler.set_velocity(0.0f);
+  movement_controler.set_enable(false);
+  stmepic::Encoder *engine_encoder = nullptr;
+  if(config.encoder_motor_enable){
+    engine_encoder = &encoder_motor;
+  }
+  switch (mode){
+    case CAN_KONARM_1_SET_CONTROL_MODE_CONTROL_MODE_POSITION_CONTROL_CHOICE:
+      movement_controler.init(main_clock, stp_motor, encoder_arm, bacis_controler,engine_encoder);
+      break;
+    case CAN_KONARM_1_SET_CONTROL_MODE_CONTROL_MODE_VELOCITY_CONTROL_CHOICE:
+      movement_controler.init(main_clock, stp_motor, encoder_arm, pass_through_controler,engine_encoder);
+      break;
+    case CAN_KONARM_1_SET_CONTROL_MODE_CONTROL_MODE_TORQUE_CONTROL_CHOICE:
+    // torque control is not implemented yet so we will use the velocity control
+      movement_controler.init(main_clock, stp_motor, encoder_arm, pass_through_controler,engine_encoder);
+      break;
+    default:
+      movement_controler.init(main_clock, stp_motor, encoder_arm, pass_through_controler,engine_encoder);
+      break;
   }
 }
 
@@ -145,21 +148,23 @@ void post_id_config(){
   
 
   //-------------------MOVEMENT CONTROLER CONFIGURATION-------------------
+  
+  // unly used if the pid controler is used
   pid_pos.set_Kp(config.pid_p);
   pid_pos.set_Ki(config.pid_i);
-  // pid_pos.set_Kd(config.pid_d);
-  bacis_controler.set_max_acceleration(1.0f);
+  pid_pos.set_Kd(config.pid_d);
+
+  // used for the position control
+  bacis_controler.set_max_acceleration(config.movement_max_acceleration);
   bacis_controler.set_target_pos_max_error(0.001f);
+
+  // for velocity control we use the pass through controler whitch doesn't do anything
 
   movement_controler.set_limit_position(config.movement_limit_lower, config.movement_limit_upper);
   movement_controler.set_max_velocity(config.movement_max_velocity);
   movement_controler.set_position(config.movement_limit_upper);
+  init_and_set_movement_controler_mode(config.movement_control_mode);
 
-  if(config.encoder_motor_enable){
-    movement_controler.init(main_clock, stp_motor, encoder_arm, pass_through_controler,&encoder_motor);
-  }else{
-    movement_controler.init(main_clock, stp_motor, encoder_arm, pass_through_controler);
-  }
 
   log_debug(loger.parse_to_json_format("state","post_id_config"));
   CAN_FilterTypeDef can_filter;

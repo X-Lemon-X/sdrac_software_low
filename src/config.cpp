@@ -10,6 +10,7 @@
 #include "pin.hpp"
 #include <limits>
 #include <string>
+#include "can.h"
 
 //**************************************************************************************************
 // Gpio assigments
@@ -84,6 +85,8 @@ const IdConfig config_id_default ={
   0.0f,
   0.0f,
   0.0f,
+  CAN_KONARM_1_SET_CONTROL_MODE_CONTROL_MODE_POSITION_CONTROL_CHOICE,
+  0.7f
 };
 
 const IdConfig config_id_1 ={
@@ -124,6 +127,8 @@ const IdConfig config_id_1 ={
   PI,
   -PI_m2,
   PI_m2,
+  CAN_KONARM_1_SET_CONTROL_MODE_CONTROL_MODE_POSITION_CONTROL_CHOICE,
+  0.7f
 };
 
 const IdConfig config_id_2 = {
@@ -164,6 +169,8 @@ const IdConfig config_id_2 = {
   PI,
   -PI_d2,
   PI_d2,
+  CAN_KONARM_1_SET_CONTROL_MODE_CONTROL_MODE_POSITION_CONTROL_CHOICE,
+  0.7f
 };
 
 const IdConfig config_id_3 = {
@@ -204,6 +211,8 @@ const IdConfig config_id_3 = {
   PI,
   -1.1f,
   4.28f,
+  CAN_KONARM_1_SET_CONTROL_MODE_CONTROL_MODE_POSITION_CONTROL_CHOICE,
+  0.7f
 };
 
 const IdConfig config_id_4 = {
@@ -244,6 +253,8 @@ const IdConfig config_id_4 = {
   1.0f,
   -std::numeric_limits<float>::max(),
   std::numeric_limits<float>::max(),
+  CAN_KONARM_1_SET_CONTROL_MODE_CONTROL_MODE_POSITION_CONTROL_CHOICE,
+  0.7f
 };
 
 const IdConfig config_id_5 = {
@@ -284,6 +295,8 @@ const IdConfig config_id_5 = {
   1.0,
   -std::numeric_limits<float>::max(),
   std::numeric_limits<float>::max(),
+  CAN_KONARM_1_SET_CONTROL_MODE_CONTROL_MODE_POSITION_CONTROL_CHOICE,
+  0.7f
 };
 
 const IdConfig config_id_6 = {
@@ -324,6 +337,8 @@ const IdConfig config_id_6 = {
   1.0f,
   -std::numeric_limits<float>::max(),
   std::numeric_limits<float>::max(),
+  CAN_KONARM_1_SET_CONTROL_MODE_CONTROL_MODE_POSITION_CONTROL_CHOICE,
+  0.7f
 };
 
 

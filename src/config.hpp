@@ -147,6 +147,8 @@ float movement_max_velocity;
 float movement_limit_lower;
 /// @brief lower limit position of the arm
 float movement_limit_upper;
+uint8_t movement_control_mode;
+float movement_max_acceleration;
 };
 
 /// @brief struct for the error data that represents the state of the system
