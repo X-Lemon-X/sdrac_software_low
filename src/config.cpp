@@ -58,6 +58,7 @@ const IdConfig config_id_default ={
   0x603,
   0x604,
   0x605,
+  0x606,
 
   400.0f,
   40.0f,
@@ -100,11 +101,12 @@ const IdConfig config_id_1 ={
   CAN_KONARM_1_GET_POS_FRAME_ID,
   CAN_KONARM_1_CLEAR_ERRORS_FRAME_ID,
   CAN_KONARM_1_GET_ERRORS_FRAME_ID,
+  CAN_KONARM_1_SET_CONTROL_MODE_FRAME_ID,
 
   400.0f,
   40.0f,
-  PI,
-  0.03f,
+  PI_m2,
+  0.05f,
   false,
   false,
   960,
@@ -117,18 +119,18 @@ const IdConfig config_id_1 ={
   0.0f,
   false,
   0.0f,
-  0,
+  40,
   true,
   
   0.9f,
   0.0f,
   0.1f,
 
-  PI,
+  1.5f,
   -PI_m2,
   PI_m2,
   CAN_KONARM_1_SET_CONTROL_MODE_CONTROL_MODE_POSITION_CONTROL_CHOICE,
-  0.7f
+  1.5f
 };
 
 const IdConfig config_id_2 = {
@@ -142,11 +144,12 @@ const IdConfig config_id_2 = {
   CAN_KONARM_2_GET_POS_FRAME_ID,
   CAN_KONARM_2_CLEAR_ERRORS_FRAME_ID,
   CAN_KONARM_2_GET_ERRORS_FRAME_ID,
+  CAN_KONARM_2_SET_CONTROL_MODE_FRAME_ID,
 
   400.0f,
   40.0f,
-  2.0f,
-  0.03f,
+  PI_m2,
+  0.05f,
   false,
   false,
   960,
@@ -154,7 +157,7 @@ const IdConfig config_id_2 = {
   1.1063838005065918f,
   false,
   PI,
-  10,
+  40,
 
   0.0f,
   false,
@@ -166,11 +169,11 @@ const IdConfig config_id_2 = {
   0.0f,
   0.1f,
 
-  PI,
+  1.5f,
   -PI_d2,
   PI_d2,
   CAN_KONARM_1_SET_CONTROL_MODE_CONTROL_MODE_POSITION_CONTROL_CHOICE,
-  0.7f
+  1.5f
 };
 
 const IdConfig config_id_3 = {
@@ -184,11 +187,12 @@ const IdConfig config_id_3 = {
   CAN_KONARM_3_GET_POS_FRAME_ID,
   CAN_KONARM_3_CLEAR_ERRORS_FRAME_ID,
   CAN_KONARM_3_GET_ERRORS_FRAME_ID,
+  CAN_KONARM_3_SET_CONTROL_MODE_FRAME_ID,
 
   400.0f,
   40.0f,
   PI_m2,
-  0.03f,
+  0.05f,
   true,
   false,
   960,
@@ -196,7 +200,7 @@ const IdConfig config_id_3 = {
   -1.6793255805969238f,
   true,
   PI,
-  1,
+  40,
 
   0.0f,
   false,
@@ -208,11 +212,11 @@ const IdConfig config_id_3 = {
   0.0f,
   0.1f,
 
-  PI,
+  1.5f,
   -1.1f,
   4.28f,
   CAN_KONARM_1_SET_CONTROL_MODE_CONTROL_MODE_POSITION_CONTROL_CHOICE,
-  0.7f
+  1.5f
 };
 
 const IdConfig config_id_4 = {
@@ -226,11 +230,12 @@ const IdConfig config_id_4 = {
   CAN_KONARM_4_GET_POS_FRAME_ID,
   CAN_KONARM_4_CLEAR_ERRORS_FRAME_ID,
   CAN_KONARM_4_GET_ERRORS_FRAME_ID,
+  CAN_KONARM_4_SET_CONTROL_MODE_FRAME_ID,
 
   6400.0f,
   71.9f,
   PI,
-  0.03f,
+  0.05f,
   false,
   true,
   32,
@@ -254,7 +259,7 @@ const IdConfig config_id_4 = {
   -std::numeric_limits<float>::max(),
   std::numeric_limits<float>::max(),
   CAN_KONARM_1_SET_CONTROL_MODE_CONTROL_MODE_POSITION_CONTROL_CHOICE,
-  0.7f
+  1.5f
 };
 
 const IdConfig config_id_5 = {
@@ -268,11 +273,12 @@ const IdConfig config_id_5 = {
   CAN_KONARM_5_GET_POS_FRAME_ID,
   CAN_KONARM_5_CLEAR_ERRORS_FRAME_ID,
   CAN_KONARM_5_GET_ERRORS_FRAME_ID,
+  CAN_KONARM_5_SET_CONTROL_MODE_FRAME_ID,
 
   6400.0f,
   71.9f,
   PI,
-  0.03f,
+  0.05f,
   false,
   true,
   32,
@@ -296,7 +302,7 @@ const IdConfig config_id_5 = {
   -std::numeric_limits<float>::max(),
   std::numeric_limits<float>::max(),
   CAN_KONARM_1_SET_CONTROL_MODE_CONTROL_MODE_POSITION_CONTROL_CHOICE,
-  0.7f
+  1.5f
 };
 
 const IdConfig config_id_6 = {
@@ -310,11 +316,12 @@ const IdConfig config_id_6 = {
   CAN_KONARM_6_GET_POS_FRAME_ID,
   CAN_KONARM_6_CLEAR_ERRORS_FRAME_ID,
   CAN_KONARM_6_GET_ERRORS_FRAME_ID,
+  CAN_KONARM_6_SET_CONTROL_MODE_FRAME_ID,
 
   6400.0f,
   71.9f,
   PI,
-  0.03f,
+  0.05f,
   false,
   true,
   32,
@@ -338,7 +345,7 @@ const IdConfig config_id_6 = {
   -std::numeric_limits<float>::max(),
   std::numeric_limits<float>::max(),
   CAN_KONARM_1_SET_CONTROL_MODE_CONTROL_MODE_POSITION_CONTROL_CHOICE,
-  0.7f
+  1.5f
 };
 
 

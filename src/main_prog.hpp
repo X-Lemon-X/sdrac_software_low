@@ -1,7 +1,5 @@
 
 
-#ifndef MAIN_PROG_H
-#define MAIN_PROG_H
 #include "can_control.hpp"
 
 #include "can.h"
@@ -29,6 +27,9 @@
 #include <string>
 #include <cmath>
 
+
+#ifndef MAIN_PROG_H
+#define MAIN_PROG_H
 
 
 
@@ -62,6 +63,9 @@ void config_tasks();
 /// is also required to chnage control mode since wewant to have known state of the robot when
 // changing control algorithm
 void init_and_set_movement_controler_mode(uint8_t mode);
+
+/// @brief can disconnect timeout reset
+void can_disconnect_timeout_reset();
 
 ///**************************************************************************************************
 /// CAN CALLBACKS

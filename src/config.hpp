@@ -110,6 +110,7 @@ uint32_t can_konarm_set_pos_frame_id;
 uint32_t can_konarm_get_pos_frame_id;
 uint32_t can_konarm_clear_errors_frame_id;
 uint32_t can_konarm_get_errors_frame_id;
+uint32_t can_konarm_set_control_mode_frame_id;
 
 
 // Steper motor config

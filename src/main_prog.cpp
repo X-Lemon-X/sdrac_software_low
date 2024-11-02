@@ -1,4 +1,5 @@
 #include "main_prog.hpp"
+#include "config.hpp"
 
 //**************************************************************************************************
 // SCARY GLOBAL VARIABLES
@@ -68,6 +69,11 @@ void id_config(){
   case BOARD_ID_6: config = config_id_6; break;
   default: config = config_id_default; break;
   }
+}
+
+void can_disconnect_timeout_reset(){
+  task_can_disconnected_timer->reset();
+  error_data.can_disconnected = false;
 }
 
 void init_and_set_movement_controler_mode(uint8_t mode){
@@ -143,7 +149,7 @@ void post_id_config(){
   encoder_motor.set_dead_zone_correction_angle(config.encoder_motor_dead_zone_correction_angle);
   encoder_motor.set_ratio(1.0f / stp_motor.get_gear_ratio());
   encoder_motor.set_enable_encoder(config.encoder_motor_enable);
-  encoder_motor_moving_avarage.set_size(50); // 15 for smooth movement but delay with sampling to 50
+  encoder_motor_moving_avarage.set_size(25); // 15 for smooth movement but delay with sampling to 50
   encoder_motor.init(hi2c1,main_clock,nullptr,&encoder_motor_moving_avarage);
   
 
@@ -156,7 +162,7 @@ void post_id_config(){
 
   // used for the position control
   bacis_controler.set_max_acceleration(config.movement_max_acceleration);
-  bacis_controler.set_target_pos_max_error(0.001f);
+  bacis_controler.set_target_pos_max_error(0.01f);
 
   // for velocity control we use the pass through controler whitch doesn't do anything
 
@@ -286,6 +292,7 @@ void task_blink_error(stmepic::Timing& task_timer){
 void config_tasks(){
 
   can_controler.add_callback(config.can_konarm_clear_errors_frame_id, can_callback_clear_errors);
+  can_controler.add_callback(config.can_konarm_set_control_mode_frame_id, can_callback_set_control_mode);
   can_controler.add_callback(config.can_konarm_get_errors_frame_id, can_callback_get_errors);
   can_controler.add_callback(config.can_konarm_status_frame_id, can_callback_status);
   can_controler.add_callback(config.can_konarm_set_pos_frame_id, can_callback_set_pos);

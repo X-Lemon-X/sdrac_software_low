@@ -7,7 +7,7 @@ timer_frequency = core_frequency / prescaler
 PI = 3.14159265359
 
 
-velocity = 0.05
+velocity = 0.03
 velocity2 = 2
 steps_per_revolution = 200*32
 gear_ratio = 1

@@ -132,7 +132,7 @@ def simulate_pid():
     current_velocity = 0
     target_velocity = 1.3
     pid = PID(kp, ki, kd, dt,t1,t2)
-    bc = Bsci_accelarator(1.0, 1, dt,current_position)
+    bc = Bsci_accelarator(1.0, 1.5, dt,current_position)
 
     veloci = []
     tim = []
