@@ -18,43 +18,36 @@ This is a a low level software for SDRACboards from SDRAC project (6DOF Manipula
 The project is based on the STM32F412RGT6 microcontroller.
 
 ## After cloning the project
-After cloning the project you have to bind a git hook to the project. In order to have the automatic software version generation.
-To do that you have to run the following command in the project directory
+After cloning the project to automatically configure the project run the following command
 ```bash
-cp update-software-version.sh .git/hooks/post-commit
-chmod +x .git/hooks/post-commit # if the file is not executable
+./init-build.sh
 ```
-This will generate the app/version.hpp file with the definitions of current version of the software.
-```cpp
-#define VERSION_MAJOR 0 //for example
-#define VERSION_MINOR 23  //for example
-```
-The new version will be generated after each commit.
 
 ## Building the project:
 Building the project requires GNU Arm Embedded Toolchain to be installed.
 1. Download it from this site https://developer.arm.com/downloads/-/gnu-rm 
-2. Move the extracted files in some directory for example "$HOME/.local/share/arm-none-aebi", 
-3. Add this in your .profile file 
+2. Move the extracted files in some directory for example "$HOME/.local/share/gccarm", 
+3. Add this in your ___.profile___ file 
 ```bash
 # Add the arm-none-aebi to the path
-if [ -d "$HOME/.local/share/arm-none-aebi/bin" ]; then
-    PATH="$HOME/.local/share/arm-none-aebi/bin:$PATH" 
+if [ -d "$HOME/.local/share/gccarm/bin" ]; then
+    PATH="$HOME/.local/share/gccarm/bin:$PATH" 
 fi
 ```
-4. Restart the pc or bash
+4. Restart reload the environment
 
 ## Flashing the board
 There are three ways to flash the board:
 1. Using the ST-Link
 2. Using the USB-flash-script (Preferred unless the board was never flashed before)
-3. Using the USB DFU-mode (can be used if the board supports it)
+3. Using the USB DFU-mode (can be used if the board supports it, meanging it has a bootloader flashed to it)
 ### Using the USB-flash-script 
-To flash the board using the USB you just have to run the following command
+1. Connect the board to the pc via USB
+2. To flash the board using the USB you just have to run the following command
 ```bash
-./auto-usb-flash.sh
+./scripts/shell/auto-usb-flash.sh
 ```
-if you don't have required programs installed the script will ask you if you want to install them automatically.
+***if you don't have required programs installed the script will ask you if you want to install them automatically.***
 
 ### Using the USB
 To flash the board using the USB you need to have the dfu-util installed.
@@ -76,13 +69,13 @@ sudo apt-get install stlink-tools -y
 ```
 Then after you connect the board to pc via st-link you can flash the board by running the following command
 ```bash
-st-flash --reset write build/executable.bin 0x08000000
+st-flash --reset write build/firmware.bin 0x08000000
 ```
 
 ## Debugging
-To debug the baord you need cortex-debug extension for vscode.
-and st-link utility installed.
-the in vs code add in .vscode/launch.json the following code
+1. To debug the baord you need cortex-debug extension for vscode [link](https://marketplace.visualstudio.com/items?itemName=marus25.cortex-debug).
+2. st-link utility installed fastest way to do this is to install stmcube-ide.
+3. In in .vscode/launch.json the following code
 ```json
 {
   "version": "0.2.0",
@@ -90,16 +83,17 @@ the in vs code add in .vscode/launch.json the following code
     {
       "name": "Cortex Debug",
       "cwd": "${workspaceFolder}",
-      "executable": "./build/executable.elf",
+      "executable": "build/firmware.elf",
       "request": "launch",
       "type": "cortex-debug",
       "runToEntryPoint": "main",
-      "servertype": "stlink"
+      "servertype": "stlink",
+      "showDevDebugOutput": "raw"
     }
   ]
 }
 ```
-and then you can start the debugging by pressing F5 or by clicking on the debug icon in the debug tab.
+2. then you can start the debugging by pressing F5 or by clicking on the debug icon in the debug tab.
 
 ## Starting CAN converter
 ```bash
