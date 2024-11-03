@@ -94,6 +94,19 @@ st-flash --reset write build/firmware.bin 0x08000000
 }
 ```
 2. then you can start the debugging by pressing F5 or by clicking on the debug icon in the debug tab.
+### Note
+- If you have multiple st-links attached you can add paranmeter to run debug on specific st-link by adding the following line in .vscode/launch.json
+```json
+"serialNumber": "serial number of the st-link",
+```
+- To list all connected st-link run the following command
+```bash
+st-info --probe
+```
+-- If you want to cehck on which hub st-link is connected run the following command
+```bash
+lsusb -tv
+```
 
 ## Starting CAN converter
 ```bash

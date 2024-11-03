@@ -18,7 +18,8 @@
       "type": "cortex-debug",
       "runToEntryPoint": "main",
       "servertype": "stlink",
-      "showDevDebugOutput": "raw"
+      "showDevDebugOutput": "raw",
+      "BMPGDBSerialPort": "/dev/ttyACM1"
     }
   ]
 }
