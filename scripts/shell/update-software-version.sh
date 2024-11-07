@@ -35,5 +35,10 @@ cat <<EOF > $dst_file
 #define VERSION_MINOR $minor_version
 #define VERSION_BUILD $build_number
 
+// for easy find  in a .bin file
+#define VERSION_DEF_BUILD_STRING_DEF "build_version:$major_version.$minor_version.$build_number"
+static const char* VERSION_DEF_BUILD_STRING = VERSION_DEF_BUILD_STRING_DEF;
+
+
 #endif // VERSION_HPP
 EOF
