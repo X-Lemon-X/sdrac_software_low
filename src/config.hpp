@@ -4,13 +4,14 @@
 
 // #include <cstddef>
 // #include <cstdint>
-#include <cstdint>
+// #include <cstdint>
 #include <limits>
 #include <random>
 #include "logger.hpp"
 #include "Timing.hpp"
 #include "can.h"
 #include "main.h"
+#include "motor.hpp"
 #include "stm32f4xx_hal.h"
 #include "usb_device.h"
 #include "usbd_cdc_if.h"
@@ -277,8 +278,9 @@ extern stmepic::TimeScheduler task_timer_scheduler;
 extern stmepic::Board_id board_id;
 extern stmepic::Encoder encoder_arm;
 extern stmepic::Encoder encoder_motor;
-extern stmepic::SteperMotor stp_motor;
-extern stmepic::CanControl can_controler;
+extern stmepic::SteperMotorStepDir stp_motor;
+extern stmepic::MotorBaseClosedLoop motor;
+extern stmepic::CanControl<> can_controler;
 extern stmepic::UsbProgramer usb_programer;
 extern stmepic::MovementControler movement_controler;
 extern stmepic::sensors::NTCTERMISTORS::NtcTermistors temp_steper_driver;

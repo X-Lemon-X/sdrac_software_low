@@ -5,7 +5,7 @@
 // SCARY GLOBAL VARIABLES
 
 stmepic::PIDControler pid_pos(main_clock);
-stmepic::BasicControler bacis_controler(main_clock);
+stmepic::BasicLinearPosControler bacis_controler(main_clock);
 stmepic::PassThroughControler pass_through_controler(main_clock);
 stmepic::filters::Filter_moving_avarage encoder_motor_moving_avarage(main_clock);
 stmepic::Timing tim_can_disconnecteded(main_clock);
@@ -86,17 +86,17 @@ void init_and_set_movement_controler_mode(uint8_t mode){
   }
   switch (mode){
     case CAN_KONARM_1_SET_CONTROL_MODE_CONTROL_MODE_POSITION_CONTROL_CHOICE:
-      movement_controler.init(main_clock, stp_motor, encoder_arm, bacis_controler,engine_encoder);
+      movement_controler.init(main_clock, motor,stmepic::MovementControlMode::POSITION, bacis_controler);
       break;
     case CAN_KONARM_1_SET_CONTROL_MODE_CONTROL_MODE_VELOCITY_CONTROL_CHOICE:
-      movement_controler.init(main_clock, stp_motor, encoder_arm, pass_through_controler,engine_encoder);
+      movement_controler.init(main_clock, motor, stmepic::MovementControlMode::VELOCITY,pass_through_controler);
       break;
     case CAN_KONARM_1_SET_CONTROL_MODE_CONTROL_MODE_TORQUE_CONTROL_CHOICE:
     // torque control is not implemented yet so we will use the velocity control
-      movement_controler.init(main_clock, stp_motor, encoder_arm, pass_through_controler,engine_encoder);
+      movement_controler.init(main_clock, motor,stmepic::MovementControlMode::TORQUE,pass_through_controler);
       break;
     default:
-      movement_controler.init(main_clock, stp_motor, encoder_arm, pass_through_controler,engine_encoder);
+      movement_controler.init(main_clock, motor,stmepic::MovementControlMode::VELOCITY,pass_through_controler);
       break;
   }
 }
@@ -114,7 +114,7 @@ void post_id_config(){
   stp_motor.set_max_velocity(config.stepper_motor_max_velocity);
   stp_motor.set_min_velocity(config.stepper_motor_min_velocity);
   stp_motor.set_reverse(config.stepper_motor_reverse);
-  stp_motor.set_enable_reversed(config.stepper_motor_enable_reversed);
+  stp_motor.set_reversed_enable_pin(config.stepper_motor_enable_reversed);
   stp_motor.set_prescaler(config.stepper_motor_timer_prescaler);
   stp_motor.init();
   stp_motor.set_enable(false);  
@@ -186,7 +186,7 @@ void post_id_config(){
   can_filter.SlaveStartFilterBank = 0;
   HAL_CAN_ConfigFilter(&hcan1, &can_filter);
   can_controler.set_filter(config.can_filter_id_high, config.can_filter_mask_high);
-  can_controler.init(hcan1, CAN_FILTER_FIFO0, main_clock, pin_tx_led, pin_rx_led);
+  can_controler.init(hcan1, CAN_FILTER_FIFO0, main_clock, &pin_tx_led, &pin_rx_led);
   HAL_CAN_Start(&hcan1);
   HAL_CAN_ActivateNotification(&hcan1, CAN_IT_RX_FIFO0_MSG_PENDING ); //| CAN_IT_RX_FIFO1_MSG_PENDING); 
 
