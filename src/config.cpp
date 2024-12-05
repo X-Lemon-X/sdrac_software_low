@@ -363,7 +363,7 @@ stmepic::Logger loger(LOG_LOGER_LEVEL,LOG_SHOW_TIMESTAMP, version_string);
 stmepic::Board_id board_id(pin_cid_0, pin_cid_1, pin_cid_2);
 
 stmepic::SteperMotorStepDir stp_motor(htim3, TIM_CHANNEL_1, pin_steper_direction, pin_steper_enable);
-stmepic::MotorBaseClosedLoop motor(stp_motor, &encoder_motor, &encoder_arm);
+stmepic::MotorClosedLoop motor(stp_motor, &encoder_motor, &encoder_arm);
 stmepic::Encoder encoder_arm;
 stmepic::Encoder encoder_motor;
 stmepic::CanControl<> can_controler;

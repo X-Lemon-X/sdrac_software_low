@@ -279,7 +279,7 @@ extern stmepic::Board_id board_id;
 extern stmepic::Encoder encoder_arm;
 extern stmepic::Encoder encoder_motor;
 extern stmepic::SteperMotorStepDir stp_motor;
-extern stmepic::MotorBaseClosedLoop motor;
+extern stmepic::MotorClosedLoop motor;
 extern stmepic::CanControl<> can_controler;
 extern stmepic::UsbProgramer usb_programer;
 extern stmepic::MovementControler movement_controler;
