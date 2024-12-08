@@ -87,7 +87,7 @@ const IdConfig config_id_default ={
   0.0f,
   0.0f,
   0.0f,
-  CAN_KONARM_1_SET_CONTROL_MODE_CONTROL_MODE_POSITION_CONTROL_CHOICE,
+  CAN_KONARM_1_SET_CONTROL_MODE_CONTROL_MODE_VELOCITY_CONTROL_CHOICE,
   0.7f
 };
 
@@ -130,7 +130,7 @@ const IdConfig config_id_1 ={
   1.5f,
   -PI_m2,
   PI_m2,
-  CAN_KONARM_1_SET_CONTROL_MODE_CONTROL_MODE_POSITION_CONTROL_CHOICE,
+  CAN_KONARM_1_SET_CONTROL_MODE_CONTROL_MODE_VELOCITY_CONTROL_CHOICE,
   1.5f
 };
 
@@ -173,7 +173,7 @@ const IdConfig config_id_2 = {
   1.5f,
   -PI_d2,
   PI_d2,
-  CAN_KONARM_1_SET_CONTROL_MODE_CONTROL_MODE_POSITION_CONTROL_CHOICE,
+  CAN_KONARM_1_SET_CONTROL_MODE_CONTROL_MODE_VELOCITY_CONTROL_CHOICE,
   1.5f
 };
 
@@ -216,7 +216,7 @@ const IdConfig config_id_3 = {
   1.5f,
   -1.1f,
   4.28f,
-  CAN_KONARM_1_SET_CONTROL_MODE_CONTROL_MODE_POSITION_CONTROL_CHOICE,
+  CAN_KONARM_1_SET_CONTROL_MODE_CONTROL_MODE_VELOCITY_CONTROL_CHOICE,
   1.5f
 };
 
@@ -259,7 +259,7 @@ const IdConfig config_id_4 = {
   1.0f,
   -std::numeric_limits<float>::max(),
   std::numeric_limits<float>::max(),
-  CAN_KONARM_1_SET_CONTROL_MODE_CONTROL_MODE_POSITION_CONTROL_CHOICE,
+  CAN_KONARM_1_SET_CONTROL_MODE_CONTROL_MODE_VELOCITY_CONTROL_CHOICE,
   1.5f
 };
 
@@ -302,7 +302,7 @@ const IdConfig config_id_5 = {
   1.0,
   -std::numeric_limits<float>::max(),
   std::numeric_limits<float>::max(),
-  CAN_KONARM_1_SET_CONTROL_MODE_CONTROL_MODE_POSITION_CONTROL_CHOICE,
+  CAN_KONARM_1_SET_CONTROL_MODE_CONTROL_MODE_VELOCITY_CONTROL_CHOICE,
   1.5f
 };
 
@@ -345,7 +345,7 @@ const IdConfig config_id_6 = {
   1.0f,
   -std::numeric_limits<float>::max(),
   std::numeric_limits<float>::max(),
-  CAN_KONARM_1_SET_CONTROL_MODE_CONTROL_MODE_POSITION_CONTROL_CHOICE,
+  CAN_KONARM_1_SET_CONTROL_MODE_CONTROL_MODE_VELOCITY_CONTROL_CHOICE,
   1.5f
 };
 
@@ -364,8 +364,8 @@ stmepic::Board_id board_id(pin_cid_0, pin_cid_1, pin_cid_2);
 
 stmepic::SteperMotorStepDir stp_motor(htim3, TIM_CHANNEL_1, pin_steper_direction, pin_steper_enable);
 stmepic::MotorClosedLoop motor(stp_motor, &encoder_motor, &encoder_arm);
-stmepic::Encoder encoder_arm;
-stmepic::Encoder encoder_motor;
+stmepic::encoders::EncoderAbsoluteMagnetic encoder_arm;
+stmepic::encoders::EncoderAbsoluteMagnetic encoder_motor;
 stmepic::CanControl<> can_controler;
 stmepic::MovementControler movement_controler;
 stmepic::UsbProgramer usb_programer(pin_boot_device,loger);

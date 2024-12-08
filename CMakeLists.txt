@@ -39,12 +39,12 @@ include("cmake/gcc-arm-none-eabi.cmake")
 
 # aditional compiler flags
 set(CMAKE_ASM_FLAGS "${CMAKE_C_FLAGS}")
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -u_printf_float")
-set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS}  -u_printf_float")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -u_printf_float -Wreturn-type")
+set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS}  -u_printf_float -Wreturn-type")
 
 # aditional linker flags
-set(CMAKE_C_LINK_FLAGS "${CMAKE_C_LINK_FLAGS}  -u_printf_float")
-set(CMAKE_CXX_LINK_FLAGS "${CMAKE_C_LINK_FLAGS}  -u_printf_float")
+set(CMAKE_C_LINK_FLAGS "${CMAKE_C_LINK_FLAGS}  -u_printf_float -Wreturn-type")
+set(CMAKE_CXX_LINK_FLAGS "${CMAKE_C_LINK_FLAGS}  -u_printf_float -Wreturn-type")
 
 
 # Enable compile command to ease indexing with e.g. clangd
@@ -81,6 +81,7 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
   "src/main_prog_callbacks.cpp"
   "src/main_prog.cpp"
   "src/config.cpp"
+  "src/main_prog_tasks.cpp"
   "src/ariadna_constants/can_messages/output/can.c"
 )
 

@@ -7,6 +7,7 @@
 // #include <cstdint>
 #include <limits>
 #include <random>
+#include "encoder_magnetic.hpp"
 #include "logger.hpp"
 #include "Timing.hpp"
 #include "can.h"
@@ -276,8 +277,8 @@ extern stmepic::Logger loger;
 extern stmepic::Ticker main_clock;
 extern stmepic::TimeScheduler task_timer_scheduler;
 extern stmepic::Board_id board_id;
-extern stmepic::Encoder encoder_arm;
-extern stmepic::Encoder encoder_motor;
+extern stmepic::encoders::EncoderAbsoluteMagnetic encoder_arm;
+extern stmepic::encoders::EncoderAbsoluteMagnetic encoder_motor;
 extern stmepic::SteperMotorStepDir stp_motor;
 extern stmepic::MotorClosedLoop motor;
 extern stmepic::CanControl<> can_controler;

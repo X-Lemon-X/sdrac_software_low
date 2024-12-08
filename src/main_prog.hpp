@@ -1,5 +1,5 @@
 
-
+#pragma once
 #include "can_control.hpp"
 
 #include "can.h"
@@ -32,8 +32,29 @@
 #define MAIN_PROG_H
 
 
+extern stmepic::PIDControler pid_pos;
+extern stmepic::BasicLinearPosControler bacis_controler;
+extern stmepic::PassThroughControler pass_through_controler;
+extern stmepic::filters::FilterMovingAvarage encoder_motor_moving_avarage;
+extern stmepic::filters::FilterSampleSkip encoder_arm_filter_velocity;
+extern stmepic::Timing tim_can_disconnecteded;
+extern std::shared_ptr<stmepic::Timing> task_blink_timer;
+extern std::shared_ptr<stmepic::Timing> task_blink_error_timer;
+extern std::shared_ptr<stmepic::Timing> task_read_analog_values_timer;
+extern std::shared_ptr<stmepic::Timing> task_encoder_timer;
+extern std::shared_ptr<stmepic::Timing> task_usb_timer;
+extern std::shared_ptr<stmepic::Timing> task_data_usb_send_timer;
+extern std::shared_ptr<stmepic::Timing> task_caculate_temp_timer;
+extern std::shared_ptr<stmepic::Timing> task_nodelay_timer;
+extern std::shared_ptr<stmepic::Timing> task_can_disconnected_timer;
+extern float temoperature_board;
+extern float temoperature_steper_driver;
+extern float temoperature_steper_motor; 
+extern float voltage_vcc;
 
 //**************************************************************************************************
+/// CONFIGURATION FUNCTIONS
+
 /// @brief main program, this function is called from main and never returns
 void run_main_prog();
 
@@ -66,6 +87,20 @@ void init_and_set_movement_controler_mode(uint8_t mode);
 
 /// @brief can disconnect timeout reset
 void can_disconnect_timeout_reset();
+
+/// @brief error checks
+void error_checks();
+
+///**************************************************************************************************
+/// TASKS
+void task_blink(stmepic::Timing& task_timer);
+void task_blink_error(stmepic::Timing& task_timer);
+void task_encoders(stmepic::Timing& task_timer);
+void task_usb_handler(stmepic::Timing& task_timer);
+void task_usb_data_loging(stmepic::Timing& task_timer);
+void task_can_disconnect(stmepic::Timing& task_timer);
+void task_read_analog_values(stmepic::Timing& task_timer);
+void task_nodelay(stmepic::Timing& task_timer);
 
 ///**************************************************************************************************
 /// CAN CALLBACKS

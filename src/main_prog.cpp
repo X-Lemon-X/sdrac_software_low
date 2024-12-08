@@ -1,5 +1,7 @@
 #include "main_prog.hpp"
 #include "config.hpp"
+#include "stm32f4xx_hal_cortex.h"
+#include "stmepic.hpp"
 
 //**************************************************************************************************
 // SCARY GLOBAL VARIABLES
@@ -7,7 +9,8 @@
 stmepic::PIDControler pid_pos(main_clock);
 stmepic::BasicLinearPosControler bacis_controler(main_clock);
 stmepic::PassThroughControler pass_through_controler(main_clock);
-stmepic::filters::Filter_moving_avarage encoder_motor_moving_avarage(main_clock);
+stmepic::filters::FilterMovingAvarage encoder_motor_moving_avarage;
+stmepic::filters::FilterSampleSkip encoder_arm_filter_velocity;
 stmepic::Timing tim_can_disconnecteded(main_clock);
 
 std::shared_ptr<stmepic::Timing> task_blink_timer;
@@ -19,11 +22,12 @@ std::shared_ptr<stmepic::Timing> task_data_usb_send_timer;
 std::shared_ptr<stmepic::Timing> task_caculate_temp_timer;
 std::shared_ptr<stmepic::Timing> task_nodelay_timer;
 std::shared_ptr<stmepic::Timing> task_can_disconnected_timer;
+float temoperature_board=0;
+float temoperature_steper_driver=0;
+float temoperature_steper_motor=0; 
+float voltage_vcc=0;
 
-float temoperature_board = 0;
-float temoperature_steper_driver = 0;
-float temoperature_steper_motor = 0; 
-float voltage_vcc = 0;
+
 
 //**************************************************************************************************
 void run_main_prog(){
@@ -80,22 +84,25 @@ void init_and_set_movement_controler_mode(uint8_t mode){
   movement_controler.set_position(movement_controler.get_current_position());
   movement_controler.set_velocity(0.0f);
   movement_controler.set_enable(false);
-  stmepic::Encoder *engine_encoder = nullptr;
+  stmepic::encoders::EncoderAbsoluteMagnetic *engine_encoder = nullptr;
   if(config.encoder_motor_enable){
     engine_encoder = &encoder_motor;
   }
   switch (mode){
     case CAN_KONARM_1_SET_CONTROL_MODE_CONTROL_MODE_POSITION_CONTROL_CHOICE:
-      movement_controler.init(main_clock, motor,stmepic::MovementControlMode::POSITION, bacis_controler);
+      // we switch control mode to position control however since the stepr motor don't have the position control yet implemented
+      // we will use the velocity control with BasicLinearPosControler that will achive the position control
+      movement_controler.init(main_clock, motor,stmepic::MovementControlMode::VELOCITY, bacis_controler);
       break;
     case CAN_KONARM_1_SET_CONTROL_MODE_CONTROL_MODE_VELOCITY_CONTROL_CHOICE:
       movement_controler.init(main_clock, motor, stmepic::MovementControlMode::VELOCITY,pass_through_controler);
       break;
     case CAN_KONARM_1_SET_CONTROL_MODE_CONTROL_MODE_TORQUE_CONTROL_CHOICE:
-    // torque control is not implemented yet so we will use the velocity control
+      // torque control is not implemented yet so we will use the velocity control
       movement_controler.init(main_clock, motor,stmepic::MovementControlMode::TORQUE,pass_through_controler);
       break;
     default:
+      // if the mode is not supported we will use the velocity control
       movement_controler.init(main_clock, motor,stmepic::MovementControlMode::VELOCITY,pass_through_controler);
       break;
   }
@@ -121,28 +128,22 @@ void post_id_config(){
 
 
   //-------------------ENCODER ARM POSITION CONFIGURATION-------------------
-  encoder_arm.set_function_to_read_angle(stmepic::translate_reg_to_angle_MT6701);
   encoder_arm.set_offset(config.encoder_arm_offset);
   encoder_arm.set_reverse(config.encoder_arm_reverse);
-  encoder_arm.set_enable_position_filter(false);
-  encoder_arm.set_enable_velocity(false);
-  encoder_arm.set_enable_velocity_filter(false);
-  encoder_arm.set_velocity_sample_amount(config.encoder_arm_velocity_sample_amount);
   encoder_arm.set_dead_zone_correction_angle(config.encoder_arm_dead_zone_correction_angle);
   encoder_arm.set_angle_register(ENCODER_MT6701_ANGLE_REG);
   encoder_arm.set_resolution(ENCODER_MT6702_RESOLUTION);
   encoder_arm.set_address(ENCODER_MT6701_I2C_ADDRESS);
   encoder_arm.set_enable_encoder(true);
-  encoder_arm.init(hi2c1,main_clock,nullptr,nullptr);
+  encoder_arm_filter_velocity.set_samples_to_skip(config.encoder_arm_velocity_sample_amount);
+  encoder_arm_filter_velocity.set_init_value(0);
+  encoder_arm.init(hi2c1,main_clock,stmepic::encoders::translate_reg_to_angle_MT6701,nullptr,&encoder_arm_filter_velocity);
   
+
   //-------------------ENCODER STEPER MOTOR POSITION CONFIGURATION-------------------
-  encoder_motor.set_function_to_read_angle(stmepic::translate_reg_to_angle_MT6701);
   encoder_motor.set_offset(config.encoder_motor_offset);
   encoder_motor.set_reverse(config.encoder_motor_reverse);
-  encoder_motor.set_enable_position_filter(false);
-  encoder_motor.set_enable_velocity(true);
-  encoder_motor.set_enable_velocity_filter(false);
-  encoder_motor.set_velocity_sample_amount(config.encoder_motor_velocity_sample_amount);
+  // encoder_motor.set_velocity_sample_amount(config.encoder_motor_velocity_sample_amount);
   encoder_motor.set_resolution(ENCODER_MT6702_RESOLUTION);
   encoder_motor.set_angle_register(ENCODER_MT6701_ANGLE_REG);
   encoder_motor.set_address(ENCODER_MT6701_I2C_ADDRESS_2); 
@@ -150,7 +151,8 @@ void post_id_config(){
   encoder_motor.set_ratio(1.0f / stp_motor.get_gear_ratio());
   encoder_motor.set_enable_encoder(config.encoder_motor_enable);
   encoder_motor_moving_avarage.set_size(25); // 15 for smooth movement but delay with sampling to 50
-  encoder_motor.init(hi2c1,main_clock,nullptr,&encoder_motor_moving_avarage);
+  encoder_motor_moving_avarage.set_samples_to_skip(config.encoder_motor_velocity_sample_amount);
+  encoder_motor.init(hi2c1,main_clock,stmepic::encoders::translate_reg_to_angle_MT6701,nullptr,&encoder_motor_moving_avarage);
   
 
   //-------------------MOVEMENT CONTROLER CONFIGURATION-------------------
@@ -216,78 +218,6 @@ void error_checks(){
   error_data.controler_motor_limit_position = movement_controler.get_limit_position_achieved();
 }
 
-void task_encoders(stmepic::Timing& task_timer){
-  encoder_arm.handle();
-  if(config.encoder_motor_enable)
-    encoder_motor.handle();
-}
-
-void task_nodelay(stmepic::Timing& task_timer){
-  movement_controler.handle();
-  can_controler.handle();
-  error_checks();
-}
-
-void task_can_disconnect(stmepic::Timing& task_timer){
-  movement_controler.set_enable(false);
-  movement_controler.set_velocity(0);
-  movement_controler.set_position(movement_controler.get_current_position());
-  error_data.can_disconnected = true;
-}
-
-void task_usb_handler(stmepic::Timing& task_timer){
-  usb_programer.handler();
-}
-
-void task_usb_data_loging(stmepic::Timing& task_timer){
-  log_info(
-        loger.parse_to_json_format("ID",std::to_string(board_id.get_id()))+
-        loger.parse_to_json_format("Vsen",std::to_string(voltage_vcc))+
-        loger.parse_to_json_format("Tste",std::to_string(temoperature_steper_motor))+
-        loger.parse_to_json_format("Tbor",std::to_string(temoperature_board))+
-        loger.parse_to_json_format("Tmot",std::to_string(temoperature_steper_driver))+
-        loger.parse_to_json_format("Eang",std::to_string(encoder_arm.get_angle()))+
-        loger.parse_to_json_format("Pos",std::to_string(movement_controler.get_current_position()))+
-        loger.parse_to_json_format("Vel",std::to_string(movement_controler.get_current_velocity()))+
-        loger.parse_to_json_format("EPos",std::to_string(encoder_motor.get_absoulute_angle()))+
-        loger.parse_to_json_format("Err",std::to_string(error_data.get_amount_of_errors()))+
-        loger.parse_to_json_format("Errs",
-          loger.parse_to_json_format("teng",BOOL_TO_STRING(error_data.temp_engine_overheating))+
-          loger.parse_to_json_format("tdri",BOOL_TO_STRING(error_data.temp_driver_overheating))+
-          loger.parse_to_json_format("tboa",BOOL_TO_STRING(error_data.temp_board_overheating))+
-          loger.parse_to_json_format("tengdis",BOOL_TO_STRING(error_data.temp_engine_sensor_disconnect))+
-          loger.parse_to_json_format("tdrivdis",BOOL_TO_STRING(error_data.temp_driver_sensor_disconnect))+
-          loger.parse_to_json_format("tborddis",BOOL_TO_STRING(error_data.temp_board_sensor_disconnect))+
-          loger.parse_to_json_format("encarmmdis",BOOL_TO_STRING(error_data.encoder_arm_disconnect))+
-          loger.parse_to_json_format("encmotdis",BOOL_TO_STRING(error_data.encoder_motor_disconnect))+
-          loger.parse_to_json_format("bovolt",BOOL_TO_STRING(error_data.baord_overvoltage))+
-          loger.parse_to_json_format("buvolt",BOOL_TO_STRING(error_data.baord_undervoltage))+
-          loger.parse_to_json_format("candis",BOOL_TO_STRING(error_data.can_disconnected))+
-          loger.parse_to_json_format("canerr",BOOL_TO_STRING(error_data.can_error))+
-          loger.parse_to_json_format("motlimit",BOOL_TO_STRING(error_data.controler_motor_limit_position),false)
-        ,false,true)
-      );
-}
-
-void task_blink(stmepic::Timing& task_timer){
-  TOGGLE_GPIO(pin_user_led_1);
-}
-
-void task_read_analog_values(stmepic::Timing& task_timer){
-  temoperature_board = stmepic::sensors::MCP9700AT::get_temperature(VOLTAGE_VALUE(pin_temp_board));
-  temoperature_steper_driver = temp_steper_driver.get_temperature(VOLTAGE_VALUE(pin_temp_steper_board)); 
-  temoperature_steper_motor = temp_steper_motor.get_temperature(VOLTAGE_VALUE(pin_temp_motor));
-  voltage_vcc = VOLTAGE_VALUE(pin_vsense) * ADC_VSENSE_MULTIPLIER;
-}
-
-void task_blink_error(stmepic::Timing& task_timer){
-  // error_checks();
-  auto errors_count = error_data.get_amount_of_errors();
-  task_timer.set_behaviour(stmepic::frequency_to_period_us((float)TIMING_LED_ERROR_BLINK_FQ*errors_count), true);
-  
-  if(errors_count) TOGGLE_GPIO(pin_user_led_2); 
-  else WRITE_GPIO(pin_user_led_2,GPIO_PIN_RESET);
-}
 
 void config_tasks(){
 
@@ -305,61 +235,102 @@ void config_tasks(){
     stmepic::frequency_to_period_us(TIMING_LED_BLINK_FQ),
     true,
     task_blink 
-    );
+    ).valueOrDie();
 
   task_blink_error_timer = stmepic::Timing::Make(
     main_clock,
     stmepic::frequency_to_period_us(TIMING_LED_ERROR_BLINK_FQ),
     true,
     task_blink_error
-    );
+    ).valueOrDie();
   task_encoder_timer = stmepic::Timing::Make(
     main_clock,
     stmepic::frequency_to_period_us(TIMING_ENCODER_UPDATE_FQ),
     true,
     task_encoders
-    );
+    ).valueOrDie();
 
   task_usb_timer = stmepic::Timing::Make(
     main_clock,
     stmepic::frequency_to_period_us(TIMING_USB_RECIVED_DATA_FQ),
     true,
     task_usb_handler
-    );
+    ).valueOrDie();
 
   task_data_usb_send_timer = stmepic::Timing::Make(
     main_clock,
     stmepic::frequency_to_period_us(TIMING_USB_SEND_DATA_FQ),
     true,
     task_usb_data_loging
-    );
+    ).valueOrDie();
 
   task_can_disconnected_timer = stmepic::Timing::Make(
     main_clock,
     TIMING_CAN_DISCONNECTED_PERIOD,
     false,
     task_can_disconnect
-    );
+    ).valueOrDie();
   task_read_analog_values_timer = stmepic::Timing::Make(
     main_clock,
     stmepic::frequency_to_period_us(TIMING_READ_TEMPERATURE_FQ),
     true,
     task_read_analog_values
-    );
+    ).valueOrDie();
   task_nodelay_timer = stmepic::Timing::Make(
     main_clock,
     0,
     true,
     task_nodelay
-    );
-  task_timer_scheduler.add_timer(task_blink_timer);
-  task_timer_scheduler.add_timer(task_blink_error_timer);
-  task_timer_scheduler.add_timer(task_encoder_timer);
-  task_timer_scheduler.add_timer(task_usb_timer);
-  task_timer_scheduler.add_timer(task_data_usb_send_timer);
-  task_timer_scheduler.add_timer(task_can_disconnected_timer);
-  task_timer_scheduler.add_timer(task_read_analog_values_timer);
-  task_timer_scheduler.add_timer(task_nodelay_timer);
+    ).valueOrDie();
+
+  auto status = task_timer_scheduler.add_timer(task_blink_timer);
+  if(!status.ok()){
+    log_error("Error adding task_blink_timer to the scheduler");
+    HAL_NVIC_SystemReset();
+  }
+
+  status = task_timer_scheduler.add_timer(task_blink_error_timer);
+  if(!status.ok()){
+    log_error("Error adding task_blink_error_timer to the scheduler");
+    HAL_NVIC_SystemReset();
+  }
+
+
+  status = task_timer_scheduler.add_timer(task_encoder_timer);
+  if (!status.ok()){
+    log_error("Error adding task_encoder_timer to the scheduler");
+    HAL_NVIC_SystemReset();
+  }
+
+  status = task_timer_scheduler.add_timer(task_usb_timer);
+  if (!status.ok()){
+    log_error("Error adding task_usb_timer to the scheduler");
+    HAL_NVIC_SystemReset();
+  }
+
+  status = task_timer_scheduler.add_timer(task_data_usb_send_timer);
+  if (!status.ok()){
+    log_error("Error adding task_data_usb_send_timer to the scheduler");
+    HAL_NVIC_SystemReset();
+  }
+
+  status = task_timer_scheduler.add_timer(task_can_disconnected_timer);
+  if (!status.ok()){
+    log_error("Error adding task_can_disconnected_timer to the scheduler");
+    HAL_NVIC_SystemReset();
+  }
+
+  status = task_timer_scheduler.add_timer(task_read_analog_values_timer);
+  if (!status.ok()){
+    log_error("Error adding task_read_analog_values_timer to the scheduler");
+    HAL_NVIC_SystemReset();
+  }
+
+  status = task_timer_scheduler.add_timer(task_nodelay_timer);
+  if (!status.ok()){
+    log_error("Error adding task_nodelay_timer to the scheduler");
+    HAL_NVIC_SystemReset();
+  }
 }
 
 void main_loop(){
