@@ -278,7 +278,7 @@ extern stmepic::Ticker main_clock;
 extern stmepic::TimeScheduler task_timer_scheduler;
 extern stmepic::Board_id board_id;
 extern stmepic::encoders::EncoderAbsoluteMagnetic encoder_arm;
-extern stmepic::encoders::EncoderAbsoluteMagnetic encoder_motor;
+extern stmepic::encoders::EncoderAbsoluteMagnetic encoder_vel_motor;
 extern stmepic::SteperMotorStepDir stp_motor;
 extern stmepic::MotorClosedLoop motor;
 extern stmepic::CanControl<> can_controler;

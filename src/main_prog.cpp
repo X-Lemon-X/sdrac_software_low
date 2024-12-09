@@ -86,7 +86,7 @@ void init_and_set_movement_controler_mode(uint8_t mode){
   movement_controler.set_enable(false);
   stmepic::encoders::EncoderAbsoluteMagnetic *engine_encoder = nullptr;
   if(config.encoder_motor_enable){
-    engine_encoder = &encoder_motor;
+    engine_encoder = &encoder_vel_motor;
   }
   switch (mode){
     case CAN_KONARM_1_SET_CONTROL_MODE_CONTROL_MODE_POSITION_CONTROL_CHOICE:
@@ -141,18 +141,17 @@ void post_id_config(){
   
 
   //-------------------ENCODER STEPER MOTOR POSITION CONFIGURATION-------------------
-  encoder_motor.set_offset(config.encoder_motor_offset);
-  encoder_motor.set_reverse(config.encoder_motor_reverse);
-  // encoder_motor.set_velocity_sample_amount(config.encoder_motor_velocity_sample_amount);
-  encoder_motor.set_resolution(ENCODER_MT6702_RESOLUTION);
-  encoder_motor.set_angle_register(ENCODER_MT6701_ANGLE_REG);
-  encoder_motor.set_address(ENCODER_MT6701_I2C_ADDRESS_2); 
-  encoder_motor.set_dead_zone_correction_angle(config.encoder_motor_dead_zone_correction_angle);
-  encoder_motor.set_ratio(1.0f / stp_motor.get_gear_ratio());
-  encoder_motor.set_enable_encoder(config.encoder_motor_enable);
+  encoder_vel_motor.set_offset(config.encoder_motor_offset);
+  encoder_vel_motor.set_reverse(config.encoder_motor_reverse);
+  encoder_vel_motor.set_dead_zone_correction_angle(config.encoder_motor_dead_zone_correction_angle);
+  encoder_vel_motor.set_angle_register(ENCODER_MT6701_ANGLE_REG);
+  encoder_vel_motor.set_resolution(ENCODER_MT6702_RESOLUTION);
+  encoder_vel_motor.set_address(ENCODER_MT6701_I2C_ADDRESS_2); 
+  encoder_vel_motor.set_ratio(1.0f / stp_motor.get_gear_ratio());
+  encoder_vel_motor.set_enable_encoder(config.encoder_motor_enable);
   encoder_motor_moving_avarage.set_size(25); // 15 for smooth movement but delay with sampling to 50
   encoder_motor_moving_avarage.set_samples_to_skip(config.encoder_motor_velocity_sample_amount);
-  encoder_motor.init(hi2c1,main_clock,stmepic::encoders::translate_reg_to_angle_MT6701,nullptr,&encoder_motor_moving_avarage);
+  encoder_vel_motor.init(hi2c1,main_clock,stmepic::encoders::translate_reg_to_angle_MT6701,nullptr,&encoder_motor_moving_avarage);
   
 
   //-------------------MOVEMENT CONTROLER CONFIGURATION-------------------
@@ -208,7 +207,7 @@ void error_checks(){
   error_data.temp_engine_sensor_disconnect = std::isnan(temoperature_steper_motor);
 
   error_data.encoder_arm_disconnect = !encoder_arm.is_connected();
-  error_data.encoder_motor_disconnect = !encoder_motor.is_connected();
+  error_data.encoder_motor_disconnect = !encoder_vel_motor.is_connected();
 
   error_data.baord_overvoltage = voltage_vcc > ERRORS_MAX_VCC_VOLTAGE? true : false;
   error_data.baord_undervoltage = voltage_vcc < ERRORS_MIN_VCC_VOLTAGE? true : false;

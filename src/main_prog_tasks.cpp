@@ -1,3 +1,4 @@
+#include "config.hpp"
 #include "main_prog.hpp"
 
 
@@ -5,7 +6,7 @@
 void task_encoders(stmepic::Timing& task_timer){
   encoder_arm.handle();
   if(config.encoder_motor_enable)
-    encoder_motor.handle();
+    encoder_vel_motor.handle();
 }
 
 void task_nodelay(stmepic::Timing& task_timer){
@@ -32,10 +33,11 @@ void task_usb_data_loging(stmepic::Timing& task_timer){
         loger.parse_to_json_format("Tste",std::to_string(temoperature_steper_motor))+
         loger.parse_to_json_format("Tbor",std::to_string(temoperature_board))+
         loger.parse_to_json_format("Tmot",std::to_string(temoperature_steper_driver))+
-        loger.parse_to_json_format("Eang",std::to_string(encoder_arm.get_angle()))+
+        loger.parse_to_json_format("EEang",std::to_string(encoder_arm.get_angle()))+
+        loger.parse_to_json_format("EAang",std::to_string(encoder_vel_motor.get_angle()))+
         loger.parse_to_json_format("Pos",std::to_string(movement_controler.get_current_position()))+
         loger.parse_to_json_format("Vel",std::to_string(movement_controler.get_current_velocity()))+
-        loger.parse_to_json_format("EPos",std::to_string(encoder_motor.get_absoulute_angle()))+
+        loger.parse_to_json_format("EPos",std::to_string(encoder_vel_motor.get_absoulute_angle()))+
         loger.parse_to_json_format("Err",std::to_string(error_data.get_amount_of_errors()))+
         loger.parse_to_json_format("Errs",
           loger.parse_to_json_format("teng",BOOL_TO_STRING(error_data.temp_engine_overheating))+
