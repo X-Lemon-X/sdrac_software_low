@@ -12,6 +12,7 @@
 #include <limits>
 #include <string>
 #include "can.h"
+#include "usbd_cdc_if.h"
 
 //**************************************************************************************************
 // Gpio assigments
@@ -359,7 +360,7 @@ uint32_t adc_dma_buffer[ADC_DMA_BUFFER_SIZE+1];
 IdConfig config;
 stmepic::Ticker main_clock;
 stmepic::TimeScheduler task_timer_scheduler(main_clock);
-stmepic::Logger loger(LOG_LOGER_LEVEL,LOG_SHOW_TIMESTAMP, version_string);
+stmepic::Logger loger(LOG_LOGER_LEVEL,LOG_SHOW_TIMESTAMP,CDC_Transmit_FS ,version_string);
 stmepic::Board_id board_id(pin_cid_0, pin_cid_1, pin_cid_2);
 
 stmepic::SteperMotorStepDir stp_motor(htim3, TIM_CHANNEL_1, pin_steper_direction, pin_steper_enable);
