@@ -92,11 +92,11 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
 void can_callback_set_pos(stmepic::can_msg &recived_msg){
   can_disconnect_timeout_reset();
   can_konarm_1_set_pos_t signals;
-  can_konarm_1_set_pos_unpack(&signals, recived_msg.data, recived_msg.data_size);
-  float targetPosition = can_konarm_1_set_pos_position_decode(signals.position);
-  float targetVelocity = can_konarm_1_set_pos_velocity_decode(signals.velocity);
-  movement_controler.set_velocity(targetVelocity);
-  movement_controler.set_position(targetPosition);
+  (void)can_konarm_1_set_pos_unpack(&signals, recived_msg.data, recived_msg.data_size);
+  // float targetPosition = can_konarm_1_set_pos_position_decode(signals.position);
+  // float targetVelocity = can_konarm_1_set_pos_velocity_decode(signals.velocity);
+  movement_controler.set_velocity(signals.position);
+  movement_controler.set_position(signals.velocity);
   movement_controler.set_enable(true); 
 }
 
@@ -105,10 +105,10 @@ void can_callback_get_pos(stmepic::can_msg &recived_msg){
   stmepic::can_msg send_msg;
   can_konarm_1_get_pos_t src_p;
   send_msg.frame_id = config.can_konarm_get_pos_frame_id;
-  src_p.position = can_konarm_1_get_pos_position_encode(movement_controler.get_current_position());
-  src_p.velocity = can_konarm_1_get_pos_velocity_encode(movement_controler.get_current_velocity());
+  src_p.position = movement_controler.get_current_position();
+  src_p.velocity = movement_controler.get_current_velocity();
   send_msg.data_size = CAN_KONARM_1_GET_POS_LENGTH;
-  can_konarm_1_get_pos_pack(send_msg.data, &src_p, send_msg.data_size);
+  (void)can_konarm_1_get_pos_pack(send_msg.data, &src_p, send_msg.data_size);
   can_controler.send_can_msg_to_queue(send_msg);
 }
 
@@ -132,21 +132,20 @@ void can_callback_get_errors(stmepic::can_msg &recived_msg){
   stmepic::can_msg send_msg;
   can_konarm_1_get_errors_t src_p;
   send_msg.frame_id = config.can_konarm_get_errors_frame_id;
-  src_p.temp_engine_overheating = can_konarm_1_get_errors_temp_engine_overheating_encode(error_data.temp_engine_overheating);
-  src_p.temp_driver_overheating = can_konarm_1_get_errors_temp_driver_overheating_encode(error_data.temp_driver_overheating);
-  src_p.temp_board_overheating = can_konarm_1_get_errors_temp_board_overheating_encode(error_data.temp_board_overheating);
-  src_p.temp_engine_sensor_disconnect = can_konarm_1_get_errors_temp_engine_sensor_disconnect_encode(error_data.temp_engine_sensor_disconnect);
-  src_p.temp_driver_sensor_disconnect = can_konarm_1_get_errors_temp_driver_sensor_disconnect_encode(error_data.temp_driver_sensor_disconnect);
-  src_p.temp_board_sensor_disconnect = can_konarm_1_get_errors_temp_board_sensor_disconnect_encode(error_data.temp_board_sensor_disconnect);
-  src_p.encoder_arm_disconnect = can_konarm_1_get_errors_encoder_arm_disconnect_encode(error_data.encoder_arm_disconnect);
-  src_p.encoder_motor_disconnect = can_konarm_1_get_errors_encoder_motor_disconnect_encode(error_data.encoder_motor_disconnect);
-  src_p.board_overvoltage = can_konarm_1_get_errors_board_overvoltage_encode(error_data.baord_overvoltage);
-  src_p.board_undervoltage = can_konarm_1_get_errors_board_undervoltage_encode(error_data.baord_undervoltage);
-  src_p.can_disconnected = can_konarm_1_get_errors_can_disconnected_encode(error_data.can_disconnected);
-  src_p.can_error = can_konarm_1_get_errors_can_error_encode(error_data.can_error);
-  src_p.controler_motor_limit_position = can_konarm_1_get_errors_controler_motor_limit_position_encode(error_data.controler_motor_limit_position);
+  src_p.temp_engine_overheating = error_data.temp_engine_overheating;
+  src_p.temp_driver_overheating = error_data.temp_driver_overheating;
+  src_p.temp_board_overheating = error_data.temp_board_overheating;
+  src_p.temp_engine_sensor_disconnect = error_data.temp_engine_sensor_disconnect;
+  src_p.temp_driver_sensor_disconnect = error_data.temp_driver_sensor_disconnect;
+  src_p.temp_board_sensor_disconnect = error_data.temp_board_sensor_disconnect;
+  src_p.encoder_arm_disconnect = error_data.encoder_arm_disconnect;
+  src_p.encoder_motor_disconnect = error_data.encoder_motor_disconnect;
+  src_p.board_overvoltage = error_data.baord_overvoltage;
+  src_p.board_undervoltage = error_data.baord_undervoltage;
+  src_p.can_disconnected = error_data.can_disconnected;
+  src_p.can_error = error_data.can_error;
+  src_p.controler_motor_limit_position = error_data.controler_motor_limit_position;
   send_msg.data_size = CAN_KONARM_1_GET_ERRORS_LENGTH;
-
   can_konarm_1_get_errors_pack(send_msg.data, &src_p, send_msg.data_size);
   can_controler.send_can_msg_to_queue(send_msg);
   error_data.can_error = false;
@@ -161,6 +160,10 @@ void can_callback_set_control_mode(stmepic::can_msg &recived_msg){
   can_disconnect_timeout_reset();
   can_konarm_1_set_control_mode_t signals;
   can_konarm_1_set_control_mode_unpack(&signals, recived_msg.data, recived_msg.data_size);
-  uint8_t mode = can_konarm_1_set_control_mode_control_mode_decode(signals.control_mode);
-  init_and_set_movement_controler_mode(mode);
+  if(!can_konarm_1_set_control_mode_control_mode_is_in_range(signals.control_mode)){
+    error_data.can_error = true;
+    log_error("Control mode is out of range");
+    return;
+  }
+  init_and_set_movement_controler_mode(signals.control_mode);
 }
