@@ -74,6 +74,7 @@ add_subdirectory(cmake/stm32cubemx)
 # set(STMEPIC_DFU_PROGRAMING ON)
 add_subdirectory(src/StmEpic)
 
+add_subdirectory(src/ariadna_constants)
 
 # Add sources to executable
 target_sources(${CMAKE_PROJECT_NAME} PRIVATE
@@ -82,20 +83,21 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
   "src/main_prog.cpp"
   "src/config.cpp"
   "src/main_prog_tasks.cpp"
-  "src/ariadna_constants/can_messages/output/can.c"
+  # "src/ariadna_constants/can_messages/output/can.c"
 )
 
 # Add include paths
 
 target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE
   "src"
-  "src/ariadna_constants/can_messages/output"
+  # "src/ariadna_constants/can_messages/output"
 )
 
 
 target_link_libraries(${CMAKE_PROJECT_NAME}
   stm32cubemx
   etl::etl
+  can_constants
   # Add user defined libraries
 )
 
