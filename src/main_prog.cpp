@@ -6,6 +6,7 @@
 #include "stm32f4xx_hal_i2c.h"
 #include "stmepic.hpp"
 #include "fram_i2c.hpp"
+#include <cstddef>
 #include <cstdint>
 
 //**************************************************************************************************
