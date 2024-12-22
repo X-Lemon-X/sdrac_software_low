@@ -20,6 +20,17 @@
       "servertype": "stlink",
       "showDevDebugOutput": "raw",
       "BMPGDBSerialPort": "/dev/ttyACM1"
+    },
+    {
+      "name": "Cortex Debug attach",
+      "cwd": "${workspaceFolder}",
+      "executable": "build/firmware.elf",
+      "request": "attach",
+      "type": "cortex-debug",
+      "runToEntryPoint": "main",
+      "servertype": "stlink",
+      "showDevDebugOutput": "raw",
+      "BMPGDBSerialPort": "/dev/ttyACM1"
     }
   ]
 }

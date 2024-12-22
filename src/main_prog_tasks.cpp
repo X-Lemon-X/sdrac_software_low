@@ -1,4 +1,5 @@
 #include "config.hpp"
+#include "logger.hpp"
 #include "main_prog.hpp"
 
 
@@ -28,31 +29,31 @@ void task_usb_handler(stmepic::Timing& task_timer){
 
 void task_usb_data_loging(stmepic::Timing& task_timer){
   log_info(
-        loger.parse_to_json_format("ID",std::to_string(board_id.get_id()))+
-        loger.parse_to_json_format("Vsen",std::to_string(voltage_vcc))+
-        loger.parse_to_json_format("Tste",std::to_string(temoperature_steper_motor))+
-        loger.parse_to_json_format("Tbor",std::to_string(temoperature_board))+
-        loger.parse_to_json_format("Tmot",std::to_string(temoperature_steper_driver))+
-        loger.parse_to_json_format("EEang",std::to_string(encoder_arm.get_angle()))+
-        loger.parse_to_json_format("EAang",std::to_string(encoder_vel_motor.get_angle()))+
-        loger.parse_to_json_format("Pos",std::to_string(movement_controler.get_current_position()))+
-        loger.parse_to_json_format("Vel",std::to_string(movement_controler.get_current_velocity()))+
-        loger.parse_to_json_format("EPos",std::to_string(encoder_vel_motor.get_absoulute_angle()))+
-        loger.parse_to_json_format("Err",std::to_string(error_data.get_amount_of_errors()))+
-        loger.parse_to_json_format("Errs",
-          loger.parse_to_json_format("teng",BOOL_TO_STRING(error_data.temp_engine_overheating))+
-          loger.parse_to_json_format("tdri",BOOL_TO_STRING(error_data.temp_driver_overheating))+
-          loger.parse_to_json_format("tboa",BOOL_TO_STRING(error_data.temp_board_overheating))+
-          loger.parse_to_json_format("tengdis",BOOL_TO_STRING(error_data.temp_engine_sensor_disconnect))+
-          loger.parse_to_json_format("tdrivdis",BOOL_TO_STRING(error_data.temp_driver_sensor_disconnect))+
-          loger.parse_to_json_format("tborddis",BOOL_TO_STRING(error_data.temp_board_sensor_disconnect))+
-          loger.parse_to_json_format("encarmmdis",BOOL_TO_STRING(error_data.encoder_arm_disconnect))+
-          loger.parse_to_json_format("encmotdis",BOOL_TO_STRING(error_data.encoder_motor_disconnect))+
-          loger.parse_to_json_format("bovolt",BOOL_TO_STRING(error_data.baord_overvoltage))+
-          loger.parse_to_json_format("buvolt",BOOL_TO_STRING(error_data.baord_undervoltage))+
-          loger.parse_to_json_format("candis",BOOL_TO_STRING(error_data.can_disconnected))+
-          loger.parse_to_json_format("canerr",BOOL_TO_STRING(error_data.can_error))+
-          loger.parse_to_json_format("motlimit",BOOL_TO_STRING(error_data.controler_motor_limit_position),false)
+        stmepic::Logger::parse_to_json_format("ID",board_id.get_id())+
+        stmepic::Logger::parse_to_json_format("Vsen",voltage_vcc)+
+        stmepic::Logger::parse_to_json_format("Tste",temoperature_steper_motor)+
+        stmepic::Logger::parse_to_json_format("Tbor",temoperature_board)+
+        stmepic::Logger::parse_to_json_format("Tmot",temoperature_steper_driver)+
+        stmepic::Logger::parse_to_json_format("EEang",encoder_arm.get_angle())+
+        stmepic::Logger::parse_to_json_format("EAang",encoder_vel_motor.get_angle())+
+        stmepic::Logger::parse_to_json_format("Pos",movement_controler.get_current_position())+
+        stmepic::Logger::parse_to_json_format("Vel",movement_controler.get_current_velocity())+
+        stmepic::Logger::parse_to_json_format("EPos",encoder_vel_motor.get_absoulute_angle())+
+        stmepic::Logger::parse_to_json_format("Err",error_data.get_amount_of_errors())+
+        stmepic::Logger::parse_to_json_format("Errs",
+          stmepic::Logger::parse_to_json_format("teng",BOOL_TO_STRING(error_data.temp_engine_overheating))+
+          stmepic::Logger::parse_to_json_format("tdri",BOOL_TO_STRING(error_data.temp_driver_overheating))+
+          stmepic::Logger::parse_to_json_format("tboa",BOOL_TO_STRING(error_data.temp_board_overheating))+
+          stmepic::Logger::parse_to_json_format("tengdis",BOOL_TO_STRING(error_data.temp_engine_sensor_disconnect))+
+          stmepic::Logger::parse_to_json_format("tdrivdis",BOOL_TO_STRING(error_data.temp_driver_sensor_disconnect))+
+          stmepic::Logger::parse_to_json_format("tborddis",BOOL_TO_STRING(error_data.temp_board_sensor_disconnect))+
+          stmepic::Logger::parse_to_json_format("encarmmdis",BOOL_TO_STRING(error_data.encoder_arm_disconnect))+
+          stmepic::Logger::parse_to_json_format("encmotdis",BOOL_TO_STRING(error_data.encoder_motor_disconnect))+
+          stmepic::Logger::parse_to_json_format("bovolt",BOOL_TO_STRING(error_data.baord_overvoltage))+
+          stmepic::Logger::parse_to_json_format("buvolt",BOOL_TO_STRING(error_data.baord_undervoltage))+
+          stmepic::Logger::parse_to_json_format("candis",BOOL_TO_STRING(error_data.can_disconnected))+
+          stmepic::Logger::parse_to_json_format("canerr",BOOL_TO_STRING(error_data.can_error))+
+          stmepic::Logger::parse_to_json_format("motlimit",BOOL_TO_STRING(error_data.controler_motor_limit_position),false)
         ,false,true)
       );
 }

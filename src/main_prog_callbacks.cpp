@@ -1,3 +1,4 @@
+#include "Timing.hpp"
 #include "can.h"
 #include "main.h"
 #include "stm32f4xx_hal.h"
@@ -8,7 +9,7 @@
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
   if (htim->Instance == TIM10){
-    main_clock.irq_update_ticker();
+    stmepic::Ticker::get_instance().irq_update_ticker();
   }
   
   // if (htim->Instance == TIM3)
@@ -95,8 +96,8 @@ void can_callback_set_pos(stmepic::can_msg &recived_msg){
   (void)can_konarm_1_set_pos_unpack(&signals, recived_msg.data, recived_msg.data_size);
   // float targetPosition = can_konarm_1_set_pos_position_decode(signals.position);
   // float targetVelocity = can_konarm_1_set_pos_velocity_decode(signals.velocity);
-  movement_controler.set_velocity(signals.position);
-  movement_controler.set_position(signals.velocity);
+  movement_controler.set_velocity(signals.velocity);
+  movement_controler.set_position(signals.position);
   movement_controler.set_enable(true); 
 }
 

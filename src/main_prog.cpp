@@ -1,17 +1,22 @@
 #include "main_prog.hpp"
 #include "config.hpp"
+#include "logger.hpp"
+#include "stm32f4xx_hal.h"
 #include "stm32f4xx_hal_cortex.h"
+#include "stm32f4xx_hal_i2c.h"
 #include "stmepic.hpp"
+#include "fram_i2c.hpp"
+#include <cstdint>
 
 //**************************************************************************************************
 // SCARY GLOBAL VARIABLES
 
-stmepic::PIDControler pid_pos(main_clock);
-stmepic::BasicLinearPosControler bacis_controler(main_clock);
-stmepic::PassThroughControler pass_through_controler(main_clock);
+stmepic::PIDControler pid_pos;
+stmepic::BasicLinearPosControler bacis_controler;
+stmepic::PassThroughControler pass_through_controler;
 stmepic::filters::FilterMovingAvarage encoder_motor_moving_avarage;
 stmepic::filters::FilterSampleSkip encoder_arm_filter_velocity;
-stmepic::Timing tim_can_disconnecteded(main_clock);
+stmepic::Timing tim_can_disconnecteded(stmepic::Ticker::get_instance());
 
 std::shared_ptr<stmepic::Timing> task_blink_timer;
 std::shared_ptr<stmepic::Timing> task_blink_error_timer;
@@ -31,7 +36,7 @@ float voltage_vcc=0;
 
 //**************************************************************************************************
 void run_main_prog(){
-  log_debug(loger.parse_to_json_format("state","start"));
+  log_debug(stmepic::Logger::parse_to_json_format("state","start"));
 
   pre_periferal_config();
   periferal_config();
@@ -42,13 +47,18 @@ void run_main_prog(){
 }
 
 void pre_periferal_config(){
-  log_debug(loger.parse_to_json_format("state","pre_perifial_config"));
+  log_debug(stmepic::Logger::parse_to_json_format("state","pre_perifial_config"));
+  stmepic::Ticker::get_instance().init(&htim10);
+  stmepic::Logger::get_instance().init(LOG_LOGER_LEVEL,LOG_SHOW_TIMESTAMP,CDC_Transmit_FS ,version_string);
 }
 
 void periferal_config(){
-  log_debug(loger.parse_to_json_format("state","periferal_config"));
+  log_debug(stmepic::Logger::parse_to_json_format("state","periferal_config"));
   // dma adc1 settings
   HAL_ADC_Start_DMA(&hadc1, adc_dma_buffer, ADC_DMA_BUFFER_SIZE);
+
+  HAL_I2C_DeInit(&hi2c1);
+  HAL_I2C_Init(&hi2c1);
 
   // timer 10 settings
   HAL_NVIC_SetPriority(TIM1_TRG_COM_TIM11_IRQn,6,0);
@@ -63,7 +73,7 @@ void periferal_config(){
 }
 
 void id_config(){
-  log_debug(loger.parse_to_json_format("state","id_config"));
+  log_debug(stmepic::Logger::parse_to_json_format("state","id_config"));
   switch (board_id.get_id()){
   case BOARD_ID_1: config = config_id_1; break;
   case BOARD_ID_2: config = config_id_2; break;
@@ -88,22 +98,27 @@ void init_and_set_movement_controler_mode(uint8_t mode){
   if(config.encoder_motor_enable){
     engine_encoder = &encoder_vel_motor;
   }
+  if(motor != nullptr){
+    delete motor;
+  }
+  motor = new stmepic::MotorClosedLoop(stp_motor, &encoder_arm, engine_encoder);
+
   switch (mode){
     case CAN_KONARM_1_SET_CONTROL_MODE_CONTROL_MODE_POSITION_CONTROL_CHOICE:
       // we switch control mode to position control however since the stepr motor don't have the position control yet implemented
       // we will use the velocity control with BasicLinearPosControler that will achive the position control
-      movement_controler.init(main_clock, motor,stmepic::MovementControlMode::VELOCITY, bacis_controler);
+      movement_controler.init( *motor,stmepic::MovementControlMode::VELOCITY, bacis_controler);
       break;
     case CAN_KONARM_1_SET_CONTROL_MODE_CONTROL_MODE_VELOCITY_CONTROL_CHOICE:
-      movement_controler.init(main_clock, motor, stmepic::MovementControlMode::VELOCITY,pass_through_controler);
+      movement_controler.init(*motor, stmepic::MovementControlMode::VELOCITY,pass_through_controler);
       break;
     case CAN_KONARM_1_SET_CONTROL_MODE_CONTROL_MODE_TORQUE_CONTROL_CHOICE:
       // torque control is not implemented yet so we will use the velocity control
-      movement_controler.init(main_clock, motor,stmepic::MovementControlMode::TORQUE,pass_through_controler);
+      movement_controler.init( *motor,stmepic::MovementControlMode::TORQUE,pass_through_controler);
       break;
     default:
       // if the mode is not supported we will use the velocity control
-      movement_controler.init(main_clock, motor,stmepic::MovementControlMode::VELOCITY,pass_through_controler);
+      movement_controler.init( *motor,stmepic::MovementControlMode::VELOCITY,pass_through_controler);
       break;
   }
 }
@@ -137,7 +152,7 @@ void post_id_config(){
   encoder_arm.set_enable_encoder(true);
   encoder_arm_filter_velocity.set_samples_to_skip(config.encoder_arm_velocity_sample_amount);
   encoder_arm_filter_velocity.set_init_value(0);
-  encoder_arm.init(hi2c1,main_clock,stmepic::encoders::translate_reg_to_angle_MT6701,nullptr,&encoder_arm_filter_velocity);
+  encoder_arm.init(hi2c1,stmepic::encoders::translate_reg_to_angle_MT6701,nullptr,&encoder_arm_filter_velocity);
   
 
   //-------------------ENCODER STEPER MOTOR POSITION CONFIGURATION-------------------
@@ -151,7 +166,7 @@ void post_id_config(){
   encoder_vel_motor.set_enable_encoder(config.encoder_motor_enable);
   encoder_motor_moving_avarage.set_size(25); // 15 for smooth movement but delay with sampling to 50
   encoder_motor_moving_avarage.set_samples_to_skip(config.encoder_motor_velocity_sample_amount);
-  encoder_vel_motor.init(hi2c1,main_clock,stmepic::encoders::translate_reg_to_angle_MT6701,nullptr,&encoder_motor_moving_avarage);
+  encoder_vel_motor.init(hi2c1,stmepic::encoders::translate_reg_to_angle_MT6701,nullptr,&encoder_motor_moving_avarage);
   
 
   //-------------------MOVEMENT CONTROLER CONFIGURATION-------------------
@@ -173,7 +188,7 @@ void post_id_config(){
   init_and_set_movement_controler_mode(config.movement_control_mode);
 
 
-  log_debug(loger.parse_to_json_format("state","post_id_config"));
+  log_debug(stmepic::Logger::get_instance().parse_to_json_format("state","post_id_config"));
   CAN_FilterTypeDef can_filter;
   can_filter.FilterBank = 1;
   can_filter.FilterFIFOAssignment = CAN_FILTER_FIFO0;
@@ -187,7 +202,7 @@ void post_id_config(){
   can_filter.SlaveStartFilterBank = 0;
   HAL_CAN_ConfigFilter(&hcan1, &can_filter);
   can_controler.set_filter(config.can_filter_id_high, config.can_filter_mask_high);
-  can_controler.init(hcan1, CAN_FILTER_FIFO0, main_clock, &pin_tx_led, &pin_rx_led);
+  can_controler.init(hcan1, CAN_FILTER_FIFO0, &pin_tx_led, &pin_rx_led);
   HAL_CAN_Start(&hcan1);
   HAL_CAN_ActivateNotification(&hcan1, CAN_IT_RX_FIFO0_MSG_PENDING ); //| CAN_IT_RX_FIFO1_MSG_PENDING); 
 
@@ -206,8 +221,8 @@ void error_checks(){
   error_data.temp_driver_sensor_disconnect = std::isnan(temoperature_steper_driver);
   error_data.temp_engine_sensor_disconnect = std::isnan(temoperature_steper_motor);
 
-  error_data.encoder_arm_disconnect = !encoder_arm.is_connected();
-  error_data.encoder_motor_disconnect = !encoder_vel_motor.is_connected();
+  error_data.encoder_arm_disconnect = !encoder_arm.device_is_connected().valueOrDie();
+  error_data.encoder_motor_disconnect = !encoder_vel_motor.device_is_connected().valueOrDie();
 
   error_data.baord_overvoltage = voltage_vcc > ERRORS_MAX_VCC_VOLTAGE? true : false;
   error_data.baord_undervoltage = voltage_vcc < ERRORS_MIN_VCC_VOLTAGE? true : false;
@@ -230,53 +245,45 @@ void config_tasks(){
 
    
   task_blink_timer = stmepic::Timing::Make(
-    main_clock,
     stmepic::frequency_to_period_us(TIMING_LED_BLINK_FQ),
     true,
     task_blink 
     ).valueOrDie();
 
   task_blink_error_timer = stmepic::Timing::Make(
-    main_clock,
     stmepic::frequency_to_period_us(TIMING_LED_ERROR_BLINK_FQ),
     true,
     task_blink_error
     ).valueOrDie();
   task_encoder_timer = stmepic::Timing::Make(
-    main_clock,
     stmepic::frequency_to_period_us(TIMING_ENCODER_UPDATE_FQ),
     true,
     task_encoders
     ).valueOrDie();
 
   task_usb_timer = stmepic::Timing::Make(
-    main_clock,
     stmepic::frequency_to_period_us(TIMING_USB_RECIVED_DATA_FQ),
     true,
     task_usb_handler
     ).valueOrDie();
 
   task_data_usb_send_timer = stmepic::Timing::Make(
-    main_clock,
     stmepic::frequency_to_period_us(TIMING_USB_SEND_DATA_FQ),
     true,
     task_usb_data_loging
     ).valueOrDie();
 
   task_can_disconnected_timer = stmepic::Timing::Make(
-    main_clock,
     TIMING_CAN_DISCONNECTED_PERIOD,
     false,
     task_can_disconnect
     ).valueOrDie();
   task_read_analog_values_timer = stmepic::Timing::Make(
-    main_clock,
     stmepic::frequency_to_period_us(TIMING_READ_TEMPERATURE_FQ),
     true,
     task_read_analog_values
     ).valueOrDie();
   task_nodelay_timer = stmepic::Timing::Make(
-    main_clock,
     0,
     true,
     task_nodelay
@@ -333,6 +340,6 @@ void config_tasks(){
 }
 
 void main_loop(){
-  log_debug("Start main_loop\n");
+  log_debug("Start main_loop\n");  
   task_timer_scheduler.schedules_handle_blocking();
 }

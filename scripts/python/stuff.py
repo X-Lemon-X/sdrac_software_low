@@ -34,3 +34,15 @@ print(f"Tick time: {ticks_per_period * single_tick_period}")
 
 
 
+# calcualet timer prescaler to get 1ms tick and counte max value should be equal to 1000
+# 1ms = 1e-3
+core_frequency = 96e6
+counte_max_value = 1000
+prescaler = core_frequency / counte_max_value / 1000
+print(f"Prescaler: {prescaler}") 
+
+
+
+
+
+

@@ -1,4 +1,5 @@
 #include "config.hpp"
+#include "encoder_magnetic.hpp"
 #include "motor.hpp"
 #include "steper_motor.hpp"
 #include "movement_controler.hpp"
@@ -358,18 +359,18 @@ const IdConfig config_id_6 = {
 std::string version_string = std::to_string(VERSION_MAJOR)+"."+std::to_string(VERSION_MINOR) + "." + std::to_string(VERSION_BUILD);
 uint32_t adc_dma_buffer[ADC_DMA_BUFFER_SIZE+1];
 IdConfig config;
-stmepic::Ticker main_clock;
-stmepic::TimeScheduler task_timer_scheduler(main_clock);
-stmepic::Logger loger(LOG_LOGER_LEVEL,LOG_SHOW_TIMESTAMP,CDC_Transmit_FS ,version_string);
+// stmepic::Ticker &main_clock = stmepic::GlobalTicker::get_instance();
+stmepic::TimeScheduler task_timer_scheduler(stmepic::Ticker::get_instance());
+// stmepic::Logger loger;
 stmepic::Board_id board_id(pin_cid_0, pin_cid_1, pin_cid_2);
 
 stmepic::SteperMotorStepDir stp_motor(htim3, TIM_CHANNEL_1, pin_steper_direction, pin_steper_enable);
 stmepic::encoders::EncoderAbsoluteMagnetic encoder_arm;
 stmepic::encoders::EncoderAbsoluteMagnetic encoder_vel_motor;
-stmepic::MotorClosedLoop motor(stp_motor, &encoder_arm, &encoder_vel_motor);
+stmepic::MotorClosedLoop *motor=new stmepic::MotorClosedLoop(stp_motor, &encoder_arm, &encoder_vel_motor);
 stmepic::CanControl<> can_controler;
 stmepic::MovementControler movement_controler;
-stmepic::UsbProgramer usb_programer(pin_boot_device,loger);
+stmepic::UsbProgramer usb_programer(pin_boot_device);
 stmepic::sensors::NTCTERMISTORS::NtcTermistors temp_steper_driver(UC_SUPPLY_VOLTAGE,TERMISTOR_RESISTANCE);
 stmepic::sensors::NTCTERMISTORS::NtcTermistors temp_steper_motor(UC_SUPPLY_VOLTAGE,TERMISTOR_RESISTANCE);
 ErrorData error_data;

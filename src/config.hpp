@@ -274,13 +274,13 @@ extern USBD_HandleTypeDef hUsbDeviceFS;
 
 extern std::string version_string;
 extern stmepic::Logger loger;
-extern stmepic::Ticker main_clock;
+// extern stmepic::Ticker &main_clock;
 extern stmepic::TimeScheduler task_timer_scheduler;
 extern stmepic::Board_id board_id;
 extern stmepic::encoders::EncoderAbsoluteMagnetic encoder_arm;
 extern stmepic::encoders::EncoderAbsoluteMagnetic encoder_vel_motor;
 extern stmepic::SteperMotorStepDir stp_motor;
-extern stmepic::MotorClosedLoop motor;
+extern stmepic::MotorClosedLoop *motor;
 extern stmepic::CanControl<> can_controler;
 extern stmepic::UsbProgramer usb_programer;
 extern stmepic::MovementControler movement_controler;
@@ -316,25 +316,25 @@ extern ErrorData error_data;
 #endif // LOG_ERROR
 
 #if _LOG_LVL <= 0
-  #define log_debug(...) loger.debug(__VA_ARGS__)
+  #define log_debug(...) stmepic::Logger::get_instance().debug(__VA_ARGS__)
 #else
   #define log_debug(...)
 #endif // LOG_DEBUG
 
 #if _LOG_LVL <= 1
-  #define log_info(...) loger.info(__VA_ARGS__)
+  #define log_info(...) stmepic::Logger::get_instance().info(__VA_ARGS__)
 #else
   #define log_info(...)
 #endif // LOG_INFO
 
 #if _LOG_LVL <= 2
-  #define log_warn(...) loger.warn(__VA_ARGS__)
+  #define log_warn(...) stmepic::Logger::get_instance().warn(__VA_ARGS__)
 #else
   #define log_warn(...)
 #endif // LOG_WARN
 
 #if _LOG_LVL <= 3
-  #define log_error(...) loger.error(__VA_ARGS__)
+  #define log_error(...) stmepic::Logger::get_instance().error(__VA_ARGS__)
 #else
   #define log_error(...) 
 #endif // LOG_ERROR
