@@ -29,7 +29,7 @@ void task_usb_handler(stmepic::Timing& task_timer){
 
 void task_usb_data_loging(stmepic::Timing& task_timer){
   log_info(
-        stmepic::Logger::parse_to_json_format("ID",board_id.get_id())+
+        stmepic::Logger::parse_to_json_format("ID",get_board_id())+
         stmepic::Logger::parse_to_json_format("Vsen",voltage_vcc)+
         stmepic::Logger::parse_to_json_format("Tste",temoperature_steper_motor)+
         stmepic::Logger::parse_to_json_format("Tbor",temoperature_board)+

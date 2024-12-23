@@ -12,9 +12,9 @@
 //**************************************************************************************************
 // SCARY GLOBAL VARIABLES
 
-stmepic::PIDControler pid_pos;
-stmepic::BasicLinearPosControler bacis_controler;
-stmepic::PassThroughControler pass_through_controler;
+stmepic::movement::PIDControler pid_pos;
+stmepic::movement::BasicLinearPosControler bacis_controler;
+stmepic::movement::PassThroughControler pass_through_controler;
 stmepic::filters::FilterMovingAvarage encoder_motor_moving_avarage;
 stmepic::filters::FilterSampleSkip encoder_arm_filter_velocity;
 stmepic::Timing tim_can_disconnecteded(stmepic::Ticker::get_instance());
@@ -73,9 +73,18 @@ void periferal_config(){
   HAL_CAN_Init(&hcan1);
 }
 
+
+uint8_t get_board_id(){
+  uint8_t id = 0;
+  id |= READ_GPIO(pin_cid_0);
+  id |= READ_GPIO(pin_cid_1) << 1;
+  id |= READ_GPIO(pin_cid_2) << 2;
+  return id;
+}
+
 void id_config(){
   log_debug(stmepic::Logger::parse_to_json_format("state","id_config"));
-  switch (board_id.get_id()){
+  switch (get_board_id()){
   case BOARD_ID_1: config = config_id_1; break;
   case BOARD_ID_2: config = config_id_2; break;
   case BOARD_ID_3: config = config_id_3; break;
@@ -102,24 +111,24 @@ void init_and_set_movement_controler_mode(uint8_t mode){
   if(motor != nullptr){
     delete motor;
   }
-  motor = new stmepic::MotorClosedLoop(stp_motor, &encoder_arm, engine_encoder);
+  motor = new stmepic::motor::MotorClosedLoop(stp_motor, &encoder_arm, engine_encoder, nullptr);
 
   switch (mode){
     case CAN_KONARM_1_SET_CONTROL_MODE_CONTROL_MODE_POSITION_CONTROL_CHOICE:
       // we switch control mode to position control however since the stepr motor don't have the position control yet implemented
       // we will use the velocity control with BasicLinearPosControler that will achive the position control
-      movement_controler.init( *motor,stmepic::MovementControlMode::VELOCITY, bacis_controler);
+      movement_controler.init( *motor,stmepic::movement::MovementControlMode::VELOCITY, bacis_controler);
       break;
     case CAN_KONARM_1_SET_CONTROL_MODE_CONTROL_MODE_VELOCITY_CONTROL_CHOICE:
-      movement_controler.init(*motor, stmepic::MovementControlMode::VELOCITY,pass_through_controler);
+      movement_controler.init(*motor, stmepic::movement::MovementControlMode::VELOCITY,pass_through_controler);
       break;
     case CAN_KONARM_1_SET_CONTROL_MODE_CONTROL_MODE_TORQUE_CONTROL_CHOICE:
       // torque control is not implemented yet so we will use the velocity control
-      movement_controler.init( *motor,stmepic::MovementControlMode::TORQUE,pass_through_controler);
+      movement_controler.init( *motor,stmepic::movement::MovementControlMode::TORQUE,pass_through_controler);
       break;
     default:
       // if the mode is not supported we will use the velocity control
-      movement_controler.init( *motor,stmepic::MovementControlMode::VELOCITY,pass_through_controler);
+      movement_controler.init( *motor,stmepic::movement::MovementControlMode::VELOCITY,pass_through_controler);
       break;
   }
 }
@@ -127,7 +136,7 @@ void init_and_set_movement_controler_mode(uint8_t mode){
 void post_id_config(){
   std::string info = "SDRACboard\n";
   info += "Software version:" + version_string + "\n";
-  info += "Board id: " + std::to_string(board_id.get_id()) + "\n";
+  info += "Board id: " + std::to_string(get_board_id()) + "\n";
   info += "Description: SDRACboard from SDRAC project https://nihilia.xyz  https://konar.pwr.edu.pl\n";
   usb_programer.set_info(info);
 

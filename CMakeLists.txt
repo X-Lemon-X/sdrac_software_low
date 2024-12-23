@@ -21,7 +21,7 @@ endif()
 
 # Set the project name
 set(CMAKE_PROJECT_NAME sdrac_cubemx)
-set(PROEJCT_MAJOR_VERSION 3)
+set(PROEJCT_MAJOR_VERSION 4)
 option(COPY_COMPILE_COMMANDS "Copy compile_commands.json to project root" OFF)
 
 ## enable ccache if available

@@ -17,30 +17,30 @@
 
 //**************************************************************************************************
 // Gpio assigments
-stmepic::GpioPin pin_user_led_1 = {GPIO_PIN_6, GPIOC,0};
-stmepic::GpioPin pin_user_led_2 = {GPIO_PIN_7, GPIOC,0};
-stmepic::GpioPin pin_user_btn_1 = {GPIO_PIN_9, GPIOA,0}; // GPIO_PIN_9, GPIOC for rev 1 of the board
-stmepic::GpioPin pin_tx_led = {GPIO_PIN_12, GPIOB,0}; 
-stmepic::GpioPin pin_rx_led = {GPIO_PIN_13, GPIOB,0};
-stmepic::GpioPin pin_encoder = {GPIO_PIN_3, GPIOB,0};  
-stmepic::GpioPin pin_poz_zero_sensor = {GPIO_PIN_4, GPIOA,0}; 
-stmepic::GpioPin pin_inout_ca1 = {GPIO_PIN_5, GPIOA,0}; 
-stmepic::GpioPin pin_inout_ca2 = {GPIO_PIN_7, GPIOA,0};
-stmepic::GpioPin pin_inout_crx = {GPIO_PIN_4, GPIOC,0};
-stmepic::GpioPin pin_inout_ctx = {GPIO_PIN_10, GPIOB,0};
-stmepic::GpioPin pin_sync_sda = {GPIO_PIN_9, GPIOC,0}; 
-stmepic::GpioPin pin_sync_scl = {GPIO_PIN_8, GPIOA,0};
-stmepic::GpioPin pin_temp_steper_board = {GPIO_PIN_0, GPIOA,0};
-stmepic::GpioPin pin_temp_board = {GPIO_PIN_1, GPIOA,0};
-stmepic::GpioPin pin_temp_motor = {GPIO_PIN_2, GPIOA,0};
-stmepic::GpioPin pin_vsense = {GPIO_PIN_3, GPIOA,0};
-stmepic::GpioPin pin_steper_direction = {GPIO_PIN_0, GPIOB,0};
-stmepic::GpioPin pin_steper_enable = {GPIO_PIN_1, GPIOB,0};
-stmepic::GpioPin pin_steper_step = {GPIO_PIN_6, GPIOA,0};
-stmepic::GpioPin pin_boot_device = {GPIO_PIN_8, GPIOC,0};
-stmepic::GpioPin pin_cid_0 = {GPIO_PIN_10, GPIOC,0};
-stmepic::GpioPin pin_cid_1 = {GPIO_PIN_11, GPIOC,0};
-stmepic::GpioPin pin_cid_2 = {GPIO_PIN_12, GPIOC,0};
+stmepic::gpio::GpioPin pin_user_led_1 = {GPIO_PIN_6, GPIOC,0};
+stmepic::gpio::GpioPin pin_user_led_2 = {GPIO_PIN_7, GPIOC,0};
+stmepic::gpio::GpioPin pin_user_btn_1 = {GPIO_PIN_9, GPIOA,0}; // GPIO_PIN_9, GPIOC for rev 1 of the board
+stmepic::gpio::GpioPin pin_tx_led = {GPIO_PIN_12, GPIOB,0}; 
+stmepic::gpio::GpioPin pin_rx_led = {GPIO_PIN_13, GPIOB,0};
+stmepic::gpio::GpioPin pin_encoder = {GPIO_PIN_3, GPIOB,0};  
+stmepic::gpio::GpioPin pin_poz_zero_sensor = {GPIO_PIN_4, GPIOA,0}; 
+stmepic::gpio::GpioPin pin_inout_ca1 = {GPIO_PIN_5, GPIOA,0}; 
+stmepic::gpio::GpioPin pin_inout_ca2 = {GPIO_PIN_7, GPIOA,0};
+stmepic::gpio::GpioPin pin_inout_crx = {GPIO_PIN_4, GPIOC,0};
+stmepic::gpio::GpioPin pin_inout_ctx = {GPIO_PIN_10, GPIOB,0};
+stmepic::gpio::GpioPin pin_sync_sda = {GPIO_PIN_9, GPIOC,0}; 
+stmepic::gpio::GpioPin pin_sync_scl = {GPIO_PIN_8, GPIOA,0};
+stmepic::gpio::GpioPin pin_temp_steper_board = {GPIO_PIN_0, GPIOA,0};
+stmepic::gpio::GpioPin pin_temp_board = {GPIO_PIN_1, GPIOA,0};
+stmepic::gpio::GpioPin pin_temp_motor = {GPIO_PIN_2, GPIOA,0};
+stmepic::gpio::GpioPin pin_vsense = {GPIO_PIN_3, GPIOA,0};
+stmepic::gpio::GpioPin pin_steper_direction = {GPIO_PIN_0, GPIOB,0};
+stmepic::gpio::GpioPin pin_steper_enable = {GPIO_PIN_1, GPIOB,0};
+stmepic::gpio::GpioPin pin_steper_step = {GPIO_PIN_6, GPIOA,0};
+stmepic::gpio::GpioPin pin_boot_device = {GPIO_PIN_8, GPIOC,0};
+stmepic::gpio::GpioPin pin_cid_0 = {GPIO_PIN_10, GPIOC,0};
+stmepic::gpio::GpioPin pin_cid_1 = {GPIO_PIN_11, GPIOC,0};
+stmepic::gpio::GpioPin pin_cid_2 = {GPIO_PIN_12, GPIOC,0};
 
 
 //**************************************************************************************************
@@ -362,15 +362,15 @@ IdConfig config;
 // stmepic::Ticker &main_clock = stmepic::GlobalTicker::get_instance();
 stmepic::TimeScheduler task_timer_scheduler(stmepic::Ticker::get_instance());
 // stmepic::Logger loger;
-stmepic::Board_id board_id(pin_cid_0, pin_cid_1, pin_cid_2);
+// stmepic::Board_id board_id(pin_cid_0, pin_cid_1, pin_cid_2);
 
-stmepic::SteperMotorStepDir stp_motor(htim3, TIM_CHANNEL_1, pin_steper_direction, pin_steper_enable);
+stmepic::motor::SteperMotorStepDir stp_motor(htim3, TIM_CHANNEL_1, pin_steper_direction, pin_steper_enable);
 stmepic::encoders::EncoderAbsoluteMagnetic encoder_arm;
 stmepic::encoders::EncoderAbsoluteMagnetic encoder_vel_motor;
-stmepic::MotorClosedLoop *motor=new stmepic::MotorClosedLoop(stp_motor, &encoder_arm, &encoder_vel_motor);
+stmepic::motor::MotorClosedLoop *motor=new stmepic::motor::MotorClosedLoop(stp_motor, &encoder_arm, &encoder_vel_motor, nullptr);
 stmepic::CanControl<> can_controler;
-stmepic::MovementControler movement_controler;
-stmepic::UsbProgramer usb_programer(pin_boot_device);
+stmepic::movement::MovementControler movement_controler;
+stmepic::dfu::UsbProgramer usb_programer(pin_boot_device);
 stmepic::sensors::NTCTERMISTORS::NtcTermistors temp_steper_driver(UC_SUPPLY_VOLTAGE,TERMISTOR_RESISTANCE);
 stmepic::sensors::NTCTERMISTORS::NtcTermistors temp_steper_motor(UC_SUPPLY_VOLTAGE,TERMISTOR_RESISTANCE);
 ErrorData error_data;

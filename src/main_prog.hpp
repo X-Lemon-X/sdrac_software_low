@@ -12,7 +12,6 @@
 #include "filter_alfa_beta.hpp"
 #include "filter_moving_avarage.hpp"
 #include "can_control.hpp"
-#include "board_id.hpp"
 #include "movement_controler.hpp"
 #include "controler_pid.hpp"
 #include "controler_linear.hpp"
@@ -32,9 +31,9 @@
 #define MAIN_PROG_H
 
 
-extern stmepic::PIDControler pid_pos;
-extern stmepic::BasicLinearPosControler bacis_controler;
-extern stmepic::PassThroughControler pass_through_controler;
+extern stmepic::movement::PIDControler pid_pos;
+extern stmepic::movement::BasicLinearPosControler bacis_controler;
+extern stmepic::movement::PassThroughControler pass_through_controler;
 extern stmepic::filters::FilterMovingAvarage encoder_motor_moving_avarage;
 extern stmepic::filters::FilterSampleSkip encoder_arm_filter_velocity;
 extern stmepic::Timing tim_can_disconnecteded;
@@ -70,6 +69,9 @@ void handle_can_rx();
 
 /// @brief This function is used to handle the main loop, never returns
 void main_loop();
+
+/// @brief get board if from hex encoded
+uint8_t get_board_id();
 
 /// @brief This function is used to configure the board base on it's hardware id
 void id_config();
