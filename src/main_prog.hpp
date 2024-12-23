@@ -107,13 +107,13 @@ void task_nodelay(stmepic::Timing& task_timer);
 ///**************************************************************************************************
 /// CAN CALLBACKS
 
-void can_callback_default(stmepic::can_msg &recived_msg);
-void can_callback_get_errors(stmepic::can_msg &recived_msg);
-void can_callback_clear_errors(stmepic::can_msg &recived_msg);
-void can_callback_status(stmepic::can_msg &recived_msg);
-void can_callback_get_pos(stmepic::can_msg &recived_msg);
-void can_callback_set_pos(stmepic::can_msg &recived_msg);
-void can_callback_set_control_mode(stmepic::can_msg &recived_msg);
+void can_callback_default(stmepic::CanMsg &recived_msg);
+void can_callback_get_errors(stmepic::CanMsg &recived_msg);
+void can_callback_clear_errors(stmepic::CanMsg &recived_msg);
+void can_callback_status(stmepic::CanMsg &recived_msg);
+void can_callback_get_pos(stmepic::CanMsg &recived_msg);
+void can_callback_set_pos(stmepic::CanMsg &recived_msg);
+void can_callback_set_control_mode(stmepic::CanMsg &recived_msg);
 
 
 #endif // MAIN_PROG_H

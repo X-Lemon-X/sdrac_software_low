@@ -1,3 +1,4 @@
+#include "MCP9700AT.hpp"
 #include "config.hpp"
 #include "logger.hpp"
 #include "main_prog.hpp"
@@ -63,7 +64,7 @@ void task_blink(stmepic::Timing& task_timer){
 }
 
 void task_read_analog_values(stmepic::Timing& task_timer){
-  temoperature_board = stmepic::sensors::MCP9700AT::get_temperature(VOLTAGE_VALUE(pin_temp_board));
+  temoperature_board = stmepic::sensors::temperature::MCP9700AT::get_temperature(VOLTAGE_VALUE(pin_temp_board));
   temoperature_steper_driver = temp_steper_driver.get_temperature(VOLTAGE_VALUE(pin_temp_steper_board)); 
   temoperature_steper_motor = temp_steper_motor.get_temperature(VOLTAGE_VALUE(pin_temp_motor));
   voltage_vcc = VOLTAGE_VALUE(pin_vsense) * ADC_VSENSE_MULTIPLIER;

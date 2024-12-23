@@ -90,7 +90,7 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
   // log_debug("ADC1: " + std::to_string(adc_dma_buffer[0]));
 }
 
-void can_callback_set_pos(stmepic::can_msg &recived_msg){
+void can_callback_set_pos(stmepic::CanMsg &recived_msg){
   can_disconnect_timeout_reset();
   can_konarm_1_set_pos_t signals;
   (void)can_konarm_1_set_pos_unpack(&signals, recived_msg.data, recived_msg.data_size);
@@ -101,9 +101,9 @@ void can_callback_set_pos(stmepic::can_msg &recived_msg){
   movement_controler.set_enable(true); 
 }
 
-void can_callback_get_pos(stmepic::can_msg &recived_msg){
+void can_callback_get_pos(stmepic::CanMsg &recived_msg){
   can_disconnect_timeout_reset();
-  stmepic::can_msg send_msg;
+  stmepic::CanMsg send_msg;
   can_konarm_1_get_pos_t src_p;
   send_msg.frame_id = config.can_konarm_get_pos_frame_id;
   src_p.position = movement_controler.get_current_position();
@@ -113,9 +113,9 @@ void can_callback_get_pos(stmepic::can_msg &recived_msg){
   can_controler.send_can_msg_to_queue(send_msg);
 }
 
-void can_callback_status(stmepic::can_msg &recived_msg){
+void can_callback_status(stmepic::CanMsg &recived_msg){
   can_disconnect_timeout_reset();
-  stmepic::can_msg send_msg;
+  stmepic::CanMsg send_msg;
   can_konarm_1_status_t src_p;
   send_msg.frame_id = config.can_konarm_status_frame_id;
   src_p.status = can_konarm_1_status_status_encode(CAN_KONARM_1_STATUS_STATUS_OK_CHOICE);
@@ -124,13 +124,13 @@ void can_callback_status(stmepic::can_msg &recived_msg){
   can_controler.send_can_msg_to_queue(send_msg);
 }
 
-void can_callback_clear_errors(stmepic::can_msg &recived_msg){
+void can_callback_clear_errors(stmepic::CanMsg &recived_msg){
   can_disconnect_timeout_reset();
 }
 
-void can_callback_get_errors(stmepic::can_msg &recived_msg){
+void can_callback_get_errors(stmepic::CanMsg &recived_msg){
   can_disconnect_timeout_reset();
-  stmepic::can_msg send_msg;
+  stmepic::CanMsg send_msg;
   can_konarm_1_get_errors_t src_p;
   send_msg.frame_id = config.can_konarm_get_errors_frame_id;
   src_p.temp_engine_overheating = error_data.temp_engine_overheating;
@@ -152,12 +152,12 @@ void can_callback_get_errors(stmepic::can_msg &recived_msg){
   error_data.can_error = false;
 }
 
-void can_callback_default(stmepic::can_msg &recived_msg){
+void can_callback_default(stmepic::CanMsg &recived_msg){
   can_disconnect_timeout_reset();
   error_data.can_error = true;
 }
 
-void can_callback_set_control_mode(stmepic::can_msg &recived_msg){
+void can_callback_set_control_mode(stmepic::CanMsg &recived_msg){
   can_disconnect_timeout_reset();
   can_konarm_1_set_control_mode_t signals;
   can_konarm_1_set_control_mode_unpack(&signals, recived_msg.data, recived_msg.data_size);

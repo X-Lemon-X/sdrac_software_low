@@ -283,8 +283,8 @@ extern stmepic::motor::MotorClosedLoop *motor;
 extern stmepic::CanControl<> can_controler;
 extern stmepic::dfu::UsbProgramer usb_programer;
 extern stmepic::movement::MovementControler movement_controler;
-extern stmepic::sensors::NTCTERMISTORS::NtcTermistors temp_steper_driver;
-extern stmepic::sensors::NTCTERMISTORS::NtcTermistors temp_steper_motor;
+extern stmepic::sensors::temperature::NtcTermistors temp_steper_driver;
+extern stmepic::sensors::temperature::NtcTermistors temp_steper_motor;
 extern ErrorData error_data;
 
 //**************************************************************************************************

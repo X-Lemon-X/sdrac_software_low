@@ -371,8 +371,8 @@ stmepic::motor::MotorClosedLoop *motor=new stmepic::motor::MotorClosedLoop(stp_m
 stmepic::CanControl<> can_controler;
 stmepic::movement::MovementControler movement_controler;
 stmepic::dfu::UsbProgramer usb_programer(pin_boot_device);
-stmepic::sensors::NTCTERMISTORS::NtcTermistors temp_steper_driver(UC_SUPPLY_VOLTAGE,TERMISTOR_RESISTANCE);
-stmepic::sensors::NTCTERMISTORS::NtcTermistors temp_steper_motor(UC_SUPPLY_VOLTAGE,TERMISTOR_RESISTANCE);
+stmepic::sensors::temperature::NtcTermistors temp_steper_driver(UC_SUPPLY_VOLTAGE,TERMISTOR_RESISTANCE);
+stmepic::sensors::temperature::NtcTermistors temp_steper_motor(UC_SUPPLY_VOLTAGE,TERMISTOR_RESISTANCE);
 ErrorData error_data;
 
 
