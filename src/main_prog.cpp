@@ -407,9 +407,6 @@ void config_tasks() {
 
 void main_loop() {
   log_debug("Start main_loop\n");
-  stmepic::memory::FRAM *fr =
-      new stmepic::memory::FramI2C(hi2c1, 0x50, 0, 0x8000);
-  fr->init();
 
   task_timer_scheduler.schedules_handle_blocking();
 }
