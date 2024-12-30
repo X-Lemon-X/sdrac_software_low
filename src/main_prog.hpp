@@ -5,26 +5,26 @@
 #include "can.h"
 #include "encoder.hpp"
 
-#include "logger.hpp"
+#include "MCP9700AT.hpp"
+#include "Timing.hpp"
+#include "can_control.hpp"
+#include "config.hpp"
+#include "controler_linear.hpp"
+#include "controler_pass_through.hpp"
+#include "controler_pid.hpp"
 #include "dfu_usb_programer.hpp"
-#include "steper_motor.hpp"
 #include "filter.hpp"
 #include "filter_alfa_beta.hpp"
 #include "filter_moving_avarage.hpp"
-#include "can_control.hpp"
+#include "logger.hpp"
 #include "movement_controler.hpp"
-#include "controler_pid.hpp"
-#include "controler_linear.hpp"
-#include "controler_pass_through.hpp"
-#include "pin.hpp"
 #include "ntc_termistors.hpp"
+#include "pin.hpp"
+#include "steper_motor.hpp"
 #include <cfloat>
-#include "MCP9700AT.hpp"
-#include "Timing.hpp"
-#include "config.hpp"
+#include <cmath>
 #include <memory>
 #include <string>
-#include <cmath>
 
 
 #ifndef MAIN_PROG_H
@@ -48,7 +48,7 @@ extern std::shared_ptr<stmepic::Timing> task_nodelay_timer;
 extern std::shared_ptr<stmepic::Timing> task_can_disconnected_timer;
 extern float temoperature_board;
 extern float temoperature_steper_driver;
-extern float temoperature_steper_motor; 
+extern float temoperature_steper_motor;
 extern float voltage_vcc;
 
 //**************************************************************************************************
@@ -107,13 +107,13 @@ void task_nodelay(stmepic::Timing& task_timer);
 ///**************************************************************************************************
 /// CAN CALLBACKS
 
-void can_callback_default(stmepic::CanMsg &recived_msg);
-void can_callback_get_errors(stmepic::CanMsg &recived_msg);
-void can_callback_clear_errors(stmepic::CanMsg &recived_msg);
-void can_callback_status(stmepic::CanMsg &recived_msg);
-void can_callback_get_pos(stmepic::CanMsg &recived_msg);
-void can_callback_set_pos(stmepic::CanMsg &recived_msg);
-void can_callback_set_control_mode(stmepic::CanMsg &recived_msg);
+void can_callback_default(stmepic::CanMsg& recived_msg);
+void can_callback_get_errors(stmepic::CanMsg& recived_msg);
+void can_callback_clear_errors(stmepic::CanMsg& recived_msg);
+void can_callback_status(stmepic::CanMsg& recived_msg);
+void can_callback_get_pos(stmepic::CanMsg& recived_msg);
+void can_callback_set_pos(stmepic::CanMsg& recived_msg);
+void can_callback_set_control_mode(stmepic::CanMsg& recived_msg);
 
 
 #endif // MAIN_PROG_H

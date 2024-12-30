@@ -5,31 +5,32 @@
 // #include <cstddef>
 // #include <cstdint>
 // #include <cstdint>
-#include <limits>
-#include <random>
-#include "encoder_magnetic.hpp"
-#include "logger.hpp"
 #include "Timing.hpp"
 #include "can.h"
+#include "can_control.hpp"
+#include "dfu_usb_programer.hpp"
+#include "encoder_magnetic.hpp"
+#include "filter.hpp"
+#include "filter_alfa_beta.hpp"
+#include "filter_moving_avarage.hpp"
+#include "fram_i2c.hpp"
+#include "logger.hpp"
 #include "main.h"
 #include "motor.hpp"
+#include "movement_controler.hpp"
+#include "ntc_termistors.hpp"
+#include "pin.hpp"
+#include "steper_motor.hpp"
 #include "stm32f4xx_hal.h"
 #include "usb_device.h"
 #include "usbd_cdc_if.h"
 #include "usbd_def.h"
-#include "pin.hpp"
-#include "can_control.hpp"
 #include "version.hpp"
-#include "steper_motor.hpp"
-#include "movement_controler.hpp"
-#include "dfu_usb_programer.hpp"
-#include "filter.hpp"
-#include "filter_moving_avarage.hpp"
-#include "filter_alfa_beta.hpp"
-#include "ntc_termistors.hpp"
+#include <limits>
+#include <random>
 
 //**************************************************************************************************
-// log levels 
+// log levels
 #define LOG_DEBUG
 // #define LOG_INFO
 // #define LOG_WARN
@@ -56,14 +57,19 @@
 #define PI_m2 6.28318530717958647692f
 #define PI_m3d2 4.71238898038468985769f
 
+// Memory Fram constants
+#define FRAM_SIZE 16000
+#define FRAM_BEGIN_ADDRESS 0x10
+#define FRAM_CONFIG_ADDRESS 0x01
+
 //**************************************************************************************************
 // I2C CONSTANTS
 #define ENCODER_MT6701_ANGLE_REG 0x03
-#define ENCODER_MT6701_I2C_ADDRESS 0xC // 0x06 ds:b0000110  << 1 =  0b00001100 = 0xC
+#define ENCODER_MT6701_I2C_ADDRESS 0xC    // 0x06 ds:b0000110  << 1 =  0b00001100 = 0xC
 #define ENCODER_MT6701_I2C_ADDRESS_2 0x8C // 0x46 ds:b01000110  << 1 =  0b10001100 = 0x8C
 #define ENCODER_MT6702_RESOLUTION 16384
 
-#define ENCODER_AS5600_I2C_ADDRESS 0x6C // ds:0x36 << 1 = 0b0110 1100 = 0x6C 
+#define ENCODER_AS5600_I2C_ADDRESS 0x6C // ds:0x36 << 1 = 0b0110 1100 = 0x6C
 #define ENCODER_AS5600_RESOLUTION 4096
 #define ENCODER_AS5600_ANGLE_REG 0x0C
 
@@ -80,7 +86,7 @@
 #define ERRORS_MAX_TEMP_DRIVER 50.0f
 #define ERRORS_MAX_TEMP_ENGINE 100.0f
 
-extern uint32_t adc_dma_buffer[ADC_DMA_BUFFER_SIZE+1];
+extern uint32_t adc_dma_buffer[ADC_DMA_BUFFER_SIZE + 1];
 
 //**************************************************************************************************
 // TIMING CONSTANTS
@@ -95,62 +101,61 @@ extern uint32_t adc_dma_buffer[ADC_DMA_BUFFER_SIZE+1];
 #define TIMING_CAN_DISCONNECTED_PERIOD 1000000
 
 
-
 //**************************************************************************************************
 // ID CONFIG
 
 struct IdConfig {
-// CAN 
-uint32_t can_filter_mask_high;
-uint32_t can_filter_mask_low;
-uint32_t can_filter_id_high;
-uint32_t can_filter_id_low;
+  // CAN
+  uint32_t can_filter_mask_high;
+  uint32_t can_filter_mask_low;
+  uint32_t can_filter_id_high;
+  uint32_t can_filter_id_low;
 
-uint32_t can_konarm_status_frame_id;
-uint32_t can_konarm_set_pos_frame_id;
-uint32_t can_konarm_get_pos_frame_id;
-uint32_t can_konarm_clear_errors_frame_id;
-uint32_t can_konarm_get_errors_frame_id;
-uint32_t can_konarm_set_control_mode_frame_id;
+  uint32_t can_konarm_status_frame_id;
+  uint32_t can_konarm_set_pos_frame_id;
+  uint32_t can_konarm_get_pos_frame_id;
+  uint32_t can_konarm_clear_errors_frame_id;
+  uint32_t can_konarm_get_errors_frame_id;
+  uint32_t can_konarm_set_control_mode_frame_id;
 
 
-// Steper motor config
-float stepper_motor_steps_per_rev;
-float stepper_motor_gear_ratio;
-float stepper_motor_max_velocity;
-float stepper_motor_min_velocity;
-bool stepper_motor_reverse;
-bool stepper_motor_enable_reversed;
-uint32_t stepper_motor_timer_prescaler;
+  // Steper motor config
+  float stepper_motor_steps_per_rev;
+  float stepper_motor_gear_ratio;
+  float stepper_motor_max_velocity;
+  float stepper_motor_min_velocity;
+  bool stepper_motor_reverse;
+  bool stepper_motor_enable_reversed;
+  uint32_t stepper_motor_timer_prescaler;
 
-// Encoder pos arm
-float encoder_arm_offset;
-bool  encoder_arm_reverse;
-float encoder_arm_dead_zone_correction_angle;
-uint16_t encoder_arm_velocity_sample_amount;
+  // Encoder pos arm
+  float encoder_arm_offset;
+  bool encoder_arm_reverse;
+  float encoder_arm_dead_zone_correction_angle;
+  uint16_t encoder_arm_velocity_sample_amount;
 
-// Encoder pos motor
-float encoder_motor_offset;
-bool  encoder_motor_reverse;
-float encoder_motor_dead_zone_correction_angle;
-uint16_t encoder_motor_velocity_sample_amount;
-bool encoder_motor_enable;
+  // Encoder pos motor
+  float encoder_motor_offset;
+  bool encoder_motor_reverse;
+  float encoder_motor_dead_zone_correction_angle;
+  uint16_t encoder_motor_velocity_sample_amount;
+  bool encoder_motor_enable;
 
-// pid config
-float pid_p;
-float pid_i;
-float pid_d;
+  // pid config
+  float pid_p;
+  float pid_i;
+  float pid_d;
 
-//--------------------Movement config
+  //--------------------Movement config
 
-/// @brief Maximum velocity of the arm
-float movement_max_velocity;
-/// @brief upper limit position of the arm
-float movement_limit_lower;
-/// @brief lower limit position of the arm
-float movement_limit_upper;
-uint8_t movement_control_mode;
-float movement_max_acceleration;
+  /// @brief Maximum velocity of the arm
+  float movement_max_velocity;
+  /// @brief upper limit position of the arm
+  float movement_limit_lower;
+  /// @brief lower limit position of the arm
+  float movement_limit_upper;
+  uint8_t movement_control_mode;
+  float movement_max_acceleration;
 };
 
 /// @brief struct for the error data that represents the state of the system
@@ -159,29 +164,28 @@ float movement_max_acceleration;
 /// 0 - no error
 /// 1 - error
 /// you can retrieve the amount of errors by calling get_amount_of_errors()
-class ErrorData
-{
-public:
+class ErrorData {
+  public:
   ErrorData(){};
   // temperature errors
-  bool temp_engine_overheating = false;
-  bool temp_driver_overheating = false;
-  bool temp_board_overheating = false;
+  bool temp_engine_overheating       = false;
+  bool temp_driver_overheating       = false;
+  bool temp_board_overheating        = false;
   bool temp_engine_sensor_disconnect = false;
   bool temp_driver_sensor_disconnect = false;
-  bool temp_board_sensor_disconnect = false;
+  bool temp_board_sensor_disconnect  = false;
 
   // encoder errors
-  bool encoder_arm_disconnect = false;
+  bool encoder_arm_disconnect   = false;
   bool encoder_motor_disconnect = false;
 
   // board errors
-  bool baord_overvoltage = false;
+  bool baord_overvoltage  = false;
   bool baord_undervoltage = false;
 
   // can errors
   bool can_disconnected = false;
-  bool can_error = false;
+  bool can_error        = false;
 
   // other errors
   bool controler_motor_limit_position = false;
@@ -222,8 +226,8 @@ extern stmepic::gpio::GpioPin pin_temp_board;
 extern stmepic::gpio::GpioPin pin_temp_motor;
 extern stmepic::gpio::GpioPin pin_vsense;
 extern stmepic::gpio::GpioPin pin_steper_direction;
-extern stmepic::gpio::GpioPin pin_steper_enable ;
-extern stmepic::gpio::GpioPin pin_steper_step ;
+extern stmepic::gpio::GpioPin pin_steper_enable;
+extern stmepic::gpio::GpioPin pin_steper_step;
 extern stmepic::gpio::GpioPin pin_boot_device;
 extern stmepic::gpio::GpioPin pin_cid_0;
 extern stmepic::gpio::GpioPin pin_cid_1;
@@ -242,7 +246,7 @@ extern DMA_HandleTypeDef hdma_adc1;
 /// @brief CAN handler for the can comuncatin between baords
 extern CAN_HandleTypeDef hcan1;
 
-/// @brief I2C handler for the encoder1, encoder2
+/// @brief I2C handler for the encoder1, encoder2, fram
 extern I2C_HandleTypeDef hi2c1;
 
 /// @brief I2C handler for the syncronisation between the boards
@@ -272,14 +276,14 @@ extern USBD_HandleTypeDef hUsbDeviceFS;
 // GLOBAL OBEJCTS
 
 extern std::string version_string;
-extern stmepic::Logger loger;
 // extern stmepic::Ticker &main_clock;
 extern stmepic::TimeScheduler task_timer_scheduler;
 // extern stmepic::Board_id board_id;
 extern stmepic::encoders::EncoderAbsoluteMagnetic encoder_arm;
 extern stmepic::encoders::EncoderAbsoluteMagnetic encoder_vel_motor;
 extern stmepic::motor::SteperMotorStepDir stp_motor;
-extern stmepic::motor::MotorClosedLoop *motor;
+extern stmepic::memory::FramI2CFM24CLxx fram;
+extern stmepic::motor::MotorClosedLoop* motor;
 extern stmepic::CanControl<> can_controler;
 extern stmepic::dfu::UsbProgramer usb_programer;
 extern stmepic::movement::MovementControler movement_controler;
@@ -294,50 +298,49 @@ extern ErrorData error_data;
 // #define _LOG_LVL 4
 
 #ifdef LOG_DEBUG
-  #define _LOG_LVL 0
-  #define LOG_LOGER_LEVEL stmepic::LOG_LEVEL::LOG_LEVEL_DEBUG
+#define _LOG_LVL 0
+#define LOG_LOGER_LEVEL stmepic::LOG_LEVEL::LOG_LEVEL_DEBUG
 #endif // LOG_DEBUG
 
 
 #ifdef LOG_INFO
-  #define _LOG_LVL 1
-  #define LOG_LOGER_LEVEL stmepic::LOG_LEVEL::LOG_LEVEL_INFO
+#define _LOG_LVL 1
+#define LOG_LOGER_LEVEL stmepic::LOG_LEVEL::LOG_LEVEL_INFO
 #endif // LOG_INFO
 
 #ifdef LOG_WARN
-  #define _LOG_LVL 2
-  #define LOG_LOGER_LEVEL stmepic::LOG_LEVEL::LOG_LEVEL_WARNING
+#define _LOG_LVL 2
+#define LOG_LOGER_LEVEL stmepic::LOG_LEVEL::LOG_LEVEL_WARNING
 #endif // LOG_WARN
 
 #ifdef LOG_ERROR
-  #define _LOG_LVL 3
-  #define LOG_LOGER_LEVEL stmepic::LOG_LEVEL::LOG_LEVEL_ERROR
+#define _LOG_LVL 3
+#define LOG_LOGER_LEVEL stmepic::LOG_LEVEL::LOG_LEVEL_ERROR
 #endif // LOG_ERROR
 
 #if _LOG_LVL <= 0
-  #define log_debug(...) stmepic::Logger::get_instance().debug(__VA_ARGS__)
+#define log_debug(...) stmepic::Logger::get_instance().debug(__VA_ARGS__)
 #else
-  #define log_debug(...)
+#define log_debug(...)
 #endif // LOG_DEBUG
 
 #if _LOG_LVL <= 1
-  #define log_info(...) stmepic::Logger::get_instance().info(__VA_ARGS__)
+#define log_info(...) stmepic::Logger::get_instance().info(__VA_ARGS__)
 #else
-  #define log_info(...)
+#define log_info(...)
 #endif // LOG_INFO
 
 #if _LOG_LVL <= 2
-  #define log_warn(...) stmepic::Logger::get_instance().warn(__VA_ARGS__)
+#define log_warn(...) stmepic::Logger::get_instance().warn(__VA_ARGS__)
 #else
-  #define log_warn(...)
+#define log_warn(...)
 #endif // LOG_WARN
 
 #if _LOG_LVL <= 3
-  #define log_error(...) stmepic::Logger::get_instance().error(__VA_ARGS__)
+#define log_error(...) stmepic::Logger::get_instance().error(__VA_ARGS__)
 #else
-  #define log_error(...) 
+#define log_error(...)
 #endif // LOG_ERROR
-
 
 
 #endif // MAIN_PROG_H
