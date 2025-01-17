@@ -72,6 +72,11 @@ add_subdirectory(cmake/stm32cubemx)
 # set(STMEPIC_MOVEMENT ON)
 # set(STMEPIC_SENSORS ON)
 # set(STMEPIC_DFU_PROGRAMING ON)
+
+set(FREERTOS_PORT GCC_ARM_CM4F CACHE STRING "")
+set(FREERTOS_HEAP 4 CACHE STRING "")
+set(FREERTOS_CONFIG_FILE_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/src")
+
 add_subdirectory(src/StmEpic)
 
 add_subdirectory(src/ariadna_constants)
@@ -93,10 +98,13 @@ target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE
   # "src/ariadna_constants/can_messages/output"
 )
 
+message(STATUS "StmEPic libgs: ${stmepic}")
 
 target_link_libraries(${CMAKE_PROJECT_NAME}
   stm32cubemx
-  etl::etl
+  # etl::etl
+  # ${stmepic}
+  stmepic
   can_constants
   # Add user defined libraries
 )

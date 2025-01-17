@@ -10,6 +10,7 @@
 #include <cstddef>
 #include <cstdint>
 
+
 //**************************************************************************************************
 // SCARY GLOBAL VARIABLES
 
@@ -126,10 +127,10 @@ void init_and_set_movement_controler_mode(uint8_t mode) {
 
   switch(mode) {
   case CAN_KONARM_1_SET_CONTROL_MODE_CONTROL_MODE_POSITION_CONTROL_CHOICE:
-    // we switch control mode to position control however since the stepr motor
-    // don't have the position control yet implemented we will use the velocity
-    // control with BasicLinearPosControler that will achive the position
-    // control
+    // we switch control mode to position control however since the stepr
+    // motor don't have the position control yet implemented we will use
+    // the velocity control with BasicLinearPosControler that will achive
+    // the position control
     movement_controler.init(*motor, stmepic::movement::MovementControlMode::VELOCITY, bacis_controler);
     break;
   case CAN_KONARM_1_SET_CONTROL_MODE_CONTROL_MODE_VELOCITY_CONTROL_CHOICE:
@@ -357,5 +358,7 @@ void config_tasks() {
 
 void main_loop() {
   log_debug("Start main_loop\n");
+
+  vTaskStartScheduler();
   task_timer_scheduler.schedules_handle_blocking();
 }

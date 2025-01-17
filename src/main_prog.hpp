@@ -16,10 +16,10 @@
 #include "filter.hpp"
 #include "filter_alfa_beta.hpp"
 #include "filter_moving_avarage.hpp"
+#include "gpio.hpp"
 #include "logger.hpp"
 #include "movement_controler.hpp"
 #include "ntc_termistors.hpp"
-#include "pin.hpp"
 #include "steper_motor.hpp"
 #include <cfloat>
 #include <cmath>

@@ -7,11 +7,11 @@
 #include "filter_alfa_beta.hpp"
 #include "filter_moving_avarage.hpp"
 #include "fram_i2c.hpp"
+#include "gpio.hpp"
 #include "memory_fram.hpp"
 #include "motor.hpp"
 #include "movement_controler.hpp"
 #include "ntc_termistors.hpp"
-#include "pin.hpp"
 #include "steper_motor.hpp"
 #include "usbd_cdc_if.h"
 #include <limits>
@@ -270,6 +270,7 @@ const IdConfig config_id_5 = { 0xff0,
 
                                0.0f,
                                false,
+
                                0.0f,
                                10,
                                false,
