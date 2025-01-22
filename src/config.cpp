@@ -30,8 +30,10 @@ stmepic::gpio::GpioPin pin_inout_ca1         = { GPIO_PIN_5, GPIOA, 0 };
 stmepic::gpio::GpioPin pin_inout_ca2         = { GPIO_PIN_7, GPIOA, 0 };
 stmepic::gpio::GpioPin pin_inout_crx         = { GPIO_PIN_4, GPIOC, 0 };
 stmepic::gpio::GpioPin pin_inout_ctx         = { GPIO_PIN_10, GPIOB, 0 };
-stmepic::gpio::GpioPin pin_sync_sda          = { GPIO_PIN_9, GPIOC, 0 };
-stmepic::gpio::GpioPin pin_sync_scl          = { GPIO_PIN_8, GPIOA, 0 };
+stmepic::gpio::GpioPin pin_i2c1_sda          = { GPIO_PIN_7, GPIOB, 0 };
+stmepic::gpio::GpioPin pin_i2c1_scl          = { GPIO_PIN_6, GPIOB, 0 };
+stmepic::gpio::GpioPin pin_i2c3_sda          = { GPIO_PIN_9, GPIOC, 0 };
+stmepic::gpio::GpioPin pin_i2c3_scl          = { GPIO_PIN_8, GPIOA, 0 };
 stmepic::gpio::GpioPin pin_temp_steper_board = { GPIO_PIN_0, GPIOA, 0 };
 stmepic::gpio::GpioPin pin_temp_board        = { GPIO_PIN_1, GPIOA, 0 };
 stmepic::gpio::GpioPin pin_temp_motor        = { GPIO_PIN_2, GPIOA, 0 };
@@ -43,6 +45,7 @@ stmepic::gpio::GpioPin pin_boot_device       = { GPIO_PIN_8, GPIOC, 0 };
 stmepic::gpio::GpioPin pin_cid_0             = { GPIO_PIN_10, GPIOC, 0 };
 stmepic::gpio::GpioPin pin_cid_1             = { GPIO_PIN_11, GPIOC, 0 };
 stmepic::gpio::GpioPin pin_cid_2             = { GPIO_PIN_12, GPIOC, 0 };
+
 
 //**************************************************************************************************
 // CONFIG GLOBAL

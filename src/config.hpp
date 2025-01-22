@@ -166,7 +166,7 @@ struct IdConfig {
 /// you can retrieve the amount of errors by calling get_amount_of_errors()
 class ErrorData {
   public:
-  ErrorData(){};
+  ErrorData() {};
   // temperature errors
   bool temp_engine_overheating       = false;
   bool temp_driver_overheating       = false;
@@ -219,8 +219,8 @@ extern stmepic::gpio::GpioPin pin_inout_ca1;
 extern stmepic::gpio::GpioPin pin_inout_ca2;
 extern stmepic::gpio::GpioPin pin_inout_crx;
 extern stmepic::gpio::GpioPin pin_inout_ctx;
-extern stmepic::gpio::GpioPin pin_sync_puls;
-extern stmepic::gpio::GpioPin pin_sync_dir;
+extern stmepic::gpio::GpioPin pin_i2c3_sda;
+extern stmepic::gpio::GpioPin pin_i2c3_scl;
 extern stmepic::gpio::GpioPin pin_temp_steper_board;
 extern stmepic::gpio::GpioPin pin_temp_board;
 extern stmepic::gpio::GpioPin pin_temp_motor;
@@ -232,6 +232,9 @@ extern stmepic::gpio::GpioPin pin_boot_device;
 extern stmepic::gpio::GpioPin pin_cid_0;
 extern stmepic::gpio::GpioPin pin_cid_1;
 extern stmepic::gpio::GpioPin pin_cid_2;
+
+extern stmepic::gpio::GpioPin pin_i2c1_sda;
+extern stmepic::gpio::GpioPin pin_i2c1_scl;
 
 //**************************************************************************************************
 // all the global variables, peripherals, and buffors are declared here

@@ -68,7 +68,7 @@ void task_read_analog_values(stmepic::Timing& task_timer) {
   temoperature_steper_driver =
   temp_steper_driver.get_temperature(VOLTAGE_VALUE(pin_temp_steper_board));
   temoperature_steper_motor = temp_steper_motor.get_temperature(VOLTAGE_VALUE(pin_temp_motor));
-  voltage_vcc               = VOLTAGE_VALUE(pin_vsense) * ADC_VSENSE_MULTIPLIER;
+  voltage_vcc = VOLTAGE_VALUE(pin_vsense) * ADC_VSENSE_MULTIPLIER;
 }
 
 void task_blink_error(stmepic::Timing& task_timer) {
