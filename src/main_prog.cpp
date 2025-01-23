@@ -361,12 +361,8 @@ void config_tasks() {
 void main_loop() {
   log_debug("Start main_loop\n");
 
-  auto i2c1 = stmepic::I2C(hi2c1, pin_i2c1_sda, pin_i2c1_scl, stmepic::HardwareTy::DMA);
-  auto i2c3 = stmepic::I2C(hi2c3, pin_i2c3_sda, pin_i2c3_scl, stmepic::HardwareTy::BLOCKING);
-  stmepic::HardwareInterface* hi2noc = &i2c1;
-  stmepic::HardwareInterface* hi2c3  = &i2c3;
-  hi2noc->start();
-  hi2c3->start();
+  auto i2c1 = stmepic::I2C::Make(hi2c1, pin_i2c1_sda, pin_i2c1_scl, stmepic::HardwareTy::DMA);
+  auto i2c3 = stmepic::I2C::Make(hi2c3, pin_i2c3_sda, pin_i2c3_scl, stmepic::HardwareTy::BLOCKING);
 
 
   vTaskStartScheduler();

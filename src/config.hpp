@@ -166,7 +166,7 @@ struct IdConfig {
 /// you can retrieve the amount of errors by calling get_amount_of_errors()
 class ErrorData {
   public:
-  ErrorData() {};
+  ErrorData(){};
   // temperature errors
   bool temp_engine_overheating       = false;
   bool temp_driver_overheating       = false;
@@ -306,44 +306,44 @@ extern ErrorData error_data;
 #endif // LOG_DEBUG
 
 
-#ifdef LOG_INFO
-#define _LOG_LVL 1
-#define LOG_LOGER_LEVEL stmepic::LOG_LEVEL::LOG_LEVEL_INFO
-#endif // LOG_INFO
+// #ifdef LOG_INFO
+// #define _LOG_LVL 1
+// #define LOG_LOGER_LEVEL stmepic::LOG_LEVEL::LOG_LEVEL_INFO
+// #endif // LOG_INFO
 
-#ifdef LOG_WARN
-#define _LOG_LVL 2
-#define LOG_LOGER_LEVEL stmepic::LOG_LEVEL::LOG_LEVEL_WARNING
-#endif // LOG_WARN
+// #ifdef LOG_WARN
+// #define _LOG_LVL 2
+// #define LOG_LOGER_LEVEL stmepic::LOG_LEVEL::LOG_LEVEL_WARNING
+// #endif // LOG_WARN
 
-#ifdef LOG_ERROR
-#define _LOG_LVL 3
-#define LOG_LOGER_LEVEL stmepic::LOG_LEVEL::LOG_LEVEL_ERROR
-#endif // LOG_ERROR
+// #ifdef LOG_ERROR
+// #define _LOG_LVL 3
+// #define LOG_LOGER_LEVEL stmepic::LOG_LEVEL::LOG_LEVEL_ERROR
+// #endif // LOG_ERROR
 
-#if _LOG_LVL <= 0
-#define log_debug(...) stmepic::Logger::get_instance().debug(__VA_ARGS__)
-#else
-#define log_debug(...)
-#endif // LOG_DEBUG
+// #if _LOG_LVL <= 0
+// #define log_debug(...) stmepic::Logger::get_instance().debug(__VA_ARGS__)
+// #else
+// #define log_debug(...)
+// #endif // LOG_DEBUG
 
-#if _LOG_LVL <= 1
-#define log_info(...) stmepic::Logger::get_instance().info(__VA_ARGS__)
-#else
-#define log_info(...)
-#endif // LOG_INFO
+// #if _LOG_LVL <= 1
+// #define log_info(...) stmepic::Logger::get_instance().info(__VA_ARGS__)
+// #else
+// #define log_info(...)
+// #endif // LOG_INFO
 
-#if _LOG_LVL <= 2
-#define log_warn(...) stmepic::Logger::get_instance().warn(__VA_ARGS__)
-#else
-#define log_warn(...)
-#endif // LOG_WARN
+// #if _LOG_LVL <= 2
+// #define log_warn(...) stmepic::Logger::get_instance().warn(__VA_ARGS__)
+// #else
+// #define log_warn(...)
+// #endif // LOG_WARN
 
-#if _LOG_LVL <= 3
-#define log_error(...) stmepic::Logger::get_instance().error(__VA_ARGS__)
-#else
-#define log_error(...)
-#endif // LOG_ERROR
+// #if _LOG_LVL <= 3
+// #define log_error(...) stmepic::Logger::get_instance().error(__VA_ARGS__)
+// #else
+// #define log_error(...)
+// #endif // LOG_ERROR
 
 
 #endif // MAIN_PROG_H
