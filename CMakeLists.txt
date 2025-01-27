@@ -37,18 +37,19 @@ endif()
 # Include toolchain file
 include("cmake/gcc-arm-none-eabi.cmake")
 
+#######################################################
 # aditional compiler flags
-set(CMAKE_ASM_FLAGS "${CMAKE_C_FLAGS}")
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -u_printf_float -Wreturn-type")
-set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS}  -u_printf_float -Wreturn-type")
+# set(CMAKE_ASM_FLAGS "${CMAKE_C_FLAGS}")
+# set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -u_printf_float -Wreturn-type")
+# set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS}  -u_printf_float -Wreturn-type")
 
-# aditional linker flags
-set(CMAKE_C_LINK_FLAGS "${CMAKE_C_LINK_FLAGS}  -u_printf_float -Wreturn-type")
-set(CMAKE_CXX_LINK_FLAGS "${CMAKE_C_LINK_FLAGS}  -u_printf_float -Wreturn-type")
+# # aditional linker flags
+# set(CMAKE_C_LINK_FLAGS "${CMAKE_C_LINK_FLAGS}  -u_printf_float -Wreturn-type")
+# set(CMAKE_CXX_LINK_FLAGS "${CMAKE_C_LINK_FLAGS}  -u_printf_float -Wreturn-type")
 
 
-# Enable compile command to ease indexing with e.g. clangd
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+# # Enable compile command to ease indexing with e.g. clangd
+# set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # Enable CMake support for ASM and C languages
 enable_language(CXX C ASM)
