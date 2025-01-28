@@ -77,6 +77,7 @@ add_subdirectory(cmake/stm32cubemx)
 set(FREERTOS_PORT GCC_ARM_CM4F CACHE STRING "")
 set(FREERTOS_HEAP 4 CACHE STRING "")
 set(FREERTOS_CONFIG_FILE_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/src")
+set(STMEPIC_GENERATE_DOCS OFF)
 
 add_subdirectory(src/StmEpic)
 

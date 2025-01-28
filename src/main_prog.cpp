@@ -175,7 +175,7 @@ void post_id_config() {
   encoder_arm.set_angle_register(ENCODER_MT6701_ANGLE_REG);
   encoder_arm.set_resolution(ENCODER_MT6702_RESOLUTION);
   encoder_arm.set_address(ENCODER_MT6701_I2C_ADDRESS);
-  encoder_arm.set_enable_encoder(true);
+  // encoder_arm.set_enable_encoder(true);
   encoder_arm_filter_velocity.set_samples_to_skip(config.encoder_arm_velocity_sample_amount);
   encoder_arm_filter_velocity.set_init_value(0);
   encoder_arm.init(hi2c1, stmepic::encoders::translate_reg_to_angle_MT6701, nullptr,
@@ -190,7 +190,7 @@ void post_id_config() {
   encoder_vel_motor.set_resolution(ENCODER_MT6702_RESOLUTION);
   encoder_vel_motor.set_address(ENCODER_MT6701_I2C_ADDRESS_2);
   encoder_vel_motor.set_ratio(1.0f / stp_motor.get_gear_ratio());
-  encoder_vel_motor.set_enable_encoder(config.encoder_motor_enable);
+  // encoder_vel_motor.set_enable_encoder(config.encoder_motor_enable);
   encoder_motor_moving_avarage.set_size(25); // 15 for smooth movement but delay with sampling to 50
   encoder_motor_moving_avarage.set_samples_to_skip(config.encoder_motor_velocity_sample_amount);
   encoder_vel_motor.init(hi2c1, stmepic::encoders::translate_reg_to_angle_MT6701, nullptr,
@@ -361,8 +361,8 @@ void config_tasks() {
 void main_loop() {
   log_debug("Start main_loop\n");
 
-  auto i2c1 = stmepic::I2C::Make(hi2c1, pin_i2c1_sda, pin_i2c1_scl, stmepic::HardwareTy::DMA);
-  auto i2c3 = stmepic::I2C::Make(hi2c3, pin_i2c3_sda, pin_i2c3_scl, stmepic::HardwareTy::BLOCKING);
+  auto i2c1 = stmepic::I2C::Make(hi2c1, pin_i2c1_sda, pin_i2c1_scl, stmepic::HardwareType::DMA);
+  auto i2c3 = stmepic::I2C::Make(hi2c3, pin_i2c3_sda, pin_i2c3_scl, stmepic::HardwareType::BLOCKING);
 
 
   vTaskStartScheduler();
