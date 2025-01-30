@@ -1,12 +1,10 @@
-cmake_minimum_required(VERSION 3.16)
+cmake_minimum_required(VERSION 3.22)
 
 project(stm32cubemx)
 add_library(stm32cubemx INTERFACE)
 
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-
-# Enable CMake support for ASM and C  CXX languages
-enable_language(CXX C ASM)
+# Enable CMake support for ASM and C languages
+enable_language(C ASM)
 
 target_compile_definitions(stm32cubemx INTERFACE 
 	USE_HAL_DRIVER 
@@ -30,6 +28,7 @@ target_sources(stm32cubemx INTERFACE
     ../../Core/Src/main.cpp
     ../../Core/Src/stm32f4xx_it.c
     ../../Core/Src/stm32f4xx_hal_msp.c
+    ../../Core/Src/stm32f4xx_hal_timebase_tim.c
     ../../USB_DEVICE/App/usb_device.c
     ../../USB_DEVICE/App/usbd_desc.c
     ../../USB_DEVICE/App/usbd_cdc_if.c

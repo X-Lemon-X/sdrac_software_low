@@ -11,6 +11,10 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef* htim) {
     stmepic::Ticker::get_instance().irq_update_ticker();
   }
 
+  if(htim->Instance == TIM14) {
+    HAL_IncTick();
+  }
+
   // if (htim->Instance == TIM3)
 }
 

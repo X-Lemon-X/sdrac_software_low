@@ -39,11 +39,11 @@ float voltage_vcc                = 0;
 void run_main_prog() {
   log_debug(stmepic::Logger::parse_to_json_format("state", "start"));
 
-  pre_periferal_config();
-  periferal_config();
-  id_config();
-  post_id_config();
-  config_tasks();
+  // pre_periferal_config();
+  // periferal_config();
+  // id_config();
+  // post_id_config();
+  // config_tasks();
   main_loop();
 }
 
@@ -67,6 +67,7 @@ void periferal_config() {
   HAL_NVIC_EnableIRQ(TIM1_TRG_COM_TIM11_IRQn);
   HAL_TIM_Base_Start_IT(&htim10);
 
+
   // timer 3 settings
   HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_1);
 
@@ -88,9 +89,9 @@ void reset_i2c() {
 
 uint8_t get_board_id() {
   uint8_t id = 0;
-  id |= READ_GPIO(pin_cid_0);
-  id |= READ_GPIO(pin_cid_1) << 1;
-  id |= READ_GPIO(pin_cid_2) << 2;
+  id |= pin_cid_0.read();
+  id |= pin_cid_1.read() << 1;
+  id |= pin_cid_2.read() << 2;
   return id;
 }
 
@@ -178,7 +179,7 @@ void post_id_config() {
   // encoder_arm.set_enable_encoder(true);
   encoder_arm_filter_velocity.set_samples_to_skip(config.encoder_arm_velocity_sample_amount);
   encoder_arm_filter_velocity.set_init_value(0);
-  encoder_arm.init(hi2c1, stmepic::encoders::translate_reg_to_angle_MT6701, nullptr,
+  encoder_arm.init(i2c1, stmepic::encoders::translate_reg_to_angle_MT6701, nullptr,
                    &encoder_arm_filter_velocity);
 
   //-------------------ENCODER STEPER MOTOR POSITION
@@ -193,7 +194,7 @@ void post_id_config() {
   // encoder_vel_motor.set_enable_encoder(config.encoder_motor_enable);
   encoder_motor_moving_avarage.set_size(25); // 15 for smooth movement but delay with sampling to 50
   encoder_motor_moving_avarage.set_samples_to_skip(config.encoder_motor_velocity_sample_amount);
-  encoder_vel_motor.init(hi2c1, stmepic::encoders::translate_reg_to_angle_MT6701, nullptr,
+  encoder_vel_motor.init(i2c1, stmepic::encoders::translate_reg_to_angle_MT6701, nullptr,
                          &encoder_motor_moving_avarage);
 
   //-------------------MOVEMENT CONTROLER CONFIGURATION-------------------
@@ -356,15 +357,61 @@ void config_tasks() {
   }
 }
 
-#include "StmEpic/src/Device/i2c.hpp"
+
+void b_task(void* Arg) {
+
+  while(true) {
+    pin_user_led_1.toggle();
+    pin_user_led_2.toggle();
+    vTaskDelay(100);
+  }
+}
+
+#define SVCall_IRQ_NBR (IRQn_Type) - 6
+
+void config_task(void* arg) {
+  pre_periferal_config();
+  periferal_config();
+
+  // BaseType_t a;
+  // do {
+  //   a = xTaskGetSchedulerState();
+  //   vTaskDelay(10);
+  // } while(a != taskSCHEDULER_RUNNING);
+
+
+  auto mayby_i2c1 =
+  stmepic::I2C::Make(hi2c1, pin_i2c1_sda, pin_i2c1_scl, stmepic::HardwareType::DMA);
+  if(!mayby_i2c1.ok()) {
+    log_error("I2C1 init error");
+  }
+  i2c1 = mayby_i2c1.valueOrDie();
+  i2c1->hardware_reset();
+
+  id_config();
+  post_id_config();
+  config_tasks();
+
+  stmepic::DeviceThrededSettingsBase i2c1_settings;
+  i2c1_settings.uxPriority = 5;
+  i2c1_settings.period     = 10;
+  // i2c1->hardware_reset();
+  // i2c1->hardware_start();
+  encoder_arm.device_task_set_settings(i2c1_settings);
+  encoder_arm.device_task_run();
+  NVIC_SetPriority(SVCall_IRQ_NBR, 0U);
+
+  while(true) {
+    vTaskDelay(1000);
+  }
+}
 
 void main_loop() {
   log_debug("Start main_loop\n");
+  // auto ang = encoder_arm.read_raw_angle();
+  // auto i2c1 = stmepic::I2C::Make(hi2c1, pin_i2c1_sda, pin_i2c1_scl, stmepic::HardwareType::DMA);
 
-  auto i2c1 = stmepic::I2C::Make(hi2c1, pin_i2c1_sda, pin_i2c1_scl, stmepic::HardwareType::DMA);
-  auto i2c3 = stmepic::I2C::Make(hi2c3, pin_i2c3_sda, pin_i2c3_scl, stmepic::HardwareType::BLOCKING);
-
-
+  xTaskCreate(config_task, "b_task", 128, NULL, 1, NULL);
   vTaskStartScheduler();
-  task_timer_scheduler.schedules_handle_blocking();
+  // task_timer_scheduler.schedules_handle_blocking();
 }

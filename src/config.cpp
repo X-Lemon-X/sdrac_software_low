@@ -19,32 +19,32 @@
 
 //**************************************************************************************************
 // Gpio assigments
-stmepic::gpio::GpioPin pin_user_led_1 = { GPIO_PIN_6, GPIOC, 0 };
-stmepic::gpio::GpioPin pin_user_led_2 = { GPIO_PIN_7, GPIOC, 0 };
-stmepic::gpio::GpioPin pin_user_btn_1 = { GPIO_PIN_9, GPIOA, 0 }; // GPIO_PIN_9, GPIOC for rev 1 of the board
-stmepic::gpio::GpioPin pin_tx_led            = { GPIO_PIN_12, GPIOB, 0 };
-stmepic::gpio::GpioPin pin_rx_led            = { GPIO_PIN_13, GPIOB, 0 };
-stmepic::gpio::GpioPin pin_encoder           = { GPIO_PIN_3, GPIOB, 0 };
-stmepic::gpio::GpioPin pin_poz_zero_sensor   = { GPIO_PIN_4, GPIOA, 0 };
-stmepic::gpio::GpioPin pin_inout_ca1         = { GPIO_PIN_5, GPIOA, 0 };
-stmepic::gpio::GpioPin pin_inout_ca2         = { GPIO_PIN_7, GPIOA, 0 };
-stmepic::gpio::GpioPin pin_inout_crx         = { GPIO_PIN_4, GPIOC, 0 };
-stmepic::gpio::GpioPin pin_inout_ctx         = { GPIO_PIN_10, GPIOB, 0 };
-stmepic::gpio::GpioPin pin_i2c1_sda          = { GPIO_PIN_7, GPIOB, 0 };
-stmepic::gpio::GpioPin pin_i2c1_scl          = { GPIO_PIN_6, GPIOB, 0 };
-stmepic::gpio::GpioPin pin_i2c3_sda          = { GPIO_PIN_9, GPIOC, 0 };
-stmepic::gpio::GpioPin pin_i2c3_scl          = { GPIO_PIN_8, GPIOA, 0 };
-stmepic::gpio::GpioPin pin_temp_steper_board = { GPIO_PIN_0, GPIOA, 0 };
-stmepic::gpio::GpioPin pin_temp_board        = { GPIO_PIN_1, GPIOA, 0 };
-stmepic::gpio::GpioPin pin_temp_motor        = { GPIO_PIN_2, GPIOA, 0 };
-stmepic::gpio::GpioPin pin_vsense            = { GPIO_PIN_3, GPIOA, 0 };
-stmepic::gpio::GpioPin pin_steper_direction  = { GPIO_PIN_0, GPIOB, 0 };
-stmepic::gpio::GpioPin pin_steper_enable     = { GPIO_PIN_1, GPIOB, 0 };
-stmepic::gpio::GpioPin pin_steper_step       = { GPIO_PIN_6, GPIOA, 0 };
-stmepic::gpio::GpioPin pin_boot_device       = { GPIO_PIN_8, GPIOC, 0 };
-stmepic::gpio::GpioPin pin_cid_0             = { GPIO_PIN_10, GPIOC, 0 };
-stmepic::gpio::GpioPin pin_cid_1             = { GPIO_PIN_11, GPIOC, 0 };
-stmepic::gpio::GpioPin pin_cid_2             = { GPIO_PIN_12, GPIOC, 0 };
+stmepic::GpioPin pin_user_led_1(*GPIOC, GPIO_PIN_6);
+stmepic::GpioPin pin_user_led_2(*GPIOC, GPIO_PIN_7);
+stmepic::GpioPin pin_user_btn_1(*GPIOA, GPIO_PIN_9); // GPIOC, GPIO_PIN_9 for rev 1 of the board
+stmepic::GpioPin pin_tx_led(*GPIOB, GPIO_PIN_12);
+stmepic::GpioPin pin_rx_led(*GPIOB, GPIO_PIN_13);
+stmepic::GpioPin pin_encoder(*GPIOB, GPIO_PIN_3);
+stmepic::GpioPin pin_poz_zero_sensor(*GPIOA, GPIO_PIN_4);
+stmepic::GpioPin pin_inout_ca1(*GPIOA, GPIO_PIN_5);
+stmepic::GpioPin pin_inout_ca2(*GPIOA, GPIO_PIN_7);
+stmepic::GpioPin pin_inout_crx(*GPIOC, GPIO_PIN_4);
+stmepic::GpioPin pin_inout_ctx(*GPIOB, GPIO_PIN_10);
+stmepic::GpioPin pin_i2c1_sda(*GPIOB, GPIO_PIN_7);
+stmepic::GpioPin pin_i2c1_scl(*GPIOB, GPIO_PIN_6);
+stmepic::GpioPin pin_i2c3_sda(*GPIOC, GPIO_PIN_9);
+stmepic::GpioPin pin_i2c3_scl(*GPIOA, GPIO_PIN_8);
+stmepic::GpioAnalog pin_temp_steper_board(*GPIOA, GPIO_PIN_0);
+stmepic::GpioAnalog pin_temp_board(*GPIOA, GPIO_PIN_1);
+stmepic::GpioAnalog pin_temp_motor(*GPIOA, GPIO_PIN_2);
+stmepic::GpioAnalog pin_vsense(*GPIOA, GPIO_PIN_3);
+stmepic::GpioPin pin_steper_direction(*GPIOB, GPIO_PIN_0);
+stmepic::GpioPin pin_steper_enable(*GPIOB, GPIO_PIN_1);
+stmepic::GpioPin pin_steper_step(*GPIOA, GPIO_PIN_6);
+stmepic::GpioPin pin_boot_device(*GPIOC, GPIO_PIN_8);
+stmepic::GpioPin pin_cid_0(*GPIOC, GPIO_PIN_10);
+stmepic::GpioPin pin_cid_1(*GPIOC, GPIO_PIN_11);
+stmepic::GpioPin pin_cid_2(*GPIOC, GPIO_PIN_12);
 
 
 //**************************************************************************************************
@@ -331,6 +331,9 @@ const IdConfig config_id_6 = { 0xff0,
 
 //**************************************************************************************************
 // Global stuff
+
+
+std::shared_ptr<stmepic::I2C> i2c1;
 
 std::string version_string = std::to_string(VERSION_MAJOR) + "." +
                              std::to_string(VERSION_MINOR) + "." + std::to_string(VERSION_BUILD);

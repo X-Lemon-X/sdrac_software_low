@@ -59,16 +59,16 @@ void task_usb_data_loging(stmepic::Timing& task_timer) {
 }
 
 void task_blink(stmepic::Timing& task_timer) {
-  TOGGLE_GPIO(pin_user_led_1);
+  pin_user_led_1.toggle();
 }
 
 void task_read_analog_values(stmepic::Timing& task_timer) {
   temoperature_board =
-  stmepic::sensors::temperature::MCP9700AT::get_temperature(VOLTAGE_VALUE(pin_temp_board));
+  stmepic::sensors::temperature::MCP9700AT::get_temperature(pin_temp_board.get_voltage());
   temoperature_steper_driver =
-  temp_steper_driver.get_temperature(VOLTAGE_VALUE(pin_temp_steper_board));
-  temoperature_steper_motor = temp_steper_motor.get_temperature(VOLTAGE_VALUE(pin_temp_motor));
-  voltage_vcc               = VOLTAGE_VALUE(pin_vsense) * ADC_VSENSE_MULTIPLIER;
+  temp_steper_driver.get_temperature(pin_temp_steper_board.get_voltage());
+  temoperature_steper_motor = temp_steper_motor.get_temperature(pin_temp_motor.get_voltage());
+  voltage_vcc               = pin_vsense.get_voltage() * ADC_VSENSE_MULTIPLIER;
 }
 
 void task_blink_error(stmepic::Timing& task_timer) {
@@ -76,9 +76,8 @@ void task_blink_error(stmepic::Timing& task_timer) {
   auto errors_count = error_data.get_amount_of_errors();
   task_timer.set_behaviour(stmepic::frequency_to_period_us((float)TIMING_LED_ERROR_BLINK_FQ * errors_count),
                            true);
-
   if(errors_count)
-    TOGGLE_GPIO(pin_user_led_2);
+    pin_user_led_2.toggle();
   else
-    WRITE_GPIO(pin_user_led_2, GPIO_PIN_RESET);
+    pin_user_led_2.write(GPIO_PIN_RESET);
 }

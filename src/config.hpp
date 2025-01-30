@@ -27,6 +27,7 @@
 #include "usbd_def.h"
 #include "version.hpp"
 #include <limits>
+#include <memory>
 #include <random>
 
 //**************************************************************************************************
@@ -208,33 +209,33 @@ extern const IdConfig config_id_6;
 
 //**************************************************************************************************
 // PINOUT
-extern stmepic::gpio::GpioPin pin_user_led_1;
-extern stmepic::gpio::GpioPin pin_user_led_2;
-extern stmepic::gpio::GpioPin pin_user_btn_1;
-extern stmepic::gpio::GpioPin pin_tx_led;
-extern stmepic::gpio::GpioPin pin_rx_led;
-extern stmepic::gpio::GpioPin pin_encoder;
-extern stmepic::gpio::GpioPin pin_poz_zero_sensor;
-extern stmepic::gpio::GpioPin pin_inout_ca1;
-extern stmepic::gpio::GpioPin pin_inout_ca2;
-extern stmepic::gpio::GpioPin pin_inout_crx;
-extern stmepic::gpio::GpioPin pin_inout_ctx;
-extern stmepic::gpio::GpioPin pin_i2c3_sda;
-extern stmepic::gpio::GpioPin pin_i2c3_scl;
-extern stmepic::gpio::GpioPin pin_temp_steper_board;
-extern stmepic::gpio::GpioPin pin_temp_board;
-extern stmepic::gpio::GpioPin pin_temp_motor;
-extern stmepic::gpio::GpioPin pin_vsense;
-extern stmepic::gpio::GpioPin pin_steper_direction;
-extern stmepic::gpio::GpioPin pin_steper_enable;
-extern stmepic::gpio::GpioPin pin_steper_step;
-extern stmepic::gpio::GpioPin pin_boot_device;
-extern stmepic::gpio::GpioPin pin_cid_0;
-extern stmepic::gpio::GpioPin pin_cid_1;
-extern stmepic::gpio::GpioPin pin_cid_2;
+extern stmepic::GpioPin pin_user_led_1;
+extern stmepic::GpioPin pin_user_led_2;
+extern stmepic::GpioPin pin_user_btn_1;
+extern stmepic::GpioPin pin_tx_led;
+extern stmepic::GpioPin pin_rx_led;
+extern stmepic::GpioPin pin_encoder;
+extern stmepic::GpioPin pin_poz_zero_sensor;
+extern stmepic::GpioPin pin_inout_ca1;
+extern stmepic::GpioPin pin_inout_ca2;
+extern stmepic::GpioPin pin_inout_crx;
+extern stmepic::GpioPin pin_inout_ctx;
+extern stmepic::GpioPin pin_i2c3_sda;
+extern stmepic::GpioPin pin_i2c3_scl;
+extern stmepic::GpioAnalog pin_temp_steper_board;
+extern stmepic::GpioAnalog pin_temp_board;
+extern stmepic::GpioAnalog pin_temp_motor;
+extern stmepic::GpioAnalog pin_vsense;
+extern stmepic::GpioPin pin_steper_direction;
+extern stmepic::GpioPin pin_steper_enable;
+extern stmepic::GpioPin pin_steper_step;
+extern stmepic::GpioPin pin_boot_device;
+extern stmepic::GpioPin pin_cid_0;
+extern stmepic::GpioPin pin_cid_1;
+extern stmepic::GpioPin pin_cid_2;
 
-extern stmepic::gpio::GpioPin pin_i2c1_sda;
-extern stmepic::gpio::GpioPin pin_i2c1_scl;
+extern stmepic::GpioPin pin_i2c1_sda;
+extern stmepic::GpioPin pin_i2c1_scl;
 
 //**************************************************************************************************
 // all the global variables, peripherals, and buffors are declared here
@@ -294,6 +295,8 @@ extern stmepic::sensors::temperature::NtcTermistors temp_steper_driver;
 extern stmepic::sensors::temperature::NtcTermistors temp_steper_motor;
 extern ErrorData error_data;
 
+extern std::shared_ptr<stmepic::I2C> i2c1;
+extern std::shared_ptr<stmepic::I2C> i2c3;
 //**************************************************************************************************
 // debug loging options
 
