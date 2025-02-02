@@ -146,7 +146,7 @@ void can_disconnect_timeout_reset() {
 }
 
 void init_and_set_movement_controler_mode(uint8_t mode) {
-  movement_controler.set_position(movement_controler.get_current_position());
+  movement_controler.set_position(encoder_arm.get_absoulute_angle());
   movement_controler.set_velocity(0.0f);
   movement_controler.set_enable(false);
   stmepic::encoders::EncoderAbsoluteMagnetic* engine_encoder = nullptr;
@@ -277,7 +277,7 @@ void config_tasks() {
   task_blink_error_timer.task_init(task_blink_error, nullptr,
                                    FREQUENCY_TO_PERIOD_MS(TIMING_LED_ERROR_BLINK_FQ));
   task_data_usb_send_timer.task_init(task_usb_data_loging, nullptr,
-                                     FREQUENCY_TO_PERIOD_MS(TIMING_USB_SEND_DATA_FQ), 2448);
+                                     FREQUENCY_TO_PERIOD_MS(TIMING_USB_SEND_DATA_FQ), 3048);
 
   task_usb_timer.task_init(task_usb_handler, nullptr,
                            FREQUENCY_TO_PERIOD_MS(TIMING_USB_RECIVED_DATA_FQ), 1050);
