@@ -1,4 +1,5 @@
 #include "main_prog.hpp"
+#include "can.hpp"
 #include "config.hpp"
 #include "fram_i2c.hpp"
 #include "logger.hpp"
@@ -71,8 +72,8 @@ void periferal_config() {
   // timer 3 settings
   HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_1);
 
-  HAL_CAN_DeInit(&hcan1);
-  HAL_CAN_Init(&hcan1);
+  // HAL_CAN_DeInit(&hcan1);
+  // HAL_CAN_Init(&hcan1);
 }
 
 void reset_i2c() {
@@ -370,6 +371,32 @@ void b_task(void* Arg) {
 #define SVCall_IRQ_NBR (IRQn_Type) - 6
 
 void config_task(void* arg) {
+
+
+  while(true) {
+    vTaskDelay(1000);
+  }
+}
+
+void can_callback1(stmepic::CanDataFrame& frame, void* arg) {
+  log_debug("CAN CALLBACK\n" + stmepic::Logger::parse_to_json_format("frame", frame.frame_id));
+  auto can = static_cast<stmepic::CAN*>(arg);
+  auto a   = encoder_arm.get_absoulute_angle();
+  stmepic::CanDataFrame send_msg;
+  can_konarm_1_status_t src_p;
+  send_msg.frame_id = config.can_konarm_status_frame_id;
+  src_p.status = can_konarm_1_status_status_encode(CAN_KONARM_1_STATUS_STATUS_OK_CHOICE);
+  send_msg.data_size      = CAN_KONARM_1_STATUS_LENGTH;
+  send_msg.extended_id    = false;
+  send_msg.remote_request = false;
+  can_konarm_1_status_pack(send_msg.data, &src_p, send_msg.data_size);
+  can->write(send_msg);
+}
+std::shared_ptr<stmepic::CAN> can_argus;
+
+void main_loop() {
+  log_debug("Start main_loop\n");
+
   pre_periferal_config();
   periferal_config();
 
@@ -382,15 +409,30 @@ void config_task(void* arg) {
 
   auto mayby_i2c1 =
   stmepic::I2C::Make(hi2c1, pin_i2c1_sda, pin_i2c1_scl, stmepic::HardwareType::DMA);
+
   if(!mayby_i2c1.ok()) {
     log_error("I2C1 init error");
   }
   i2c1 = mayby_i2c1.valueOrDie();
   i2c1->hardware_reset();
-
   id_config();
   post_id_config();
   config_tasks();
+
+  CAN_FilterTypeDef can_filter;
+  can_filter.FilterBank           = 1;
+  can_filter.FilterFIFOAssignment = CAN_FILTER_FIFO0;
+  can_filter.FilterActivation     = CAN_FILTER_ENABLE;
+  can_filter.FilterMode           = CAN_FILTERMODE_IDMASK;
+  can_filter.FilterScale          = CAN_FILTERSCALE_16BIT;
+  can_filter.FilterIdHigh         = config.can_filter_id_high;
+  can_filter.FilterIdLow          = config.can_filter_id_low;
+  can_filter.FilterMaskIdHigh     = config.can_filter_mask_high;
+  can_filter.FilterMaskIdLow      = config.can_filter_mask_low;
+  can_filter.SlaveStartFilterBank = 0;
+  auto mayby_can1 = stmepic::CAN::Make(hcan1, can_filter, &pin_tx_led, &pin_rx_led);
+  auto can_argus  = mayby_can1.valueOrDie();
+  can_argus->hardware_start();
 
   stmepic::DeviceThrededSettingsBase i2c1_settings;
   i2c1_settings.uxPriority = 5;
@@ -399,19 +441,21 @@ void config_task(void* arg) {
   // i2c1->hardware_start();
   encoder_arm.device_task_set_settings(i2c1_settings);
   encoder_arm.device_task_run();
-  NVIC_SetPriority(SVCall_IRQ_NBR, 0U);
-
-  while(true) {
-    vTaskDelay(1000);
+  can_argus->add_callback(config.can_konarm_status_frame_id, can_callback1,
+                          (void*)can_argus.get());
+  stmepic::CanDataFrame frame;
+  frame.frame_id       = 1400;
+  frame.data_size      = 8;
+  frame.extended_id    = false;
+  frame.remote_request = false;
+  for(int i = 0; i < 8; i++) {
+    frame.data[i] = i;
   }
-}
+  can_argus->write(frame);
 
-void main_loop() {
-  log_debug("Start main_loop\n");
   // auto ang = encoder_arm.read_raw_angle();
   // auto i2c1 = stmepic::I2C::Make(hi2c1, pin_i2c1_sda, pin_i2c1_scl, stmepic::HardwareType::DMA);
 
-  xTaskCreate(config_task, "b_task", 128, NULL, 1, NULL);
-  vTaskStartScheduler();
+  xTaskCreate(b_task, "b_task", 128, NULL, 1, NULL);
   // task_timer_scheduler.schedules_handle_blocking();
 }

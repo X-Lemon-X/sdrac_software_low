@@ -19,17 +19,17 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef* htim) {
 }
 
 
-void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef* hcan) {
-  if(hcan->Instance == CAN1) {
-    can_controler.irq_handle_rx();
-  }
-}
+// void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef* hcan) {
+//   if(hcan->Instance == CAN1) {
+//     can_controler.irq_handle_rx();
+//   }
+// }
 
-void HAL_CAN_RxFifo1MsgPendingCallback(CAN_HandleTypeDef* hcan) {
-  if(hcan->Instance == CAN1) {
-    can_controler.irq_handle_rx();
-  }
-}
+// void HAL_CAN_RxFifo1MsgPendingCallback(CAN_HandleTypeDef* hcan) {
+//   if(hcan->Instance == CAN1) {
+//     can_controler.irq_handle_rx();
+//   }
+// }
 
 // void HAL_CAN_TxMailbox0CompleteCallback(CAN_HandleTypeDef *hcan)
 // {

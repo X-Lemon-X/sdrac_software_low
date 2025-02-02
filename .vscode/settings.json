@@ -1,6 +1,6 @@
 {
   "intelliSenseMode": "arm-none-eabi-gcc",
-  "stm32-for-vscode.openOCDPath": "/usr/bin/openocd",
+  "stm32-for-vscode.openOCDPath": false,
   "C_Cpp.errorSquiggles": "enabled",
   "files.associations": {
     "stm32f4xx_hal.h": "c",
