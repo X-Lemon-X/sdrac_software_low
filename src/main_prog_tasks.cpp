@@ -4,30 +4,56 @@
 #include "main_prog.hpp"
 
 
-void task_encoders(stmepic::Timing& task_timer) {
-  encoder_arm.handle();
-  if(config.encoder_motor_enable)
-    encoder_vel_motor.handle();
+// void task_encoders(stmepic::Timing& task_timer) {
+//   encoder_arm.handle();
+//   if(config.encoder_motor_enable)
+//     encoder_vel_motor.handle();
+// }
+
+// void task_nodelay(stmepic::Timing& task_timer) {
+//   movement_controler.handle();
+//   can_controler.handle();
+//   error_checks();
+// }
+
+void task_error_check(stmepic::SimpleTask& task_handler, void* args) {
+  if(task_can_disconnected_timer->triggered()) {
+    movement_controler.set_enable(false);
+    movement_controler.set_velocity(0);
+    movement_controler.set_position(movement_controler.get_current_position());
+    error_data.can_disconnected = true;
+  }
+
+  error_data.temp_board_overheating =
+  !std::isnan(temoperature_board) && temoperature_board > ERRORS_MAX_TEMP_BOARD ? true : false;
+  error_data.temp_driver_overheating       = !std::isnan(temoperature_steper_driver) &&
+                                       temoperature_steper_driver > ERRORS_MAX_TEMP_DRIVER ?
+                                             true :
+                                             false;
+  error_data.temp_engine_overheating       = !std::isnan(temoperature_steper_motor) &&
+                                       temoperature_steper_motor > ERRORS_MAX_TEMP_ENGINE ?
+                                             true :
+                                             false;
+  error_data.temp_board_sensor_disconnect  = std::isnan(temoperature_board);
+  error_data.temp_driver_sensor_disconnect = std::isnan(temoperature_steper_driver);
+  error_data.temp_engine_sensor_disconnect = std::isnan(temoperature_steper_motor);
+
+  error_data.encoder_arm_disconnect = !encoder_arm.device_is_connected().valueOrDie();
+  error_data.encoder_motor_disconnect = !encoder_vel_motor.device_is_connected().valueOrDie();
+
+  error_data.baord_overvoltage  = voltage_vcc > ERRORS_MAX_VCC_VOLTAGE ? true : false;
+  error_data.baord_undervoltage = voltage_vcc < ERRORS_MIN_VCC_VOLTAGE ? true : false;
+
+  // can errors are handled in the handle_can_rx function
+
+  error_data.controler_motor_limit_position = movement_controler.get_limit_position_achieved();
 }
 
-void task_nodelay(stmepic::Timing& task_timer) {
-  movement_controler.handle();
-  can_controler.handle();
-  error_checks();
-}
-
-void task_can_disconnect(stmepic::Timing& task_timer) {
-  movement_controler.set_enable(false);
-  movement_controler.set_velocity(0);
-  movement_controler.set_position(movement_controler.get_current_position());
-  error_data.can_disconnected = true;
-}
-
-void task_usb_handler(stmepic::Timing& task_timer) {
+void task_usb_handler(stmepic::SimpleTask& task_handler, void* args) {
   usb_programer.handler();
 }
 
-void task_usb_data_loging(stmepic::Timing& task_timer) {
+void task_usb_data_loging(stmepic::SimpleTask& task_handler, void* args) {
   log_info(
   stmepic::Logger::parse_to_json_format("ID", get_board_id()) +
   stmepic::Logger::parse_to_json_format("Vsen", voltage_vcc) +
@@ -58,11 +84,11 @@ void task_usb_data_loging(stmepic::Timing& task_timer) {
   false, true));
 }
 
-void task_blink(stmepic::Timing& task_timer) {
+void task_blink(stmepic::SimpleTask& task_handler, void* args) {
   pin_user_led_1.toggle();
 }
 
-void task_read_analog_values(stmepic::Timing& task_timer) {
+void task_read_analog_values(stmepic::SimpleTask& task_handler, void* args) {
   temoperature_board =
   stmepic::sensors::temperature::MCP9700AT::get_temperature(pin_temp_board.get_voltage());
   temoperature_steper_driver =
@@ -71,11 +97,11 @@ void task_read_analog_values(stmepic::Timing& task_timer) {
   voltage_vcc               = pin_vsense.get_voltage() * ADC_VSENSE_MULTIPLIER;
 }
 
-void task_blink_error(stmepic::Timing& task_timer) {
+void task_blink_error(stmepic::SimpleTask& task_handler, void* args) {
   // error_checks();
   auto errors_count = error_data.get_amount_of_errors();
-  task_timer.set_behaviour(stmepic::frequency_to_period_us((float)TIMING_LED_ERROR_BLINK_FQ * errors_count),
-                           true);
+  task_handler.task_set_period(FREQUENCY_TO_PERIOD_MS((float)TIMING_LED_ERROR_BLINK_FQ * errors_count));
+
   if(errors_count)
     pin_user_led_2.toggle();
   else

@@ -22,14 +22,23 @@ stmepic::filters::FilterMovingAvarage encoder_motor_moving_avarage;
 stmepic::filters::FilterSampleSkip encoder_arm_filter_velocity;
 stmepic::Timing tim_can_disconnecteded(stmepic::Ticker::get_instance());
 
-std::shared_ptr<stmepic::Timing> task_blink_timer;
-std::shared_ptr<stmepic::Timing> task_blink_error_timer;
-std::shared_ptr<stmepic::Timing> task_read_analog_values_timer;
-std::shared_ptr<stmepic::Timing> task_encoder_timer;
-std::shared_ptr<stmepic::Timing> task_usb_timer;
-std::shared_ptr<stmepic::Timing> task_data_usb_send_timer;
-std::shared_ptr<stmepic::Timing> task_caculate_temp_timer;
-std::shared_ptr<stmepic::Timing> task_nodelay_timer;
+stmepic::SimpleTask task_blink_timer;
+stmepic::SimpleTask task_blink_error_timer;
+stmepic::SimpleTask task_read_analog_values_timer;
+stmepic::SimpleTask task_encoder_timer;
+stmepic::SimpleTask task_usb_timer;
+stmepic::SimpleTask task_data_usb_send_timer;
+stmepic::SimpleTask task_caculate_temp_timer;
+stmepic::SimpleTask task_error_timer;
+
+// std::shared_ptr<stmepic::Timing> task_blink_timer;
+// std::shared_ptr<stmepic::Timing> task_blink_error_timer;
+// std::shared_ptr<stmepic::Timing> task_read_analog_values_timer;
+// std::shared_ptr<stmepic::Timing> task_encoder_timer;
+// std::shared_ptr<stmepic::Timing> task_usb_timer;
+// std::shared_ptr<stmepic::Timing> task_data_usb_send_timer;
+// std::shared_ptr<stmepic::Timing> task_caculate_temp_timer;
+// std::shared_ptr<stmepic::Timing> task_nodelay_timer;
 std::shared_ptr<stmepic::Timing> task_can_disconnected_timer;
 float temoperature_board         = 0;
 float temoperature_steper_driver = 0;
@@ -38,13 +47,11 @@ float voltage_vcc                = 0;
 
 //**************************************************************************************************
 void run_main_prog() {
-  log_debug(stmepic::Logger::parse_to_json_format("state", "start"));
-
-  // pre_periferal_config();
-  // periferal_config();
-  // id_config();
-  // post_id_config();
-  // config_tasks();
+  pre_periferal_config();
+  periferal_config();
+  id_config();
+  post_id_config();
+  config_tasks();
   main_loop();
 }
 
@@ -60,8 +67,8 @@ void periferal_config() {
   // dma adc1 settings
   HAL_ADC_Start_DMA(&hadc1, adc_dma_buffer, ADC_DMA_BUFFER_SIZE);
 
-  HAL_I2C_DeInit(&hi2c1);
-  HAL_I2C_Init(&hi2c1);
+  // HAL_I2C_DeInit(&hi2c1);
+  // HAL_I2C_Init(&hi2c1);
 
   // timer 10 settings
   HAL_NVIC_SetPriority(TIM1_TRG_COM_TIM11_IRQn, 6, 0);
@@ -72,20 +79,44 @@ void periferal_config() {
   // timer 3 settings
   HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_1);
 
-  // HAL_CAN_DeInit(&hcan1);
-  // HAL_CAN_Init(&hcan1);
-}
+  auto mayby_i2c1 =
+  stmepic::I2C::Make(hi2c1, pin_i2c1_sda, pin_i2c1_scl, stmepic::HardwareType::DMA);
+  if(!mayby_i2c1.ok()) {
+    log_error("I2C1 error: " + mayby_i2c1.status().to_string());
+    HAL_NVIC_SystemReset();
+  }
 
-void reset_i2c() {
-  HAL_I2C_DeInit(&hi2c1);
-  GPIO_InitTypeDef GPIO_InitStruct = { 0 };
-  GPIO_InitStruct.Pin              = GPIO_PIN_6 | GPIO_PIN_7;
-  GPIO_InitStruct.Mode             = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull             = GPIO_NOPULL;
-  GPIO_InitStruct.Speed            = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+  i2c1 = mayby_i2c1.valueOrDie();
 
-  HAL_I2C_Init(&hi2c1);
+  auto mayby_i2c3 =
+  stmepic::I2C::Make(hi2c3, pin_i2c3_sda, pin_i2c3_scl, stmepic::HardwareType::DMA);
+  if(!mayby_i2c3.ok()) {
+    log_error("I2C3 error: " + mayby_i2c3.status().to_string());
+    HAL_NVIC_SystemReset();
+  }
+  i2c3 = mayby_i2c3.valueOrDie();
+
+  CAN_FilterTypeDef can_filter;
+  can_filter.FilterBank           = 1;
+  can_filter.FilterFIFOAssignment = CAN_FILTER_FIFO0;
+  can_filter.FilterActivation     = CAN_FILTER_ENABLE;
+  can_filter.FilterMode           = CAN_FILTERMODE_IDMASK;
+  can_filter.FilterScale          = CAN_FILTERSCALE_16BIT;
+  can_filter.FilterIdHigh         = config.can_filter_id_high;
+  can_filter.FilterIdLow          = config.can_filter_id_low;
+  can_filter.FilterMaskIdHigh     = config.can_filter_mask_high;
+  can_filter.FilterMaskIdLow      = config.can_filter_mask_low;
+  can_filter.SlaveStartFilterBank = 0;
+  auto mayby_can1 = stmepic::CAN::Make(hcan1, can_filter, &pin_tx_led, &pin_rx_led);
+  if(!mayby_can1.ok()) {
+    log_error("CAN1 error: " + mayby_can1.status().to_string());
+    HAL_NVIC_SystemReset();
+  }
+  can1 = mayby_can1.valueOrDie();
+
+  i2c1->hardware_start();
+  i2c3->hardware_start();
+  can1->hardware_start();
 }
 
 uint8_t get_board_id() {
@@ -159,6 +190,11 @@ void post_id_config() {
           "https://konar.pwr.edu.pl\n";
   usb_programer.set_info(info);
 
+  stmepic::DeviceThrededSettingsBase enc_device_settings;
+  enc_device_settings.period       = 20;
+  enc_device_settings.uxPriority   = 3;
+  enc_device_settings.uxStackDepth = 254;
+
   //-------------------STEPER MOTOR CONFIGURATION-------------------
   stp_motor.set_steps_per_revolution(config.stepper_motor_steps_per_rev);
   stp_motor.set_gear_ratio(config.stepper_motor_gear_ratio);
@@ -182,6 +218,8 @@ void post_id_config() {
   encoder_arm_filter_velocity.set_init_value(0);
   encoder_arm.init(i2c1, stmepic::encoders::translate_reg_to_angle_MT6701, nullptr,
                    &encoder_arm_filter_velocity);
+  encoder_arm.device_task_set_settings(enc_device_settings);
+  encoder_arm.device_task_start();
 
   //-------------------ENCODER STEPER MOTOR POSITION
   // CONFIGURATION-------------------
@@ -192,12 +230,14 @@ void post_id_config() {
   encoder_vel_motor.set_resolution(ENCODER_MT6702_RESOLUTION);
   encoder_vel_motor.set_address(ENCODER_MT6701_I2C_ADDRESS_2);
   encoder_vel_motor.set_ratio(1.0f / stp_motor.get_gear_ratio());
-  // encoder_vel_motor.set_enable_encoder(config.encoder_motor_enable);
   encoder_motor_moving_avarage.set_size(25); // 15 for smooth movement but delay with sampling to 50
   encoder_motor_moving_avarage.set_samples_to_skip(config.encoder_motor_velocity_sample_amount);
   encoder_vel_motor.init(i2c1, stmepic::encoders::translate_reg_to_angle_MT6701, nullptr,
                          &encoder_motor_moving_avarage);
-
+  if(config.encoder_motor_enable) {
+    encoder_vel_motor.device_task_set_settings(enc_device_settings);
+    encoder_vel_motor.device_task_start();
+  }
   //-------------------MOVEMENT CONTROLER CONFIGURATION-------------------
 
   // unly used if the pid controler is used
@@ -215,247 +255,56 @@ void post_id_config() {
   movement_controler.set_limit_position(config.movement_limit_lower, config.movement_limit_upper);
   movement_controler.set_max_velocity(config.movement_max_velocity);
   movement_controler.set_position(config.movement_limit_upper);
-  init_and_set_movement_controler_mode(config.movement_control_mode);
-
-  log_debug(
-  stmepic::Logger::get_instance().parse_to_json_format("state", "post_id_config"));
-  CAN_FilterTypeDef can_filter;
-  can_filter.FilterBank           = 1;
-  can_filter.FilterFIFOAssignment = CAN_FILTER_FIFO0;
-  can_filter.FilterActivation     = CAN_FILTER_ENABLE;
-  can_filter.FilterMode           = CAN_FILTERMODE_IDMASK;
-  can_filter.FilterScale          = CAN_FILTERSCALE_16BIT;
-  can_filter.FilterIdHigh         = config.can_filter_id_high;
-  can_filter.FilterIdLow          = config.can_filter_id_low;
-  can_filter.FilterMaskIdHigh     = config.can_filter_mask_high;
-  can_filter.FilterMaskIdLow      = config.can_filter_mask_low;
-  can_filter.SlaveStartFilterBank = 0;
-  HAL_CAN_ConfigFilter(&hcan1, &can_filter);
-  can_controler.set_filter(config.can_filter_id_high, config.can_filter_mask_high);
-  can_controler.init(hcan1, CAN_FILTER_FIFO0, &pin_tx_led, &pin_rx_led);
-  HAL_CAN_Start(&hcan1);
-  HAL_CAN_ActivateNotification(&hcan1, CAN_IT_RX_FIFO0_MSG_PENDING); //| CAN_IT_RX_FIFO1_MSG_PENDING);
-
-  // init the movement controler should be done after the encoder and the steper
-  // motor are initialized
   movement_controler.set_position(encoder_arm.get_angle());
   movement_controler.set_velocity(0.0f);
   movement_controler.set_enable(false);
-  movement_controler.handle();
+  init_and_set_movement_controler_mode(config.movement_control_mode);
 }
 
-void error_checks() {
-  error_data.temp_board_overheating =
-  !std::isnan(temoperature_board) && temoperature_board > ERRORS_MAX_TEMP_BOARD ? true : false;
-  error_data.temp_driver_overheating       = !std::isnan(temoperature_steper_driver) &&
-                                       temoperature_steper_driver > ERRORS_MAX_TEMP_DRIVER ?
-                                             true :
-                                             false;
-  error_data.temp_engine_overheating       = !std::isnan(temoperature_steper_motor) &&
-                                       temoperature_steper_motor > ERRORS_MAX_TEMP_ENGINE ?
-                                             true :
-                                             false;
-  error_data.temp_board_sensor_disconnect  = std::isnan(temoperature_board);
-  error_data.temp_driver_sensor_disconnect = std::isnan(temoperature_steper_driver);
-  error_data.temp_engine_sensor_disconnect = std::isnan(temoperature_steper_motor);
-
-  error_data.encoder_arm_disconnect = !encoder_arm.device_is_connected().valueOrDie();
-  error_data.encoder_motor_disconnect = !encoder_vel_motor.device_is_connected().valueOrDie();
-
-  error_data.baord_overvoltage  = voltage_vcc > ERRORS_MAX_VCC_VOLTAGE ? true : false;
-  error_data.baord_undervoltage = voltage_vcc < ERRORS_MIN_VCC_VOLTAGE ? true : false;
-
-  // can errors are handled in the handle_can_rx function
-
-  error_data.controler_motor_limit_position = movement_controler.get_limit_position_achieved();
-}
 
 void config_tasks() {
 
-  can_controler.add_callback(config.can_konarm_clear_errors_frame_id, can_callback_clear_errors);
-  can_controler.add_callback(config.can_konarm_set_control_mode_frame_id, can_callback_set_control_mode);
-  can_controler.add_callback(config.can_konarm_get_errors_frame_id, can_callback_get_errors);
-  can_controler.add_callback(config.can_konarm_status_frame_id, can_callback_status);
-  can_controler.add_callback(config.can_konarm_set_pos_frame_id, can_callback_set_pos);
-  can_controler.add_callback(config.can_konarm_get_pos_frame_id, can_callback_get_pos);
-  can_controler.add_callback(stmepic::CanControl<>::CAN_DEFAULT_FRAME_ID, can_callback_default);
+  can1->add_callback(config.can_konarm_clear_errors_frame_id, can_callback_clear_errors);
+  can1->add_callback(config.can_konarm_set_control_mode_frame_id, can_callback_set_control_mode);
+  can1->add_callback(config.can_konarm_get_errors_frame_id, can_callback_get_errors);
+  can1->add_callback(config.can_konarm_status_frame_id, can_callback_status);
+  can1->add_callback(config.can_konarm_set_pos_frame_id, can_callback_set_pos);
+  can1->add_callback(config.can_konarm_get_pos_frame_id, can_callback_get_pos);
+  can1->add_callback(0, can_callback_default);
 
-  auto s = stmepic::Timing::Make(stmepic::frequency_to_period_us(TIMING_READ_TEMPERATURE_FQ),
-                                 true, task_read_analog_values);
+  task_blink_timer.task_init(task_blink, (void*)&pin_user_led_1,
+                             FREQUENCY_TO_PERIOD_MS(TIMING_LED_BLINK_FQ));
+  task_blink_error_timer.task_init(task_blink_error, nullptr,
+                                   FREQUENCY_TO_PERIOD_MS(TIMING_LED_ERROR_BLINK_FQ));
+  task_data_usb_send_timer.task_init(task_usb_data_loging, nullptr,
+                                     FREQUENCY_TO_PERIOD_MS(TIMING_USB_SEND_DATA_FQ), 2448);
 
-  task_blink_timer =
-  stmepic::Timing::Make(stmepic::frequency_to_period_us(TIMING_LED_BLINK_FQ), true, task_blink)
-  .valueOrDie();
+  task_usb_timer.task_init(task_usb_handler, nullptr,
+                           FREQUENCY_TO_PERIOD_MS(TIMING_USB_RECIVED_DATA_FQ), 1050);
 
-  task_blink_error_timer =
-  stmepic::Timing::Make(stmepic::frequency_to_period_us(TIMING_LED_ERROR_BLINK_FQ), true, task_blink_error)
-  .valueOrDie();
-  task_encoder_timer =
-  stmepic::Timing::Make(stmepic::frequency_to_period_us(TIMING_ENCODER_UPDATE_FQ), true, task_encoders)
-  .valueOrDie();
+  task_read_analog_values_timer.task_init(task_read_analog_values, nullptr,
+                                          FREQUENCY_TO_PERIOD_MS(TIMING_READ_TEMPERATURE_FQ));
 
-  task_usb_timer =
-  stmepic::Timing::Make(stmepic::frequency_to_period_us(TIMING_USB_RECIVED_DATA_FQ), true, task_usb_handler)
-  .valueOrDie();
+  task_error_timer.task_init(task_error_check, nullptr, FREQUENCY_TO_PERIOD_MS(1000));
 
-  task_data_usb_send_timer =
-  stmepic::Timing::Make(stmepic::frequency_to_period_us(TIMING_USB_SEND_DATA_FQ), true, task_usb_data_loging)
-  .valueOrDie();
-
-  task_can_disconnected_timer =
-  stmepic::Timing::Make(TIMING_CAN_DISCONNECTED_PERIOD, false, task_can_disconnect).valueOrDie();
-  task_read_analog_values_timer =
-  stmepic::Timing::Make(stmepic::frequency_to_period_us(TIMING_READ_TEMPERATURE_FQ), true, task_read_analog_values)
-  .valueOrDie();
-  task_nodelay_timer = stmepic::Timing::Make(0, true, task_nodelay).valueOrDie();
-
-  auto status = task_timer_scheduler.add_timer(task_blink_timer);
-  if(!status.ok()) {
-    log_error("Error adding task_blink_timer to the scheduler");
+  auto mayby_timer = stmepic::Timing::Make(TIMING_CAN_DISCONNECTED_PERIOD, false);
+  if(!mayby_timer.ok()) {
+    log_error("Can't create can disconnect timer");
     HAL_NVIC_SystemReset();
   }
+  task_can_disconnected_timer = mayby_timer.valueOrDie();
+  task_can_disconnected_timer->reset();
+  error_data.can_disconnected = true;
 
-  status = task_timer_scheduler.add_timer(task_blink_error_timer);
-  if(!status.ok()) {
-    log_error("Error adding task_blink_error_timer to the scheduler");
-    HAL_NVIC_SystemReset();
-  }
-
-  status = task_timer_scheduler.add_timer(task_encoder_timer);
-  if(!status.ok()) {
-    log_error("Error adding task_encoder_timer to the scheduler");
-    HAL_NVIC_SystemReset();
-  }
-
-  status = task_timer_scheduler.add_timer(task_usb_timer);
-  if(!status.ok()) {
-    log_error("Error adding task_usb_timer to the scheduler");
-    HAL_NVIC_SystemReset();
-  }
-
-  status = task_timer_scheduler.add_timer(task_data_usb_send_timer);
-  if(!status.ok()) {
-    log_error("Error adding task_data_usb_send_timer to the scheduler");
-    HAL_NVIC_SystemReset();
-  }
-
-  status = task_timer_scheduler.add_timer(task_can_disconnected_timer);
-  if(!status.ok()) {
-    log_error("Error adding task_can_disconnected_timer to the scheduler");
-    HAL_NVIC_SystemReset();
-  }
-
-  status = task_timer_scheduler.add_timer(task_read_analog_values_timer);
-  if(!status.ok()) {
-    log_error("Error adding task_read_analog_values_timer to the scheduler");
-    HAL_NVIC_SystemReset();
-  }
-
-  status = task_timer_scheduler.add_timer(task_nodelay_timer);
-  if(!status.ok()) {
-    log_error("Error adding task_nodelay_timer to the scheduler");
-    HAL_NVIC_SystemReset();
-  }
+  task_blink_timer.task_run();
+  task_blink_error_timer.task_run();
+  task_data_usb_send_timer.task_run();
+  task_usb_timer.task_run();
+  task_read_analog_values_timer.task_run();
+  task_error_timer.task_run();
 }
-
-
-void b_task(void* Arg) {
-
-  while(true) {
-    pin_user_led_1.toggle();
-    pin_user_led_2.toggle();
-    vTaskDelay(100);
-  }
-}
-
-#define SVCall_IRQ_NBR (IRQn_Type) - 6
-
-void config_task(void* arg) {
-
-
-  while(true) {
-    vTaskDelay(1000);
-  }
-}
-
-void can_callback1(stmepic::CanDataFrame& frame, void* arg) {
-  log_debug("CAN CALLBACK\n" + stmepic::Logger::parse_to_json_format("frame", frame.frame_id));
-  auto can = static_cast<stmepic::CAN*>(arg);
-  auto a   = encoder_arm.get_absoulute_angle();
-  stmepic::CanDataFrame send_msg;
-  can_konarm_1_status_t src_p;
-  send_msg.frame_id = config.can_konarm_status_frame_id;
-  src_p.status = can_konarm_1_status_status_encode(CAN_KONARM_1_STATUS_STATUS_OK_CHOICE);
-  send_msg.data_size      = CAN_KONARM_1_STATUS_LENGTH;
-  send_msg.extended_id    = false;
-  send_msg.remote_request = false;
-  can_konarm_1_status_pack(send_msg.data, &src_p, send_msg.data_size);
-  can->write(send_msg);
-}
-std::shared_ptr<stmepic::CAN> can_argus;
 
 void main_loop() {
-  log_debug("Start main_loop\n");
-
-  pre_periferal_config();
-  periferal_config();
-
-  // BaseType_t a;
-  // do {
-  //   a = xTaskGetSchedulerState();
-  //   vTaskDelay(10);
-  // } while(a != taskSCHEDULER_RUNNING);
-
-
-  auto mayby_i2c1 =
-  stmepic::I2C::Make(hi2c1, pin_i2c1_sda, pin_i2c1_scl, stmepic::HardwareType::DMA);
-
-  if(!mayby_i2c1.ok()) {
-    log_error("I2C1 init error");
-  }
-  i2c1 = mayby_i2c1.valueOrDie();
-  i2c1->hardware_reset();
-  id_config();
-  post_id_config();
-  config_tasks();
-
-  CAN_FilterTypeDef can_filter;
-  can_filter.FilterBank           = 1;
-  can_filter.FilterFIFOAssignment = CAN_FILTER_FIFO0;
-  can_filter.FilterActivation     = CAN_FILTER_ENABLE;
-  can_filter.FilterMode           = CAN_FILTERMODE_IDMASK;
-  can_filter.FilterScale          = CAN_FILTERSCALE_16BIT;
-  can_filter.FilterIdHigh         = config.can_filter_id_high;
-  can_filter.FilterIdLow          = config.can_filter_id_low;
-  can_filter.FilterMaskIdHigh     = config.can_filter_mask_high;
-  can_filter.FilterMaskIdLow      = config.can_filter_mask_low;
-  can_filter.SlaveStartFilterBank = 0;
-  auto mayby_can1 = stmepic::CAN::Make(hcan1, can_filter, &pin_tx_led, &pin_rx_led);
-  auto can_argus  = mayby_can1.valueOrDie();
-  can_argus->hardware_start();
-
-  stmepic::DeviceThrededSettingsBase i2c1_settings;
-  i2c1_settings.uxPriority = 5;
-  i2c1_settings.period     = 10;
-  // i2c1->hardware_reset();
-  // i2c1->hardware_start();
-  encoder_arm.device_task_set_settings(i2c1_settings);
-  encoder_arm.device_task_run();
-  can_argus->add_callback(config.can_konarm_status_frame_id, can_callback1,
-                          (void*)can_argus.get());
-  stmepic::CanDataFrame frame;
-  frame.frame_id       = 1400;
-  frame.data_size      = 8;
-  frame.extended_id    = false;
-  frame.remote_request = false;
-  for(int i = 0; i < 8; i++) {
-    frame.data[i] = i;
-  }
-  can_argus->write(frame);
-
-  // auto ang = encoder_arm.read_raw_angle();
-  // auto i2c1 = stmepic::I2C::Make(hi2c1, pin_i2c1_sda, pin_i2c1_scl, stmepic::HardwareType::DMA);
-
-  xTaskCreate(b_task, "b_task", 128, NULL, 1, NULL);
-  // task_timer_scheduler.schedules_handle_blocking();
+  log_debug("Start scheduler\n");
+  osKernelStart();
 }

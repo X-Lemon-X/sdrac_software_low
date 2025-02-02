@@ -7,7 +7,8 @@
 // #include <cstdint>
 #include "Timing.hpp"
 #include "can.h"
-#include "can_control.hpp"
+#include "can.hpp"
+// #include "can_control.hpp"
 #include "dfu_usb_programer.hpp"
 #include "encoder_magnetic.hpp"
 #include "filter.hpp"
@@ -15,6 +16,7 @@
 #include "filter_moving_avarage.hpp"
 #include "fram_i2c.hpp"
 #include "gpio.hpp"
+#include "i2c.hpp"
 #include "logger.hpp"
 #include "main.h"
 #include "motor.hpp"
@@ -95,7 +97,6 @@ extern uint32_t adc_dma_buffer[ADC_DMA_BUFFER_SIZE + 1];
 
 #define TIMING_LED_BLINK_FQ 2
 #define TIMING_LED_ERROR_BLINK_FQ 1
-#define TIMING_ENCODER_UPDATE_FQ 1000
 #define TIMING_USB_RECIVED_DATA_FQ 5
 #define TIMING_USB_SEND_DATA_FQ 100
 #define TIMING_READ_TEMPERATURE_FQ 20
@@ -281,14 +282,14 @@ extern USBD_HandleTypeDef hUsbDeviceFS;
 
 extern std::string version_string;
 // extern stmepic::Ticker &main_clock;
-extern stmepic::TimeScheduler task_timer_scheduler;
+// extern stmepic::TimeScheduler task_timer_scheduler;
 // extern stmepic::Board_id board_id;
 extern stmepic::encoders::EncoderAbsoluteMagnetic encoder_arm;
 extern stmepic::encoders::EncoderAbsoluteMagnetic encoder_vel_motor;
 extern stmepic::motor::SteperMotorStepDir stp_motor;
 extern stmepic::memory::FramI2CFM24CLxx fram;
 extern stmepic::motor::MotorClosedLoop* motor;
-extern stmepic::CanControl<> can_controler;
+// extern stmepic::CanControl<> can_controler;
 extern stmepic::dfu::UsbProgramer usb_programer;
 extern stmepic::movement::MovementControler movement_controler;
 extern stmepic::sensors::temperature::NtcTermistors temp_steper_driver;
@@ -297,6 +298,7 @@ extern ErrorData error_data;
 
 extern std::shared_ptr<stmepic::I2C> i2c1;
 extern std::shared_ptr<stmepic::I2C> i2c3;
+extern std::shared_ptr<stmepic::CAN> can1;
 //**************************************************************************************************
 // debug loging options
 

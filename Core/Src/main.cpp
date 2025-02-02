@@ -22,7 +22,6 @@
 #include "usb_device.h"
 
 /* Private includes ----------------------------------------------------------*/
-/* USER CODE BEGIN Includes */
 #include "main_prog.hpp"
 /* USER CODE END Includes */
 
@@ -134,6 +133,7 @@ int main(void) {
   MX_TIM3_Init();
   MX_TIM1_Init();
   MX_TIM8_Init();
+  MX_USB_DEVICE_Init();
   MX_USART3_UART_Init();
   MX_TIM10_Init();
   MX_I2C3_Init();
@@ -173,7 +173,6 @@ int main(void) {
   /* USER CODE END RTOS_EVENTS */
 
   /* Start scheduler */
-  osKernelStart();
 
   /* We should never get here as control is now taken by the scheduler */
 
@@ -794,26 +793,6 @@ void StartDefaultTask(void* argument) {
   }
   /* USER CODE END 5 */
 }
-
-/**
- * @brief  Period elapsed callback in non blocking mode
- * @note   This function is called  when TIM14 interrupt took place, inside
- * HAL_TIM_IRQHandler(). It makes a direct call to HAL_IncTick() to increment
- * a global variable "uwTick" used as application time base.
- * @param  htim : TIM handle
- * @retval None
- */
-// void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef* htim) {
-//   /* USER CODE BEGIN Callback 0 */
-
-//   /* USER CODE END Callback 0 */
-//   if(htim->Instance == TIM14) {
-//     HAL_IncTick();
-//   }
-//   /* USER CODE BEGIN Callback 1 */
-
-//   /* USER CODE END Callback 1 */
-// }
 
 /**
  * @brief  This function is executed in case of error occurrence.

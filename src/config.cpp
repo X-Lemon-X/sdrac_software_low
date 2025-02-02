@@ -334,6 +334,8 @@ const IdConfig config_id_6 = { 0xff0,
 
 
 std::shared_ptr<stmepic::I2C> i2c1;
+std::shared_ptr<stmepic::I2C> i2c3;
+std::shared_ptr<stmepic::CAN> can1;
 
 std::string version_string = std::to_string(VERSION_MAJOR) + "." +
                              std::to_string(VERSION_MINOR) + "." + std::to_string(VERSION_BUILD);
@@ -349,7 +351,6 @@ stmepic::encoders::EncoderAbsoluteMagnetic encoder_arm;
 stmepic::encoders::EncoderAbsoluteMagnetic encoder_vel_motor;
 stmepic::motor::MotorClosedLoop* motor =
 new stmepic::motor::MotorClosedLoop(stp_motor, &encoder_arm, &encoder_vel_motor, nullptr);
-stmepic::CanControl<> can_controler;
 stmepic::movement::MovementControler movement_controler;
 stmepic::dfu::UsbProgramer usb_programer(pin_boot_device);
 stmepic::sensors::temperature::NtcTermistors temp_steper_driver(UC_SUPPLY_VOLTAGE, TERMISTOR_RESISTANCE);

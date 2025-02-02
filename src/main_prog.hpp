@@ -1,13 +1,15 @@
 
 #pragma once
-#include "can_control.hpp"
+
+#include "cmsis_os.h"
+
 
 #include "can.h"
 #include "encoder.hpp"
 
 #include "MCP9700AT.hpp"
 #include "Timing.hpp"
-#include "can_control.hpp"
+// #include "can_control.hpp"
 #include "config.hpp"
 #include "controler_linear.hpp"
 #include "controler_pass_through.hpp"
@@ -37,14 +39,23 @@ extern stmepic::movement::PassThroughControler pass_through_controler;
 extern stmepic::filters::FilterMovingAvarage encoder_motor_moving_avarage;
 extern stmepic::filters::FilterSampleSkip encoder_arm_filter_velocity;
 extern stmepic::Timing tim_can_disconnecteded;
-extern std::shared_ptr<stmepic::Timing> task_blink_timer;
-extern std::shared_ptr<stmepic::Timing> task_blink_error_timer;
-extern std::shared_ptr<stmepic::Timing> task_read_analog_values_timer;
-extern std::shared_ptr<stmepic::Timing> task_encoder_timer;
-extern std::shared_ptr<stmepic::Timing> task_usb_timer;
-extern std::shared_ptr<stmepic::Timing> task_data_usb_send_timer;
-extern std::shared_ptr<stmepic::Timing> task_caculate_temp_timer;
-extern std::shared_ptr<stmepic::Timing> task_nodelay_timer;
+extern stmepic::SimpleTask task_blink_timer;
+extern stmepic::SimpleTask task_blink_error_timer;
+extern stmepic::SimpleTask task_read_analog_values_timer;
+// extern stmepic::SimpleTask task_encoder_timer;
+extern stmepic::SimpleTask task_usb_timer;
+extern stmepic::SimpleTask task_data_usb_send_timer;
+// extern stmepic::SimpleTask task_caculate_temp_timer;
+extern stmepic::SimpleTask task_error_timer;
+
+// // extern std::shared_ptr<stmepic::Timing> task_blink_timer;
+// extern std::shared_ptr<stmepic::Timing> task_blink_error_timer;
+// extern std::shared_ptr<stmepic::Timing> task_read_analog_values_timer;
+// extern std::shared_ptr<stmepic::Timing> task_encoder_timer;
+// extern std::shared_ptr<stmepic::Timing> task_usb_timer;
+// extern std::shared_ptr<stmepic::Timing> task_data_usb_send_timer;
+// extern std::shared_ptr<stmepic::Timing> task_caculate_temp_timer;
+// extern std::shared_ptr<stmepic::Timing> task_nodelay_timer;
 extern std::shared_ptr<stmepic::Timing> task_can_disconnected_timer;
 extern float temoperature_board;
 extern float temoperature_steper_driver;
@@ -95,25 +106,26 @@ void error_checks();
 
 ///**************************************************************************************************
 /// TASKS
-void task_blink(stmepic::Timing& task_timer);
-void task_blink_error(stmepic::Timing& task_timer);
-void task_encoders(stmepic::Timing& task_timer);
-void task_usb_handler(stmepic::Timing& task_timer);
-void task_usb_data_loging(stmepic::Timing& task_timer);
-void task_can_disconnect(stmepic::Timing& task_timer);
-void task_read_analog_values(stmepic::Timing& task_timer);
-void task_nodelay(stmepic::Timing& task_timer);
+void task_error_check(stmepic::SimpleTask& task_handler, void* args);
+void task_blink(stmepic::SimpleTask& task_handler, void* arg);
+void task_blink_error(stmepic::SimpleTask& task_handler, void* arg);
+void task_encoders(stmepic::SimpleTask& task_handler, void* arg);
+void task_usb_handler(stmepic::SimpleTask& task_handler, void* arg);
+void task_usb_data_loging(stmepic::SimpleTask& task_handler, void* arg);
+void task_can_disconnect(stmepic::SimpleTask& task_handler, void* arg);
+void task_read_analog_values(stmepic::SimpleTask& task_handler, void* arg);
+void task_nodelay(stmepic::SimpleTask& task_handler, void* arg);
 
 ///**************************************************************************************************
 /// CAN CALLBACKS
 
-void can_callback_default(stmepic::CanMsg& recived_msg);
-void can_callback_get_errors(stmepic::CanMsg& recived_msg);
-void can_callback_clear_errors(stmepic::CanMsg& recived_msg);
-void can_callback_status(stmepic::CanMsg& recived_msg);
-void can_callback_get_pos(stmepic::CanMsg& recived_msg);
-void can_callback_set_pos(stmepic::CanMsg& recived_msg);
-void can_callback_set_control_mode(stmepic::CanMsg& recived_msg);
+void can_callback_default(stmepic::CAN& can, stmepic::CanDataFrame& recived_msg, void* args);
+void can_callback_get_errors(stmepic::CAN& can, stmepic::CanDataFrame& recived_msg, void* args);
+void can_callback_clear_errors(stmepic::CAN& can, stmepic::CanDataFrame& recived_msg, void* args);
+void can_callback_status(stmepic::CAN& can, stmepic::CanDataFrame& recived_msg, void* args);
+void can_callback_get_pos(stmepic::CAN& can, stmepic::CanDataFrame& recived_msg, void* args);
+void can_callback_set_pos(stmepic::CAN& can, stmepic::CanDataFrame& recived_msg, void* args);
+void can_callback_set_control_mode(stmepic::CAN& can, stmepic::CanDataFrame& recived_msg, void* args);
 
 
 #endif // MAIN_PROG_H
