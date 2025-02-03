@@ -346,7 +346,7 @@ stmepic::TimeScheduler task_timer_scheduler(stmepic::Ticker::get_instance());
 // stmepic::Board_id board_id(pin_cid_0, pin_cid_1, pin_cid_2);
 
 stmepic::motor::SteperMotorStepDir stp_motor(htim3, TIM_CHANNEL_1, pin_steper_direction, pin_steper_enable);
-stmepic::memory::FramI2CFM24CLxx fram(hi2c1, FRAM_BEGIN_ADDRESS, FRAM_SIZE);
+std::shared_ptr<stmepic::memory::FRAM> fram;
 stmepic::encoders::EncoderAbsoluteMagnetic encoder_arm;
 stmepic::encoders::EncoderAbsoluteMagnetic encoder_vel_motor;
 stmepic::motor::MotorClosedLoop* motor =

@@ -287,7 +287,7 @@ extern std::string version_string;
 extern stmepic::encoders::EncoderAbsoluteMagnetic encoder_arm;
 extern stmepic::encoders::EncoderAbsoluteMagnetic encoder_vel_motor;
 extern stmepic::motor::SteperMotorStepDir stp_motor;
-extern stmepic::memory::FramI2CFM24CLxx fram;
+extern std::shared_ptr<stmepic::memory::FRAM> fram;
 extern stmepic::motor::MotorClosedLoop* motor;
 // extern stmepic::CanControl<> can_controler;
 extern stmepic::dfu::UsbProgramer usb_programer;

@@ -190,6 +190,11 @@ void post_id_config() {
           "https://konar.pwr.edu.pl\n";
   usb_programer.set_info(info);
 
+  //-------------------FRAM CONFIGURATION-------------------
+  fram = std::shared_ptr<stmepic::memory::FramI2CFM24CLxx>(
+  new stmepic::memory::FramI2CFM24CLxx(i2c1, FRAM_BEGIN_ADDRESS, FRAM_SIZE));
+  fram->init();
+
   stmepic::DeviceThrededSettingsBase enc_device_settings;
   enc_device_settings.period       = 20;
   enc_device_settings.uxPriority   = 3;
