@@ -56,29 +56,21 @@ stmepic::GpioPin pin_cid_2(*GPIOC, GPIO_PIN_12);
 // regiser strting from 5th bit
 
 const IdConfig config_id_default = {
-  0xff0,  0x000,
-  0x600,  0x000,
-  0x601,  0x602,
-  0x603,  0x604,
+  0xff0,  0x000, 0x600, 0x000,
+  0x601,  0x602, 0x603, 0x604,
   0x605,  0x606,
 
-  400.0f, 40.0f,
-  0.0f,   0.0f,
-  false,  false,
-  960,
+  400.0f, 40.0f, 0.0f,  0.0f,
+  false,  false, 960,
 
-  0.0f,   false,
-  0.0f,   0,
+  0.0f,   false, 0.0f,  0,
 
-  0.0f,   false,
-  0.0f,   0,
+  0.0f,   false, 0.0f,  0,
   false,
 
-  0.0f,   0.0f,
-  0.0f,
+  0.0f,   0.0f,  0.0f,
 
-  0.0f,   0.0f,
-  0.0f,   CAN_KONARM_1_SET_CONTROL_MODE_CONTROL_MODE_VELOCITY_CONTROL_CHOICE,
+  0.0f,   0.0f,  0.0f,  CAN_KONARM_1_SET_CONTROL_MODE_CONTROL_MODE_VELOCITY_CONTROL_CHOICE,
   0.7f
 };
 
@@ -337,8 +329,8 @@ std::shared_ptr<stmepic::I2C> i2c1;
 std::shared_ptr<stmepic::I2C> i2c3;
 std::shared_ptr<stmepic::CAN> can1;
 
-std::string version_string = std::to_string(VERSION_MAJOR) + "." +
-                             std::to_string(VERSION_MINOR) + "." + std::to_string(VERSION_BUILD);
+std::string version_string =
+std::to_string(VERSION_MAJOR) + "." + std::to_string(VERSION_MINOR) + "." + std::to_string(VERSION_BUILD);
 uint32_t adc_dma_buffer[ADC_DMA_BUFFER_SIZE + 1];
 IdConfig config;
 // stmepic::Ticker &main_clock = stmepic::GlobalTicker::get_instance();
@@ -347,10 +339,9 @@ stmepic::TimeScheduler task_timer_scheduler(stmepic::Ticker::get_instance());
 
 stmepic::motor::SteperMotorStepDir stp_motor(htim3, TIM_CHANNEL_1, pin_steper_direction, pin_steper_enable);
 std::shared_ptr<stmepic::memory::FRAM> fram;
-stmepic::encoders::EncoderAbsoluteMagnetic encoder_arm;
-stmepic::encoders::EncoderAbsoluteMagnetic encoder_vel_motor;
-stmepic::motor::MotorClosedLoop* motor =
-new stmepic::motor::MotorClosedLoop(stp_motor, &encoder_arm, &encoder_vel_motor, nullptr);
+std::shared_ptr<stmepic::encoders::EncoderAbsoluteMagneticMT6701> encoder_arm;
+std::shared_ptr<stmepic::encoders::EncoderAbsoluteMagneticMT6701> encoder_vel_motor;
+std::shared_ptr<stmepic::motor::MotorClosedLoop> motor;
 stmepic::movement::MovementControler movement_controler;
 stmepic::dfu::UsbProgramer usb_programer(pin_boot_device);
 stmepic::sensors::temperature::NtcTermistors temp_steper_driver(UC_SUPPLY_VOLTAGE, TERMISTOR_RESISTANCE);
@@ -358,10 +349,9 @@ stmepic::sensors::temperature::NtcTermistors temp_steper_motor(UC_SUPPLY_VOLTAGE
 ErrorData error_data;
 
 unsigned int ErrorData::get_amount_of_errors() const {
-  return (uint8_t)temp_engine_overheating + (uint8_t)temp_driver_overheating +
-         (uint8_t)temp_board_overheating + (uint8_t)temp_engine_sensor_disconnect +
-         (uint8_t)temp_driver_sensor_disconnect + (uint8_t)temp_board_sensor_disconnect +
-         (uint8_t)encoder_arm_disconnect + (uint8_t)encoder_motor_disconnect +
-         (uint8_t)baord_overvoltage + (uint8_t)baord_undervoltage + (uint8_t)can_disconnected +
-         (uint8_t)can_error + (uint8_t)controler_motor_limit_position;
+  return (uint8_t)temp_engine_overheating + (uint8_t)temp_driver_overheating + (uint8_t)temp_board_overheating +
+         (uint8_t)temp_engine_sensor_disconnect + (uint8_t)temp_driver_sensor_disconnect +
+         (uint8_t)temp_board_sensor_disconnect + (uint8_t)encoder_arm_disconnect +
+         (uint8_t)encoder_motor_disconnect + (uint8_t)baord_overvoltage + (uint8_t)baord_undervoltage +
+         (uint8_t)can_disconnected + (uint8_t)can_error + (uint8_t)controler_motor_limit_position;
 }

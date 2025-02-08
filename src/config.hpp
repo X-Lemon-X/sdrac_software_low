@@ -67,14 +67,14 @@
 
 //**************************************************************************************************
 // I2C CONSTANTS
-#define ENCODER_MT6701_ANGLE_REG 0x03
-#define ENCODER_MT6701_I2C_ADDRESS 0xC    // 0x06 ds:b0000110  << 1 =  0b00001100 = 0xC
-#define ENCODER_MT6701_I2C_ADDRESS_2 0x8C // 0x46 ds:b01000110  << 1 =  0b10001100 = 0x8C
-#define ENCODER_MT6702_RESOLUTION 16384
+// #define ENCODER_MT6701_ANGLE_REG 0x03
+// #define ENCODER_MT6701_I2C_ADDRESS 0x06   // 0x06 ds:b0000110  << 1 =  0b00001100 = 0xC
+// #define ENCODER_MT6701_I2C_ADDRESS_2 0x46 // 0x46 ds:b01000110  << 1 =  0b10001100 =
+// 0x8C #define ENCODER_MT6702_RESOLUTION 16384
 
-#define ENCODER_AS5600_I2C_ADDRESS 0x6C // ds:0x36 << 1 = 0b0110 1100 = 0x6C
-#define ENCODER_AS5600_RESOLUTION 4096
-#define ENCODER_AS5600_ANGLE_REG 0x0C
+// #define ENCODER_AS5600_I2C_ADDRESS 0x36 // ds:0x36 << 1 = 0b0110 1100 = 0x6C
+// #define ENCODER_AS5600_RESOLUTION 4096
+// #define ENCODER_AS5600_ANGLE_REG 0x0C
 
 //**************************************************************************************************
 // ADC CONSTANTS
@@ -167,7 +167,7 @@ struct IdConfig {
 /// 1 - error
 /// you can retrieve the amount of errors by calling get_amount_of_errors()
 class ErrorData {
-  public:
+public:
   ErrorData(){};
   // temperature errors
   bool temp_engine_overheating       = false;
@@ -284,11 +284,11 @@ extern std::string version_string;
 // extern stmepic::Ticker &main_clock;
 // extern stmepic::TimeScheduler task_timer_scheduler;
 // extern stmepic::Board_id board_id;
-extern stmepic::encoders::EncoderAbsoluteMagnetic encoder_arm;
-extern stmepic::encoders::EncoderAbsoluteMagnetic encoder_vel_motor;
+extern std::shared_ptr<stmepic::encoders::EncoderAbsoluteMagneticMT6701> encoder_arm;
+extern std::shared_ptr<stmepic::encoders::EncoderAbsoluteMagneticMT6701> encoder_vel_motor;
 extern stmepic::motor::SteperMotorStepDir stp_motor;
 extern std::shared_ptr<stmepic::memory::FRAM> fram;
-extern stmepic::motor::MotorClosedLoop* motor;
+extern std::shared_ptr<stmepic::motor::MotorClosedLoop> motor;
 // extern stmepic::CanControl<> can_controler;
 extern stmepic::dfu::UsbProgramer usb_programer;
 extern stmepic::movement::MovementControler movement_controler;
