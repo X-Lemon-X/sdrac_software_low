@@ -135,7 +135,7 @@ const IdConfig config_id_2 = { 0xff0,
                                false,
                                960,
 
-                               1.1063838005065918f,
+                               1.077238f, // 1.1063838005065918f
                                false,
                                PI,
                                40,

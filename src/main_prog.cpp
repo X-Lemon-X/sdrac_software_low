@@ -190,10 +190,10 @@ void post_id_config() {
   fram = std::shared_ptr<stmepic::memory::FramI2CFM24CLxx>(
   new stmepic::memory::FramI2CFM24CLxx(i2c1, FRAM_BEGIN_ADDRESS, FRAM_SIZE));
 
-  stmepic::DeviceThrededSettingsBase enc_device_settings;
+  stmepic::DeviceThrededSettings enc_device_settings;
   enc_device_settings.period       = 20;
   enc_device_settings.uxPriority   = 3;
-  enc_device_settings.uxStackDepth = 254;
+  enc_device_settings.uxStackDepth = 1054;
 
   // new stmepic::motor::MotorClosedLoop(stp_motor, &encoder_arm, &encoder_vel_motor, nullptr);
 
@@ -218,13 +218,14 @@ void post_id_config() {
   encoder_arm->set_offset(config.encoder_arm_offset);
   encoder_arm->set_reverse(config.encoder_arm_reverse);
   encoder_arm->set_dead_zone_correction_angle(config.encoder_arm_dead_zone_correction_angle);
-  encoder_arm->init();
+  // encoder_arm->init();
   // encoder_arm.set_enable_encoder(true);
   encoder_arm->device_task_set_settings(enc_device_settings);
   encoder_arm->device_task_start();
 
   //-------------------ENCODER STEPER MOTOR POSITION CONFIGURATION-------------------
-  if(config.encoder_motor_enable) {
+  // config.encoder_motor_enable
+  if(false) {
     auto encoder_motor_moving_avarage = std::make_shared<stmepic::filters::FilterMovingAvarage>();
     encoder_motor_moving_avarage->set_size(25); // 15 for smooth movement but delay with sampling to 50
     encoder_motor_moving_avarage->set_samples_to_skip(config.encoder_motor_velocity_sample_amount);
@@ -279,9 +280,10 @@ void config_tasks() {
 
   task_blink_timer.task_init(task_blink, (void *)&pin_user_led_1, FREQUENCY_TO_PERIOD_MS(TIMING_LED_BLINK_FQ));
   task_blink_error_timer.task_init(task_blink_error, nullptr, FREQUENCY_TO_PERIOD_MS(TIMING_LED_ERROR_BLINK_FQ));
-  task_data_usb_send_timer.task_init(task_usb_data_loging, nullptr, FREQUENCY_TO_PERIOD_MS(TIMING_USB_SEND_DATA_FQ), 3048);
+  task_data_usb_send_timer.task_init(task_usb_data_loging, nullptr,
+                                     FREQUENCY_TO_PERIOD_MS(TIMING_USB_SEND_DATA_FQ), nullptr, 15048);
 
-  task_usb_timer.task_init(task_usb_handler, nullptr, FREQUENCY_TO_PERIOD_MS(TIMING_USB_RECIVED_DATA_FQ), 1050);
+  task_usb_timer.task_init(task_usb_handler, nullptr, FREQUENCY_TO_PERIOD_MS(TIMING_USB_RECIVED_DATA_FQ), nullptr, 1050);
 
   task_read_analog_values_timer.task_init(task_read_analog_values, nullptr,
                                           FREQUENCY_TO_PERIOD_MS(TIMING_READ_TEMPERATURE_FQ));

@@ -59,8 +59,8 @@ void task_usb_data_loging(stmepic::SimpleTask &task_handler, void *args) {
   stmepic::Logger::parse_to_json_format("Tste", temoperature_steper_motor) +
   stmepic::Logger::parse_to_json_format("Tbor", temoperature_board) +
   stmepic::Logger::parse_to_json_format("Tmot", temoperature_steper_driver) +
-  stmepic::Logger::parse_to_json_format("EEang", encoder_arm->get_angle()) +
-  stmepic::Logger::parse_to_json_format("EAang", encoder_vel_motor->get_angle()) +
+  stmepic::Logger::parse_to_json_format("EAang", encoder_arm->get_angle()) +
+  stmepic::Logger::parse_to_json_format("EMang", encoder_vel_motor->get_angle()) +
   stmepic::Logger::parse_to_json_format("Pos", movement_controler.get_current_position()) +
   stmepic::Logger::parse_to_json_format("Vel", movement_controler.get_current_velocity()) +
   stmepic::Logger::parse_to_json_format("EPos", encoder_vel_motor->get_absoulute_angle()) +
