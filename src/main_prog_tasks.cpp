@@ -17,6 +17,8 @@
 // }
 
 void task_error_check(stmepic::SimpleTask &task_handler, void *args) {
+  (void)task_handler;
+  (void)args;
   if(task_can_disconnected_timer->triggered()) {
     movement_controler.set_enable(false);
     movement_controler.set_velocity(0);
@@ -50,10 +52,14 @@ void task_error_check(stmepic::SimpleTask &task_handler, void *args) {
 }
 
 void task_usb_handler(stmepic::SimpleTask &task_handler, void *args) {
+  (void)task_handler;
+  (void)args;
   usb_programer.handler();
 }
 
 void task_usb_data_loging(stmepic::SimpleTask &task_handler, void *args) {
+  (void)task_handler;
+  (void)args;
   log_info(
   stmepic::Logger::parse_to_json_format("ID", get_board_id()) + stmepic::Logger::parse_to_json_format("Vsen", voltage_vcc) +
   stmepic::Logger::parse_to_json_format("Tste", temoperature_steper_motor) +
@@ -84,10 +90,14 @@ void task_usb_data_loging(stmepic::SimpleTask &task_handler, void *args) {
 }
 
 void task_blink(stmepic::SimpleTask &task_handler, void *args) {
+  (void)task_handler;
+  (void)args;
   pin_user_led_1.toggle();
 }
 
 void task_read_analog_values(stmepic::SimpleTask &task_handler, void *args) {
+  (void)task_handler;
+  (void)args;
   temoperature_board = stmepic::sensors::temperature::MCP9700AT::get_temperature(pin_temp_board.get_voltage());
   temoperature_steper_driver = temp_steper_driver.get_temperature(pin_temp_steper_board.get_voltage());
   temoperature_steper_motor  = temp_steper_motor.get_temperature(pin_temp_motor.get_voltage());
@@ -95,6 +105,7 @@ void task_read_analog_values(stmepic::SimpleTask &task_handler, void *args) {
 }
 
 void task_blink_error(stmepic::SimpleTask &task_handler, void *args) {
+  (void)args;
   // error_checks();
   auto errors_count = error_data.get_amount_of_errors();
   task_handler.task_set_period(FREQUENCY_TO_PERIOD_MS((float)TIMING_LED_ERROR_BLINK_FQ * errors_count));

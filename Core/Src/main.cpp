@@ -184,8 +184,8 @@ int main(void) {
  * @retval None
  */
 void SystemClock_Config(void) {
-  RCC_OscInitTypeDef RCC_OscInitStruct = { 0 };
-  RCC_ClkInitTypeDef RCC_ClkInitStruct = { 0 };
+  RCC_OscInitTypeDef RCC_OscInitStruct = {};
+  RCC_ClkInitTypeDef RCC_ClkInitStruct = {};
 
   /** Configure the main internal regulator output voltage
    */
@@ -236,7 +236,7 @@ static void MX_ADC1_Init(void) {
 
   /* USER CODE END ADC1_Init 0 */
 
-  ADC_ChannelConfTypeDef sConfig = { 0 };
+  ADC_ChannelConfTypeDef sConfig = {};
 
   /* USER CODE BEGIN ADC1_Init 1 */
 
@@ -436,9 +436,9 @@ static void MX_TIM1_Init(void) {
 
   /* USER CODE END TIM1_Init 0 */
 
-  TIM_MasterConfigTypeDef sMasterConfig               = { 0 };
-  TIM_OC_InitTypeDef sConfigOC                        = { 0 };
-  TIM_BreakDeadTimeConfigTypeDef sBreakDeadTimeConfig = { 0 };
+  TIM_MasterConfigTypeDef sMasterConfig               = {};
+  TIM_OC_InitTypeDef sConfigOC                        = {};
+  TIM_BreakDeadTimeConfigTypeDef sBreakDeadTimeConfig = {};
 
   /* USER CODE BEGIN TIM1_Init 1 */
 
@@ -494,9 +494,9 @@ static void MX_TIM2_Init(void) {
 
   /* USER CODE END TIM2_Init 0 */
 
-  TIM_ClockConfigTypeDef sClockSourceConfig = { 0 };
-  TIM_MasterConfigTypeDef sMasterConfig     = { 0 };
-  TIM_IC_InitTypeDef sConfigIC              = { 0 };
+  TIM_ClockConfigTypeDef sClockSourceConfig = {};
+  TIM_MasterConfigTypeDef sMasterConfig     = {};
+  TIM_IC_InitTypeDef sConfigIC              = {};
 
   /* USER CODE BEGIN TIM2_Init 1 */
 
@@ -545,9 +545,9 @@ static void MX_TIM3_Init(void) {
 
   /* USER CODE END TIM3_Init 0 */
 
-  TIM_ClockConfigTypeDef sClockSourceConfig = { 0 };
-  TIM_MasterConfigTypeDef sMasterConfig     = { 0 };
-  TIM_OC_InitTypeDef sConfigOC              = { 0 };
+  TIM_ClockConfigTypeDef sClockSourceConfig = {};
+  TIM_MasterConfigTypeDef sMasterConfig     = {};
+  TIM_OC_InitTypeDef sConfigOC              = {};
 
   /* USER CODE BEGIN TIM3_Init 1 */
 
@@ -597,8 +597,8 @@ static void MX_TIM8_Init(void) {
 
   /* USER CODE END TIM8_Init 0 */
 
-  TIM_ClockConfigTypeDef sClockSourceConfig = { 0 };
-  TIM_MasterConfigTypeDef sMasterConfig     = { 0 };
+  TIM_ClockConfigTypeDef sClockSourceConfig = {};
+  TIM_MasterConfigTypeDef sMasterConfig     = {};
 
   /* USER CODE BEGIN TIM8_Init 1 */
 
@@ -718,7 +718,7 @@ static void MX_DMA_Init(void) {
  * @retval None
  */
 static void MX_GPIO_Init(void) {
-  GPIO_InitTypeDef GPIO_InitStruct = { 0 };
+  GPIO_InitTypeDef GPIO_InitStruct = {};
   /* USER CODE BEGIN MX_GPIO_Init_1 */
   /* USER CODE END MX_GPIO_Init_1 */
 

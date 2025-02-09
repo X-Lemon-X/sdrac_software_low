@@ -221,7 +221,7 @@ void post_id_config() {
   // encoder_arm->init();
   // encoder_arm.set_enable_encoder(true);
   encoder_arm->device_task_set_settings(enc_device_settings);
-  encoder_arm->device_task_start();
+  STMEPIC_NONE_OR_HRESET(encoder_arm->device_task_start());
 
   //-------------------ENCODER STEPER MOTOR POSITION CONFIGURATION-------------------
   // config.encoder_motor_enable
@@ -240,7 +240,7 @@ void post_id_config() {
     encoder_vel_motor->set_ratio(1.0f / stp_motor.get_gear_ratio());
 
     encoder_vel_motor->device_task_set_settings(enc_device_settings);
-    encoder_vel_motor->device_task_start();
+    STMEPIC_NONE_OR_HRESET(encoder_vel_motor->device_task_start());
   } else {
     encoder_vel_motor = encoder_arm;
   }

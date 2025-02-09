@@ -6,7 +6,7 @@
 #include "main_prog.hpp"
 #include "stm32f4xx_hal.h"
 
-void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef* htim) {
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
   if(htim->Instance == TIM10) {
     stmepic::Ticker::get_instance().irq_update_ticker();
   }
@@ -16,7 +16,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef* htim) {
   }
 }
 
-void HAL_ADC_ConvHalfCpltCallback(ADC_HandleTypeDef* hadc) {
+void HAL_ADC_ConvHalfCpltCallback(ADC_HandleTypeDef *hadc) {
   if(hadc->Instance == ADC1) {
     pin_temp_steper_board.analog_value = adc_dma_buffer[0];
     pin_temp_board.analog_value        = adc_dma_buffer[1];
@@ -25,7 +25,7 @@ void HAL_ADC_ConvHalfCpltCallback(ADC_HandleTypeDef* hadc) {
   }
 }
 
-void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc) {
+void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc) {
   if(hadc->Instance == ADC1) {
     pin_poz_zero_sensor.analog_value = adc_dma_buffer[4];
     pin_inout_ca1.analog_value       = adc_dma_buffer[5];
@@ -34,7 +34,9 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc) {
   }
 }
 
-void can_callback_set_pos(stmepic::CAN& can, stmepic::CanDataFrame& recived_msg, void* args) {
+void can_callback_set_pos(stmepic::CAN &can, stmepic::CanDataFrame &recived_msg, void *args) {
+  (void)can;
+  (void)args;
   can_disconnect_timeout_reset();
   can_konarm_1_set_pos_t signals;
   (void)can_konarm_1_set_pos_unpack(&signals, recived_msg.data, recived_msg.data_size);
@@ -45,7 +47,10 @@ void can_callback_set_pos(stmepic::CAN& can, stmepic::CanDataFrame& recived_msg,
   movement_controler.set_enable(true);
 }
 
-void can_callback_get_pos(stmepic::CAN& can, stmepic::CanDataFrame& recived_msg, void* args) {
+void can_callback_get_pos(stmepic::CAN &can, stmepic::CanDataFrame &recived_msg, void *args) {
+  (void)recived_msg;
+  (void)args;
+
   can_disconnect_timeout_reset();
   stmepic::CanDataFrame send_msg;
   can_konarm_1_get_pos_t src_p;
@@ -57,22 +62,29 @@ void can_callback_get_pos(stmepic::CAN& can, stmepic::CanDataFrame& recived_msg,
   can.write(send_msg);
 }
 
-void can_callback_status(stmepic::CAN& can, stmepic::CanDataFrame& recived_msg, void* args) {
+void can_callback_status(stmepic::CAN &can, stmepic::CanDataFrame &recived_msg, void *args) {
+  (void)recived_msg;
+  (void)args;
   can_disconnect_timeout_reset();
   stmepic::CanDataFrame send_msg;
   can_konarm_1_status_t src_p;
-  send_msg.frame_id = config.can_konarm_status_frame_id;
-  src_p.status = can_konarm_1_status_status_encode(CAN_KONARM_1_STATUS_STATUS_OK_CHOICE);
+  send_msg.frame_id  = config.can_konarm_status_frame_id;
+  src_p.status       = can_konarm_1_status_status_encode(CAN_KONARM_1_STATUS_STATUS_OK_CHOICE);
   send_msg.data_size = CAN_KONARM_1_STATUS_LENGTH;
   can_konarm_1_status_pack(send_msg.data, &src_p, send_msg.data_size);
   can.write(send_msg);
 }
 
-void can_callback_clear_errors(stmepic::CAN& can, stmepic::CanDataFrame& recived_msg, void* args) {
+void can_callback_clear_errors(stmepic::CAN &can, stmepic::CanDataFrame &recived_msg, void *args) {
+  (void)can;
+  (void)recived_msg;
+  (void)args;
   can_disconnect_timeout_reset();
 }
 
-void can_callback_get_errors(stmepic::CAN& can, stmepic::CanDataFrame& recived_msg, void* args) {
+void can_callback_get_errors(stmepic::CAN &can, stmepic::CanDataFrame &recived_msg, void *args) {
+  (void)recived_msg;
+  (void)args;
   can_disconnect_timeout_reset();
   stmepic::CanDataFrame send_msg;
   can_konarm_1_get_errors_t src_p;
@@ -96,12 +108,17 @@ void can_callback_get_errors(stmepic::CAN& can, stmepic::CanDataFrame& recived_m
   error_data.can_error = false;
 }
 
-void can_callback_default(stmepic::CAN& can, stmepic::CanDataFrame& recived_msg, void* args) {
+void can_callback_default(stmepic::CAN &can, stmepic::CanDataFrame &recived_msg, void *args) {
+  (void)can;
+  (void)recived_msg;
+  (void)args;
   can_disconnect_timeout_reset();
   error_data.can_error = true;
 }
 
-void can_callback_set_control_mode(stmepic::CAN& can, stmepic::CanDataFrame& recived_msg, void* args) {
+void can_callback_set_control_mode(stmepic::CAN &can, stmepic::CanDataFrame &recived_msg, void *args) {
+  (void)can;
+  (void)args;
   can_disconnect_timeout_reset();
   can_konarm_1_set_control_mode_t signals;
   can_konarm_1_set_control_mode_unpack(&signals, recived_msg.data, recived_msg.data_size);
