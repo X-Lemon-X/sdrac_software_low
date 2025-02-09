@@ -220,6 +220,7 @@ void post_id_config() {
   encoder_arm->set_dead_zone_correction_angle(config.encoder_arm_dead_zone_correction_angle);
   // encoder_arm->init();
   // encoder_arm.set_enable_encoder(true);
+  encoder_arm->device_start();
   encoder_arm->device_task_set_settings(enc_device_settings);
   STMEPIC_NONE_OR_HRESET(encoder_arm->device_task_start());
 
