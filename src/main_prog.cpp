@@ -226,7 +226,7 @@ void post_id_config() {
 
   //-------------------ENCODER STEPER MOTOR POSITION CONFIGURATION-------------------
   // config.encoder_motor_enable
-  if(false) {
+  if(config.encoder_motor_enable) {
     auto encoder_motor_moving_avarage = std::make_shared<stmepic::filters::FilterMovingAvarage>();
     encoder_motor_moving_avarage->set_size(25); // 15 for smooth movement but delay with sampling to 50
     encoder_motor_moving_avarage->set_samples_to_skip(config.encoder_motor_velocity_sample_amount);
