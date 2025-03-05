@@ -45,6 +45,7 @@ void can_callback_set_pos(stmepic::CAN &can, stmepic::CanDataFrame &recived_msg,
   movement_controler.set_velocity(signals.velocity);
   movement_controler.set_position(signals.position);
   movement_controler.set_enable(true);
+  log_debug("Set position:" + std::to_string(signals.position) + "velocity:" + std::to_string(signals.velocity));
 }
 
 void can_callback_get_pos(stmepic::CAN &can, stmepic::CanDataFrame &recived_msg, void *args) {
@@ -128,4 +129,5 @@ void can_callback_set_control_mode(stmepic::CAN &can, stmepic::CanDataFrame &rec
     return;
   }
   init_and_set_movement_controler_mode(signals.control_mode);
+  log_debug("Set control mode:" + std::to_string(signals.control_mode));
 }

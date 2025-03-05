@@ -351,4 +351,4 @@ extern std::shared_ptr<stmepic::CAN> can1;
 // #endif // LOG_ERROR
 
 
-#endif // MAIN_PROG_H
+#endif // MAIN_PROG_H  mc->current_state.position = mc->motor->get_absolute_position();

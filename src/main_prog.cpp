@@ -17,8 +17,9 @@
 // SCARY GLOBAL VARIABLES
 
 stmepic::movement::PIDControler pid_pos;
-stmepic::movement::BasicLinearPosControler bacis_controler;
-stmepic::movement::PassThroughControler pass_through_controler;
+// stmepic::movement::BasicLinearPosControler bacis_controler;
+std::shared_ptr<stmepic::movement::BasicLinearPosControler> bacis_controler;
+std::shared_ptr<stmepic::movement::PassThroughControler> pass_through_controler;
 // stmepic::filters::FilterMovingAvarage encoder_motor_moving_avarage;
 // stmepic::filters::FilterSampleSkip encoder_arm_filter_velocity;
 stmepic::Timing tim_can_disconnecteded(stmepic::Ticker::get_instance());
@@ -151,29 +152,26 @@ void init_and_set_movement_controler_mode(uint8_t mode) {
   if(config.encoder_motor_enable) {
     engine_encoder = encoder_vel_motor;
   }
-  if(motor != nullptr) {
-    motor.reset();
-  }
-  motor = std::make_shared<stmepic::motor::MotorClosedLoop>(stp_motor, encoder_arm, engine_encoder, nullptr);
 
+  motor = std::make_shared<stmepic::motor::MotorClosedLoop>(stp_motor, encoder_arm, engine_encoder, nullptr);
   switch(mode) {
   case CAN_KONARM_1_SET_CONTROL_MODE_CONTROL_MODE_POSITION_CONTROL_CHOICE:
     // we switch control mode to position control however since the stepr
     // motor don't have the position control yet implemented we will use
     // the velocity control with BasicLinearPosControler that will achive
     // the position control
-    movement_controler.init(*motor, stmepic::movement::MovementControlMode::VELOCITY, bacis_controler);
+    movement_controler.init(motor, stmepic::movement::MovementControlMode::VELOCITY, bacis_controler);
     break;
   case CAN_KONARM_1_SET_CONTROL_MODE_CONTROL_MODE_VELOCITY_CONTROL_CHOICE:
-    movement_controler.init(*motor, stmepic::movement::MovementControlMode::VELOCITY, pass_through_controler);
+    movement_controler.init(motor, stmepic::movement::MovementControlMode::VELOCITY, pass_through_controler);
     break;
   case CAN_KONARM_1_SET_CONTROL_MODE_CONTROL_MODE_TORQUE_CONTROL_CHOICE:
     // torque control is not implemented yet so we will use the velocity control
-    movement_controler.init(*motor, stmepic::movement::MovementControlMode::TORQUE, pass_through_controler);
+    movement_controler.init(motor, stmepic::movement::MovementControlMode::TORQUE, pass_through_controler);
     break;
   default:
     // if the mode is not supported we will use the velocity control
-    movement_controler.init(*motor, stmepic::movement::MovementControlMode::VELOCITY, pass_through_controler);
+    movement_controler.init(motor, stmepic::movement::MovementControlMode::VELOCITY, pass_through_controler);
     break;
   }
 }
@@ -187,8 +185,7 @@ void post_id_config() {
   usb_programer.set_info(info);
 
   //-------------------FRAM CONFIGURATION-------------------
-  fram = std::shared_ptr<stmepic::memory::FramI2CFM24CLxx>(
-  new stmepic::memory::FramI2CFM24CLxx(i2c1, FRAM_BEGIN_ADDRESS, FRAM_SIZE));
+  fram = std::make_shared<stmepic::memory::FramI2CFM24CLxx>(i2c1, FRAM_BEGIN_ADDRESS, FRAM_SIZE);
 
   stmepic::DeviceThrededSettings enc_device_settings;
   enc_device_settings.period       = 20;
@@ -252,9 +249,13 @@ void post_id_config() {
   pid_pos.set_Ki(config.pid_i);
   pid_pos.set_Kd(config.pid_d);
 
+  // pass through controler is used for the velocity control
+  pass_through_controler = std::make_shared<stmepic::movement::PassThroughControler>();
+
   // used for the position control
-  bacis_controler.set_max_acceleration(config.movement_max_acceleration);
-  bacis_controler.set_target_pos_max_error(0.01f);
+  bacis_controler = std::make_shared<stmepic::movement::BasicLinearPosControler>();
+  bacis_controler->set_max_acceleration(config.movement_max_acceleration);
+  bacis_controler->set_target_pos_max_error(0.01f);
 
   // for velocity control we use the pass through controler whitch doesn't do
   // anything

@@ -34,8 +34,8 @@
 
 
 extern stmepic::movement::PIDControler pid_pos;
-extern stmepic::movement::BasicLinearPosControler bacis_controler;
-extern stmepic::movement::PassThroughControler pass_through_controler;
+extern std::shared_ptr<stmepic::movement::BasicLinearPosControler> bacis_controler;
+extern std::shared_ptr<stmepic::movement::PassThroughControler> pass_through_controler;
 extern stmepic::filters::FilterMovingAvarage encoder_motor_moving_avarage;
 extern stmepic::filters::FilterSampleSkip encoder_arm_filter_velocity;
 extern stmepic::Timing tim_can_disconnecteded;
@@ -106,26 +106,26 @@ void error_checks();
 
 ///**************************************************************************************************
 /// TASKS
-void task_error_check(stmepic::SimpleTask& task_handler, void* args);
-void task_blink(stmepic::SimpleTask& task_handler, void* arg);
-void task_blink_error(stmepic::SimpleTask& task_handler, void* arg);
-void task_encoders(stmepic::SimpleTask& task_handler, void* arg);
-void task_usb_handler(stmepic::SimpleTask& task_handler, void* arg);
-void task_usb_data_loging(stmepic::SimpleTask& task_handler, void* arg);
-void task_can_disconnect(stmepic::SimpleTask& task_handler, void* arg);
-void task_read_analog_values(stmepic::SimpleTask& task_handler, void* arg);
-void task_nodelay(stmepic::SimpleTask& task_handler, void* arg);
+void task_error_check(stmepic::SimpleTask &task_handler, void *args);
+void task_blink(stmepic::SimpleTask &task_handler, void *arg);
+void task_blink_error(stmepic::SimpleTask &task_handler, void *arg);
+void task_encoders(stmepic::SimpleTask &task_handler, void *arg);
+void task_usb_handler(stmepic::SimpleTask &task_handler, void *arg);
+void task_usb_data_loging(stmepic::SimpleTask &task_handler, void *arg);
+void task_can_disconnect(stmepic::SimpleTask &task_handler, void *arg);
+void task_read_analog_values(stmepic::SimpleTask &task_handler, void *arg);
+void task_nodelay(stmepic::SimpleTask &task_handler, void *arg);
 
 ///**************************************************************************************************
 /// CAN CALLBACKS
 
-void can_callback_default(stmepic::CAN& can, stmepic::CanDataFrame& recived_msg, void* args);
-void can_callback_get_errors(stmepic::CAN& can, stmepic::CanDataFrame& recived_msg, void* args);
-void can_callback_clear_errors(stmepic::CAN& can, stmepic::CanDataFrame& recived_msg, void* args);
-void can_callback_status(stmepic::CAN& can, stmepic::CanDataFrame& recived_msg, void* args);
-void can_callback_get_pos(stmepic::CAN& can, stmepic::CanDataFrame& recived_msg, void* args);
-void can_callback_set_pos(stmepic::CAN& can, stmepic::CanDataFrame& recived_msg, void* args);
-void can_callback_set_control_mode(stmepic::CAN& can, stmepic::CanDataFrame& recived_msg, void* args);
+void can_callback_default(stmepic::CAN &can, stmepic::CanDataFrame &recived_msg, void *args);
+void can_callback_get_errors(stmepic::CAN &can, stmepic::CanDataFrame &recived_msg, void *args);
+void can_callback_clear_errors(stmepic::CAN &can, stmepic::CanDataFrame &recived_msg, void *args);
+void can_callback_status(stmepic::CAN &can, stmepic::CanDataFrame &recived_msg, void *args);
+void can_callback_get_pos(stmepic::CAN &can, stmepic::CanDataFrame &recived_msg, void *args);
+void can_callback_set_pos(stmepic::CAN &can, stmepic::CanDataFrame &recived_msg, void *args);
+void can_callback_set_control_mode(stmepic::CAN &can, stmepic::CanDataFrame &recived_msg, void *args);
 
 
 #endif // MAIN_PROG_H
