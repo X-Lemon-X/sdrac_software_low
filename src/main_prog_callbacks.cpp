@@ -34,7 +34,7 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc) {
   }
 }
 
-void can_callback_set_pos(stmepic::CAN &can, stmepic::CanDataFrame &recived_msg, void *args) {
+void can_callback_set_pos(stmepic::CanBase &can, stmepic::CanDataFrame &recived_msg, void *args) {
   (void)can;
   (void)args;
   can_disconnect_timeout_reset();
@@ -48,7 +48,7 @@ void can_callback_set_pos(stmepic::CAN &can, stmepic::CanDataFrame &recived_msg,
   log_debug("Set position:" + std::to_string(signals.position) + "velocity:" + std::to_string(signals.velocity));
 }
 
-void can_callback_get_pos(stmepic::CAN &can, stmepic::CanDataFrame &recived_msg, void *args) {
+void can_callback_get_pos(stmepic::CanBase &can, stmepic::CanDataFrame &recived_msg, void *args) {
   (void)recived_msg;
   (void)args;
 
@@ -63,7 +63,7 @@ void can_callback_get_pos(stmepic::CAN &can, stmepic::CanDataFrame &recived_msg,
   can.write(send_msg);
 }
 
-void can_callback_status(stmepic::CAN &can, stmepic::CanDataFrame &recived_msg, void *args) {
+void can_callback_status(stmepic::CanBase &can, stmepic::CanDataFrame &recived_msg, void *args) {
   (void)recived_msg;
   (void)args;
   can_disconnect_timeout_reset();
@@ -76,14 +76,14 @@ void can_callback_status(stmepic::CAN &can, stmepic::CanDataFrame &recived_msg, 
   can.write(send_msg);
 }
 
-void can_callback_clear_errors(stmepic::CAN &can, stmepic::CanDataFrame &recived_msg, void *args) {
+void can_callback_clear_errors(stmepic::CanBase &can, stmepic::CanDataFrame &recived_msg, void *args) {
   (void)can;
   (void)recived_msg;
   (void)args;
   can_disconnect_timeout_reset();
 }
 
-void can_callback_get_errors(stmepic::CAN &can, stmepic::CanDataFrame &recived_msg, void *args) {
+void can_callback_get_errors(stmepic::CanBase &can, stmepic::CanDataFrame &recived_msg, void *args) {
   (void)recived_msg;
   (void)args;
   can_disconnect_timeout_reset();
@@ -109,7 +109,7 @@ void can_callback_get_errors(stmepic::CAN &can, stmepic::CanDataFrame &recived_m
   error_data.can_error = false;
 }
 
-void can_callback_default(stmepic::CAN &can, stmepic::CanDataFrame &recived_msg, void *args) {
+void can_callback_default(stmepic::CanBase &can, stmepic::CanDataFrame &recived_msg, void *args) {
   (void)can;
   (void)recived_msg;
   (void)args;
@@ -117,7 +117,7 @@ void can_callback_default(stmepic::CAN &can, stmepic::CanDataFrame &recived_msg,
   error_data.can_error = true;
 }
 
-void can_callback_set_control_mode(stmepic::CAN &can, stmepic::CanDataFrame &recived_msg, void *args) {
+void can_callback_set_control_mode(stmepic::CanBase &can, stmepic::CanDataFrame &recived_msg, void *args) {
   (void)can;
   (void)args;
   can_disconnect_timeout_reset();

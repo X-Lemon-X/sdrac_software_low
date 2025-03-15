@@ -119,13 +119,13 @@ void task_nodelay(stmepic::SimpleTask &task_handler, void *arg);
 ///**************************************************************************************************
 /// CAN CALLBACKS
 
-void can_callback_default(stmepic::CAN &can, stmepic::CanDataFrame &recived_msg, void *args);
-void can_callback_get_errors(stmepic::CAN &can, stmepic::CanDataFrame &recived_msg, void *args);
-void can_callback_clear_errors(stmepic::CAN &can, stmepic::CanDataFrame &recived_msg, void *args);
-void can_callback_status(stmepic::CAN &can, stmepic::CanDataFrame &recived_msg, void *args);
-void can_callback_get_pos(stmepic::CAN &can, stmepic::CanDataFrame &recived_msg, void *args);
-void can_callback_set_pos(stmepic::CAN &can, stmepic::CanDataFrame &recived_msg, void *args);
-void can_callback_set_control_mode(stmepic::CAN &can, stmepic::CanDataFrame &recived_msg, void *args);
+void can_callback_default(stmepic::CanBase &can, stmepic::CanDataFrame &recived_msg, void *args);
+void can_callback_get_errors(stmepic::CanBase &can, stmepic::CanDataFrame &recived_msg, void *args);
+void can_callback_clear_errors(stmepic::CanBase &can, stmepic::CanDataFrame &recived_msg, void *args);
+void can_callback_status(stmepic::CanBase &can, stmepic::CanDataFrame &recived_msg, void *args);
+void can_callback_get_pos(stmepic::CanBase &can, stmepic::CanDataFrame &recived_msg, void *args);
+void can_callback_set_pos(stmepic::CanBase &can, stmepic::CanDataFrame &recived_msg, void *args);
+void can_callback_set_control_mode(stmepic::CanBase &can, stmepic::CanDataFrame &recived_msg, void *args);
 
 
 #endif // MAIN_PROG_H

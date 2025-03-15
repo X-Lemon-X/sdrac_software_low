@@ -28,6 +28,7 @@
 #include "usbd_cdc_if.h"
 #include "usbd_def.h"
 #include "version.hpp"
+#include "can2.0.hpp"
 #include <limits>
 #include <memory>
 #include <random>
