@@ -38,7 +38,7 @@ extern std::shared_ptr<stmepic::movement::BasicLinearPosControler> bacis_control
 extern std::shared_ptr<stmepic::movement::PassThroughControler> pass_through_controler;
 extern stmepic::filters::FilterMovingAvarage encoder_motor_moving_avarage;
 extern stmepic::filters::FilterSampleSkip encoder_arm_filter_velocity;
-extern stmepic::Timing tim_can_disconnecteded;
+extern stmepic::Timer tim_can_disconnecteded;
 extern stmepic::SimpleTask task_blink_timer;
 extern stmepic::SimpleTask task_blink_error_timer;
 extern stmepic::SimpleTask task_read_analog_values_timer;
@@ -56,7 +56,7 @@ extern stmepic::SimpleTask task_error_timer;
 // extern std::shared_ptr<stmepic::Timing> task_data_usb_send_timer;
 // extern std::shared_ptr<stmepic::Timing> task_caculate_temp_timer;
 // extern std::shared_ptr<stmepic::Timing> task_nodelay_timer;
-extern std::shared_ptr<stmepic::Timing> task_can_disconnected_timer;
+extern std::shared_ptr<stmepic::Timer> task_can_disconnected_timer;
 extern float temoperature_board;
 extern float temoperature_steper_driver;
 extern float temoperature_steper_motor;

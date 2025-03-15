@@ -22,7 +22,7 @@ std::shared_ptr<stmepic::movement::BasicLinearPosControler> bacis_controler;
 std::shared_ptr<stmepic::movement::PassThroughControler> pass_through_controler;
 // stmepic::filters::FilterMovingAvarage encoder_motor_moving_avarage;
 // stmepic::filters::FilterSampleSkip encoder_arm_filter_velocity;
-stmepic::Timing tim_can_disconnecteded(stmepic::Ticker::get_instance());
+stmepic::Timer tim_can_disconnecteded(stmepic::Ticker::get_instance());
 
 stmepic::SimpleTask task_blink_timer;
 stmepic::SimpleTask task_blink_error_timer;
@@ -41,7 +41,7 @@ stmepic::SimpleTask task_error_timer;
 // std::shared_ptr<stmepic::Timing> task_data_usb_send_timer;
 // std::shared_ptr<stmepic::Timing> task_caculate_temp_timer;
 // std::shared_ptr<stmepic::Timing> task_nodelay_timer;
-std::shared_ptr<stmepic::Timing> task_can_disconnected_timer;
+std::shared_ptr<stmepic::Timer> task_can_disconnected_timer;
 float temoperature_board         = 0;
 float temoperature_steper_driver = 0;
 float temoperature_steper_motor  = 0;
@@ -292,7 +292,7 @@ void config_tasks() {
 
   task_error_timer.task_init(task_error_check, nullptr, FREQUENCY_TO_PERIOD_MS(1000));
 
-  auto mayby_timer = stmepic::Timing::Make(TIMING_CAN_DISCONNECTED_PERIOD, false);
+  auto mayby_timer = stmepic::Timer::Make(TIMING_CAN_DISCONNECTED_PERIOD, false);
   if(!mayby_timer.ok()) {
     log_error("Can't create can disconnect timer");
     HAL_NVIC_SystemReset();

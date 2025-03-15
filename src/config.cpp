@@ -334,7 +334,6 @@ std::to_string(VERSION_MAJOR) + "." + std::to_string(VERSION_MINOR) + "." + std:
 uint32_t adc_dma_buffer[ADC_DMA_BUFFER_SIZE + 1];
 IdConfig config;
 // stmepic::Ticker &main_clock = stmepic::GlobalTicker::get_instance();
-stmepic::TimeScheduler task_timer_scheduler(stmepic::Ticker::get_instance());
 // stmepic::Board_id board_id(pin_cid_0, pin_cid_1, pin_cid_2);
 
 stmepic::motor::SteperMotorStepDir stp_motor(htim3, TIM_CHANNEL_1, pin_steper_direction, pin_steper_enable);
