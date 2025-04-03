@@ -187,7 +187,7 @@ void post_id_config() {
   //-------------------FRAM CONFIGURATION-------------------
   fram = std::make_shared<stmepic::memory::FramI2CFM24CLxx>(i2c1, FRAM_BEGIN_ADDRESS, FRAM_SIZE);
 
-  stmepic::DeviceThrededSettings enc_device_settings;
+  stmepic::DeviceThreadedSettings enc_device_settings;
   enc_device_settings.period       = 20;
   enc_device_settings.uxPriority   = 3;
   enc_device_settings.uxStackDepth = 1054;
