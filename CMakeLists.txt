@@ -131,12 +131,12 @@ if(CCACHE_PROGRAM)
 	 )
  endif()
 
-if( COPY_COMPILE_COMMANDS )
-  message(STATUS "Copying compile_commands.json")
-  add_custom_command(
-    TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/compile_commands.json ${CMAKE_SOURCE_DIR}/compile_commands.json
-  )
-else()
-  message(STATUS "Not copying compile_commands.json")
-endif()
+# if( COPY_COMPILE_COMMANDS )
+#   message(STATUS "Copying compile_commands.json")
+#   add_custom_command(
+#     TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
+#     # COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/compile_commands.json ${CMAKE_SOURCE_DIR}/compile_commands.json
+#   )
+# else()
+#   message(STATUS "Not copying compile_commands.json")
+# endif()

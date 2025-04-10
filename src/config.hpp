@@ -14,6 +14,7 @@
 #include "filter.hpp"
 #include "filter_alfa_beta.hpp"
 #include "filter_moving_avarage.hpp"
+#include "memory_fram.hpp"
 #include "fram_i2c.hpp"
 #include "gpio.hpp"
 #include "i2c.hpp"

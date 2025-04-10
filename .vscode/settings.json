@@ -80,8 +80,11 @@
     "span": "cpp",
     "sstream": "cpp"
   },
-  "ros.distro": "humble",
   "cortex-debug.variableUseNaturalFormat": true,
+  "C_Cpp.clang_format_fallbackStyle": "Google",
+  "C_Cpp.clang_format_style": "file",
+  "editor.formatOnSave": true,
+  "ros.distro": "humble",
   "python.autoComplete.extraPaths": [
     "/opt/ros/humble/lib/python3.10/site-packages",
     "/opt/ros/humble/local/lib/python3.10/dist-packages"
@@ -90,7 +93,5 @@
     "/opt/ros/humble/lib/python3.10/site-packages",
     "/opt/ros/humble/local/lib/python3.10/dist-packages"
   ],
-  "C_Cpp.clang_format_fallbackStyle": "Google",
-  "C_Cpp.clang_format_style": "file",
-  "editor.formatOnSave": true
+  "C_Cpp.default.compilerPath": "/home/lemonx/.local/share/arm-gnu-toolchain-14/bin/arm-none-eabi-gcc"
 }

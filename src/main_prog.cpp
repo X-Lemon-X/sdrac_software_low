@@ -6,6 +6,7 @@
 #include "fram_i2c.hpp"
 #include "logger.hpp"
 #include "memory_fram.hpp"
+#include "fram_i2c.hpp"
 #include "stm32f4xx_hal.h"
 #include "stm32f4xx_hal_cortex.h"
 #include "stm32f4xx_hal_i2c.h"
@@ -106,16 +107,18 @@ void periferal_config() {
   can_filter.FilterMaskIdHigh     = config.can_filter_mask_high;
   can_filter.FilterMaskIdLow      = config.can_filter_mask_low;
   can_filter.SlaveStartFilterBank = 0;
-  auto mayby_can1                 = stmepic::CAN::Make(hcan1, can_filter, &pin_tx_led, &pin_rx_led);
-  if(!mayby_can1.ok()) {
-    log_error("CAN1 error: " + mayby_can1.status().to_string());
-    HAL_NVIC_SystemReset();
-  }
-  can1 = mayby_can1.valueOrDie();
 
-  i2c1->hardware_start();
-  i2c3->hardware_start();
-  can1->hardware_start();
+  STMEPIC_ASSING_TO_OR_HRESET(can1, stmepic::CAN::Make(hcan1, can_filter, &pin_tx_led, &pin_rx_led));
+
+
+  STMEPIC_NONE_OR_HRESET(i2c1->hardware_start());
+  STMEPIC_NONE_OR_HRESET(i2c3->hardware_start());
+  STMEPIC_NONE_OR_HRESET(can1->hardware_start());
+
+  //-------------------FRAM CONFIGURATION-------------------
+  // fram = std::make_shared<stmepic::memory::FramI2CFM24CLxx>(i2c1, FRAM_BEGIN_ADDRESS, FRAM_SIZE);
+  STMEPIC_ASSING_TO_OR_HRESET(fram, stmepic::memory::FramI2CFM24CLxx::Make(i2c1, FRAM_BEGIN_ADDRESS, FRAM_SIZE));
+  fram->device_start();
 }
 
 uint8_t get_board_id() {
@@ -128,6 +131,9 @@ uint8_t get_board_id() {
 
 void id_config() {
   log_debug(stmepic::Logger::parse_to_json_format("state", "id_config"));
+
+  // probably here load data from FRAM
+
   switch(get_board_id()) {
   case BOARD_ID_1: config = config_id_1; break;
   case BOARD_ID_2: config = config_id_2; break;
@@ -184,8 +190,6 @@ void post_id_config() {
           "https://konar.pwr.edu.pl\n";
   usb_programer.set_info(info);
 
-  //-------------------FRAM CONFIGURATION-------------------
-  fram = std::make_shared<stmepic::memory::FramI2CFM24CLxx>(i2c1, FRAM_BEGIN_ADDRESS, FRAM_SIZE);
 
   stmepic::DeviceThreadedSettings enc_device_settings;
   enc_device_settings.period       = 20;
