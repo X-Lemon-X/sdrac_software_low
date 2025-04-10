@@ -133,6 +133,13 @@ void id_config() {
   log_debug(stmepic::Logger::parse_to_json_format("state", "id_config"));
 
   // probably here load data from FRAM
+  auto mayby_config = fram->readStruct<IdConfig>(FRAM_CONFIG_ADDRESS);
+  if(mayby_config.ok()) {
+    config = mayby_config.valueOrDie();
+    log_debug("Config loaded from FRAM");
+  } else {
+    log_debug("Config not loaded from FRAM");
+  }
 
   switch(get_board_id()) {
   case BOARD_ID_1: config = config_id_1; break;
@@ -143,6 +150,8 @@ void id_config() {
   case BOARD_ID_6: config = config_id_6; break;
   default: config = config_id_default; break;
   }
+
+  (void)fram->writeStruct(FRAM_CONFIG_ADDRESS, config);
 }
 
 void can_disconnect_timeout_reset() {

@@ -67,6 +67,8 @@
 #define FRAM_BEGIN_ADDRESS 0x10
 #define FRAM_CONFIG_ADDRESS 0x01
 
+#define FRAM_CONFIG_ADDRESS 0x01
+
 //**************************************************************************************************
 // I2C CONSTANTS
 // #define ENCODER_MT6701_ANGLE_REG 0x03

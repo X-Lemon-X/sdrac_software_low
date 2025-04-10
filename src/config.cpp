@@ -94,7 +94,7 @@ const IdConfig config_id_1 = { 0xff0,
                                false,
                                960,
 
-                               -2.9145636558532715f,
+                               -1.6655197143554688f,
                                true,
                                PI,
                                0,
@@ -135,7 +135,7 @@ const IdConfig config_id_2 = { 0xff0,
                                false,
                                960,
 
-                               1.077238f, // 1.1063838005065918f
+                               1.6218013763427734f, // 1.1063838005065918f
                                false,
                                PI,
                                40,
@@ -176,7 +176,7 @@ const IdConfig config_id_3 = { 0xff0,
                                false,
                                960,
 
-                               -1.6793255805969238f,
+                               -1.711155414581298f,
                                true,
                                PI,
                                40,
