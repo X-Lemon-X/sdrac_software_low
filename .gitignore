@@ -21,3 +21,6 @@ generated/
 Thumbs.db
 .cache/
 .venv/
+
+
+log
