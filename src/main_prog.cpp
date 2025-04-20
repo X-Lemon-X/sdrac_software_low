@@ -61,7 +61,7 @@ void run_main_prog() {
 void pre_periferal_config() {
   log_debug(stmepic::Logger::parse_to_json_format("state", "pre_perifial_config"));
   stmepic::Ticker::get_instance().init(&htim10);
-  stmepic::Logger::get_instance().init(LOG_LOGER_LEVEL, LOG_SHOW_TIMESTAMP, CDC_Transmit_FS, version_string);
+  stmepic::Logger::get_instance().init(LOG_LOGER_LEVEL, LOG_SHOW_TIMESTAMP, CDC_Transmit_FS, false, version_string);
 }
 
 void periferal_config() {
