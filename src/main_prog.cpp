@@ -218,6 +218,7 @@ void post_id_config() {
   stp_motor.init();
   stp_motor.set_enable(false);
 
+
   //-------------------ENCODER ARM POSITION CONFIGURATION-------------------
   auto encoder_arm_filter_velocity = std::make_shared<stmepic::filters::FilterSampleSkip>();
   encoder_arm_filter_velocity->set_samples_to_skip(config.encoder_arm_velocity_sample_amount);
