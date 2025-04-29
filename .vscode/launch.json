@@ -1,7 +1,6 @@
 {
   "version": "0.2.0",
   "configurations": [
-
     {
       "type": "bashdb",
       "request": "launch",
@@ -31,7 +30,27 @@
       "servertype": "stlink",
       "showDevDebugOutput": "raw",
       "BMPGDBSerialPort": "/dev/ttyACM1"
+    },
+    {
+      "cwd": "${workspaceFolder}",
+      "executable": "${workspaceFolder}/build/firmware.elf",
+      "name": "Local Launch OpenOCD",
+      "request": "launch",
+      "type": "cortex-debug",
+      "servertype": "openocd",
+      "configFiles": [
+        "${workspaceFolder}/stlink.cfg",
+        "${workspaceFolder}/stm32f4x.cfg"
+      ],
+      "serverArgs": [
+        "-c",
+        "init; arm semihosting enable"
+      ],
+      "runToEntryPoint": "main",
+      // "showDevDebugOutput": "both",
+      "svdFile": "${workspaceFolder}/STM32F412.svd",
+      "breakAfterReset": false
     }
   ]
 }
-      // "preLaunchTask": "CMake:build",
+// "preLaunchTask": "CMake:build",
