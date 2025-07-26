@@ -22,7 +22,7 @@
 #include "main.h"
 #include "motor.hpp"
 #include "movement_controler.hpp"
-#include "ntc_termistors.hpp"
+#include "ntc_termistor.hpp"
 #include "steper_motor.hpp"
 #include "stm32f4xx_hal.h"
 #include "usb_device.h"
@@ -30,6 +30,7 @@
 #include "usbd_def.h"
 #include "version.hpp"
 #include "can2.0.hpp"
+#include "MT6701.hpp"
 #include <limits>
 #include <memory>
 #include <random>
@@ -296,8 +297,8 @@ extern std::shared_ptr<stmepic::motor::MotorClosedLoop> motor;
 // extern stmepic::CanControl<> can_controler;
 extern stmepic::dfu::UsbProgramer usb_programer;
 extern stmepic::movement::MovementControler movement_controler;
-extern stmepic::sensors::temperature::NtcTermistors temp_steper_driver;
-extern stmepic::sensors::temperature::NtcTermistors temp_steper_motor;
+extern stmepic::sensors::temperature::NtcTermistor temp_steper_driver;
+extern stmepic::sensors::temperature::NtcTermistor temp_steper_motor;
 extern ErrorData error_data;
 
 extern std::shared_ptr<stmepic::I2C> i2c1;

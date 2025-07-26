@@ -11,7 +11,7 @@
 #include "memory_fram.hpp"
 #include "motor.hpp"
 #include "movement_controler.hpp"
-#include "ntc_termistors.hpp"
+#include "ntc_termistor.hpp"
 #include "steper_motor.hpp"
 #include "usbd_cdc_if.h"
 #include <limits>
@@ -343,8 +343,8 @@ std::shared_ptr<stmepic::encoders::EncoderAbsoluteMagneticMT6701> encoder_vel_mo
 std::shared_ptr<stmepic::motor::MotorClosedLoop> motor;
 stmepic::movement::MovementControler movement_controler;
 stmepic::dfu::UsbProgramer usb_programer(pin_boot_device);
-stmepic::sensors::temperature::NtcTermistors temp_steper_driver(UC_SUPPLY_VOLTAGE, TERMISTOR_RESISTANCE);
-stmepic::sensors::temperature::NtcTermistors temp_steper_motor(UC_SUPPLY_VOLTAGE, TERMISTOR_RESISTANCE);
+stmepic::sensors::temperature::NtcTermistor temp_steper_driver(UC_SUPPLY_VOLTAGE, TERMISTOR_RESISTANCE);
+stmepic::sensors::temperature::NtcTermistor temp_steper_motor(UC_SUPPLY_VOLTAGE, TERMISTOR_RESISTANCE);
 ErrorData error_data;
 
 unsigned int ErrorData::get_amount_of_errors() const {

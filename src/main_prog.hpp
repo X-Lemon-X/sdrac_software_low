@@ -21,8 +21,10 @@
 #include "gpio.hpp"
 #include "logger.hpp"
 #include "movement_controler.hpp"
-#include "ntc_termistors.hpp"
+#include "ntc_termistor.hpp"
 #include "steper_motor.hpp"
+
+
 #include <cfloat>
 #include <cmath>
 #include <memory>
@@ -106,15 +108,15 @@ void error_checks();
 
 ///**************************************************************************************************
 /// TASKS
-void task_error_check(stmepic::SimpleTask &task_handler, void *args);
-void task_blink(stmepic::SimpleTask &task_handler, void *arg);
-void task_blink_error(stmepic::SimpleTask &task_handler, void *arg);
-void task_encoders(stmepic::SimpleTask &task_handler, void *arg);
-void task_usb_handler(stmepic::SimpleTask &task_handler, void *arg);
-void task_usb_data_loging(stmepic::SimpleTask &task_handler, void *arg);
-void task_can_disconnect(stmepic::SimpleTask &task_handler, void *arg);
-void task_read_analog_values(stmepic::SimpleTask &task_handler, void *arg);
-void task_nodelay(stmepic::SimpleTask &task_handler, void *arg);
+stmepic::Status task_error_check(stmepic::SimpleTask &task_handler, void *args);
+stmepic::Status task_blink(stmepic::SimpleTask &task_handler, void *arg);
+stmepic::Status task_blink_error(stmepic::SimpleTask &task_handler, void *arg);
+stmepic::Status task_encoders(stmepic::SimpleTask &task_handler, void *arg);
+stmepic::Status task_usb_handler(stmepic::SimpleTask &task_handler, void *arg);
+stmepic::Status task_usb_data_loging(stmepic::SimpleTask &task_handler, void *arg);
+stmepic::Status task_can_disconnect(stmepic::SimpleTask &task_handler, void *arg);
+stmepic::Status task_read_analog_values(stmepic::SimpleTask &task_handler, void *arg);
+stmepic::Status task_nodelay(stmepic::SimpleTask &task_handler, void *arg);
 
 ///**************************************************************************************************
 /// CAN CALLBACKS

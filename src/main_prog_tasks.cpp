@@ -2,6 +2,8 @@
 #include "config.hpp"
 #include "logger.hpp"
 #include "main_prog.hpp"
+#include "stmepic.hpp"
+#include "simple_task.hpp"
 
 
 // void task_encoders(stmepic::Timing& task_timer) {
@@ -16,7 +18,7 @@
 //   error_checks();
 // }
 
-void task_error_check(stmepic::SimpleTask &task_handler, void *args) {
+stmepic::Status task_error_check(stmepic::SimpleTask &task_handler, void *args) {
   (void)task_handler;
   (void)args;
   if(task_can_disconnected_timer->triggered()) {
@@ -49,15 +51,17 @@ void task_error_check(stmepic::SimpleTask &task_handler, void *args) {
   // can errors are handled in the handle_can_rx function
 
   error_data.controler_motor_limit_position = movement_controler.get_limit_position_achieved();
+  return stmepic::Status::OK();
 }
 
-void task_usb_handler(stmepic::SimpleTask &task_handler, void *args) {
+stmepic::Status task_usb_handler(stmepic::SimpleTask &task_handler, void *args) {
   (void)task_handler;
   (void)args;
   usb_programer.handler();
+  return stmepic::Status::OK();
 }
 
-void task_usb_data_loging(stmepic::SimpleTask &task_handler, void *args) {
+stmepic::Status task_usb_data_loging(stmepic::SimpleTask &task_handler, void *args) {
   (void)task_handler;
   (void)args;
   log_info(
@@ -87,24 +91,27 @@ void task_usb_data_loging(stmepic::SimpleTask &task_handler, void *args) {
   stmepic::Logger::parse_to_json_format("canerr", BOOL_TO_STRING(error_data.can_error)) +
   stmepic::Logger::parse_to_json_format("motlimit", BOOL_TO_STRING(error_data.controler_motor_limit_position), false),
   false, true));
+  return stmepic::Status::OK();
 }
 
-void task_blink(stmepic::SimpleTask &task_handler, void *args) {
+stmepic::Status task_blink(stmepic::SimpleTask &task_handler, void *args) {
   (void)task_handler;
   (void)args;
   pin_user_led_1.toggle();
+  return stmepic::Status::OK();
 }
 
-void task_read_analog_values(stmepic::SimpleTask &task_handler, void *args) {
+stmepic::Status task_read_analog_values(stmepic::SimpleTask &task_handler, void *args) {
   (void)task_handler;
   (void)args;
   temoperature_board = stmepic::sensors::temperature::MCP9700AT::get_temperature(pin_temp_board.get_voltage());
   temoperature_steper_driver = temp_steper_driver.get_temperature(pin_temp_steper_board.get_voltage());
   temoperature_steper_motor  = temp_steper_motor.get_temperature(pin_temp_motor.get_voltage());
   voltage_vcc                = pin_vsense.get_voltage() * ADC_VSENSE_MULTIPLIER;
+  return stmepic::Status::OK();
 }
 
-void task_blink_error(stmepic::SimpleTask &task_handler, void *args) {
+stmepic::Status task_blink_error(stmepic::SimpleTask &task_handler, void *args) {
   (void)args;
   // error_checks();
   auto errors_count = error_data.get_amount_of_errors();
@@ -114,4 +121,5 @@ void task_blink_error(stmepic::SimpleTask &task_handler, void *args) {
     pin_user_led_2.toggle();
   else
     pin_user_led_2.write(GPIO_PIN_RESET);
+  return stmepic::Status::OK();
 }
