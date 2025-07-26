@@ -128,14 +128,14 @@ const IdConfig config_id_2 = { 0xff0,
                                CAN_KONARM_2_SET_CONTROL_MODE_FRAME_ID,
 
                                400.0f,
-                               40.0f,
+                               68.0f,
                                PI_m2,
                                0.05f,
                                false,
                                false,
                                960,
 
-                               1.6218013763427734f, // 1.1063838005065918f
+                               1.617966f, // 1.6218013763427734f
                                false,
                                PI,
                                40,
