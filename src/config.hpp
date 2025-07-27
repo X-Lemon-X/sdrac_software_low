@@ -6,7 +6,7 @@
 // #include <cstdint>
 // #include <cstdint>
 #include "Timing.hpp"
-#include "can.h"
+#include "can_messages.h"
 #include "can.hpp"
 // #include "can_control.hpp"
 #include "dfu_usb_programer.hpp"
@@ -22,6 +22,7 @@
 #include "main.h"
 #include "motor.hpp"
 #include "movement_controler.hpp"
+#include "servo_motor.hpp"
 #include "ntc_termistor.hpp"
 #include "steper_motor.hpp"
 #include "stm32f4xx_hal.h"
@@ -34,6 +35,7 @@
 #include <limits>
 #include <memory>
 #include <random>
+namespace se = stmepic;
 
 //**************************************************************************************************
 // log levels
@@ -124,6 +126,7 @@ struct IdConfig {
   uint32_t can_konarm_clear_errors_frame_id;
   uint32_t can_konarm_get_errors_frame_id;
   uint32_t can_konarm_set_control_mode_frame_id;
+  uint32_t can_konarm_set_effector_position_frame_id;
 
 
   // Steper motor config
@@ -215,33 +218,33 @@ extern const IdConfig config_id_6;
 
 //**************************************************************************************************
 // PINOUT
-extern stmepic::GpioPin pin_user_led_1;
-extern stmepic::GpioPin pin_user_led_2;
-extern stmepic::GpioPin pin_user_btn_1;
-extern stmepic::GpioPin pin_tx_led;
-extern stmepic::GpioPin pin_rx_led;
-extern stmepic::GpioPin pin_encoder;
-extern stmepic::GpioPin pin_poz_zero_sensor;
-extern stmepic::GpioPin pin_inout_ca1;
-extern stmepic::GpioPin pin_inout_ca2;
-extern stmepic::GpioPin pin_inout_crx;
-extern stmepic::GpioPin pin_inout_ctx;
-extern stmepic::GpioPin pin_i2c3_sda;
-extern stmepic::GpioPin pin_i2c3_scl;
-extern stmepic::GpioAnalog pin_temp_steper_board;
-extern stmepic::GpioAnalog pin_temp_board;
-extern stmepic::GpioAnalog pin_temp_motor;
-extern stmepic::GpioAnalog pin_vsense;
-extern stmepic::GpioPin pin_steper_direction;
-extern stmepic::GpioPin pin_steper_enable;
-extern stmepic::GpioPin pin_steper_step;
-extern stmepic::GpioPin pin_boot_device;
-extern stmepic::GpioPin pin_cid_0;
-extern stmepic::GpioPin pin_cid_1;
-extern stmepic::GpioPin pin_cid_2;
+extern se::GpioPin pin_user_led_1;
+extern se::GpioPin pin_user_led_2;
+extern se::GpioPin pin_user_btn_1;
+extern se::GpioPin pin_tx_led;
+extern se::GpioPin pin_rx_led;
+extern se::GpioPin pin_encoder;
+extern se::GpioPin pin_poz_zero_sensor;
+extern se::GpioPin pin_inout_ca1;
+extern se::GpioPin pin_inout_ca2;
+extern se::GpioPin pin_inout_crx;
+extern se::GpioPin pin_inout_ctx;
+extern se::GpioPin pin_i2c3_sda;
+extern se::GpioPin pin_i2c3_scl;
+extern se::GpioAnalog pin_temp_steper_board;
+extern se::GpioAnalog pin_temp_board;
+extern se::GpioAnalog pin_temp_motor;
+extern se::GpioAnalog pin_vsense;
+extern se::GpioPin pin_steper_direction;
+extern se::GpioPin pin_steper_enable;
+extern se::GpioPin pin_steper_step;
+extern se::GpioPin pin_boot_device;
+extern se::GpioPin pin_cid_0;
+extern se::GpioPin pin_cid_1;
+extern se::GpioPin pin_cid_2;
 
-extern stmepic::GpioPin pin_i2c1_sda;
-extern stmepic::GpioPin pin_i2c1_scl;
+extern se::GpioPin pin_i2c1_sda;
+extern se::GpioPin pin_i2c1_scl;
 
 //**************************************************************************************************
 // all the global variables, peripherals, and buffors are declared here
@@ -277,7 +280,11 @@ extern TIM_HandleTypeDef htim8;
 /// @brief TIM handler for the [us] precision clock
 extern TIM_HandleTypeDef htim10;
 
+/// @brief TIM handler for the IO use
+extern TIM_HandleTypeDef htim14;
+
 extern UART_HandleTypeDef huart3;
+
 
 /// @brief USB handler for on board USB-C
 extern USBD_HandleTypeDef hUsbDeviceFS;
@@ -286,24 +293,25 @@ extern USBD_HandleTypeDef hUsbDeviceFS;
 // GLOBAL OBEJCTS
 
 extern std::string version_string;
-// extern stmepic::Ticker &main_clock;
-// extern stmepic::TimeScheduler task_timer_scheduler;
-// extern stmepic::Board_id board_id;
-extern std::shared_ptr<stmepic::encoders::EncoderAbsoluteMagneticMT6701> encoder_arm;
-extern std::shared_ptr<stmepic::encoders::EncoderAbsoluteMagneticMT6701> encoder_vel_motor;
-extern stmepic::motor::SteperMotorStepDir stp_motor;
-extern std::shared_ptr<stmepic::memory::FRAM> fram;
-extern std::shared_ptr<stmepic::motor::MotorClosedLoop> motor;
-// extern stmepic::CanControl<> can_controler;
-extern stmepic::dfu::UsbProgramer usb_programer;
-extern stmepic::movement::MovementControler movement_controler;
-extern stmepic::sensors::temperature::NtcTermistor temp_steper_driver;
-extern stmepic::sensors::temperature::NtcTermistor temp_steper_motor;
+// extern se::Ticker &main_clock;
+// extern se::TimeScheduler task_timer_scheduler;
+// extern se::Board_id board_id;
+extern std::shared_ptr<se::encoders::EncoderAbsoluteMagneticMT6701> encoder_arm;
+extern std::shared_ptr<se::encoders::EncoderAbsoluteMagneticMT6701> encoder_vel_motor;
+extern se::motor::SteperMotorStepDir stp_motor;
+extern std::shared_ptr<se::memory::FRAM> fram;
+extern std::shared_ptr<se::motor::MotorClosedLoop> motor;
+extern std::shared_ptr<se::motor::ServoMotorPWM> servo_motor;
+// extern se::CanControl<> can_controler;
+extern se::dfu::UsbProgramer usb_programer;
+extern se::movement::MovementControler movement_controler;
+extern se::sensors::temperature::NtcTermistor temp_steper_driver;
+extern se::sensors::temperature::NtcTermistor temp_steper_motor;
 extern ErrorData error_data;
 
-extern std::shared_ptr<stmepic::I2C> i2c1;
-extern std::shared_ptr<stmepic::I2C> i2c3;
-extern std::shared_ptr<stmepic::CAN> can1;
+extern std::shared_ptr<se::I2C> i2c1;
+extern std::shared_ptr<se::I2C> i2c3;
+extern std::shared_ptr<se::CAN> can1;
 //**************************************************************************************************
 // debug loging options
 
@@ -312,45 +320,45 @@ extern std::shared_ptr<stmepic::CAN> can1;
 
 #ifdef LOG_DEBUG
 #define _LOG_LVL 0
-#define LOG_LOGER_LEVEL stmepic::LOG_LEVEL::LOG_LEVEL_DEBUG
+#define LOG_LOGER_LEVEL se::LOG_LEVEL::LOG_LEVEL_DEBUG
 #endif // LOG_DEBUG
 
 
 // #ifdef LOG_INFO
 // #define _LOG_LVL 1
-// #define LOG_LOGER_LEVEL stmepic::LOG_LEVEL::LOG_LEVEL_INFO
+// #define LOG_LOGER_LEVEL se::LOG_LEVEL::LOG_LEVEL_INFO
 // #endif // LOG_INFO
 
 // #ifdef LOG_WARN
 // #define _LOG_LVL 2
-// #define LOG_LOGER_LEVEL stmepic::LOG_LEVEL::LOG_LEVEL_WARNING
+// #define LOG_LOGER_LEVEL se::LOG_LEVEL::LOG_LEVEL_WARNING
 // #endif // LOG_WARN
 
 // #ifdef LOG_ERROR
 // #define _LOG_LVL 3
-// #define LOG_LOGER_LEVEL stmepic::LOG_LEVEL::LOG_LEVEL_ERROR
+// #define LOG_LOGER_LEVEL se::LOG_LEVEL::LOG_LEVEL_ERROR
 // #endif // LOG_ERROR
 
 // #if _LOG_LVL <= 0
-// #define log_debug(...) stmepic::Logger::get_instance().debug(__VA_ARGS__)
+// #define log_debug(...) se::Logger::get_instance().debug(__VA_ARGS__)
 // #else
 // #define log_debug(...)
 // #endif // LOG_DEBUG
 
 // #if _LOG_LVL <= 1
-// #define log_info(...) stmepic::Logger::get_instance().info(__VA_ARGS__)
+// #define log_info(...) se::Logger::get_instance().info(__VA_ARGS__)
 // #else
 // #define log_info(...)
 // #endif // LOG_INFO
 
 // #if _LOG_LVL <= 2
-// #define log_warn(...) stmepic::Logger::get_instance().warn(__VA_ARGS__)
+// #define log_warn(...) se::Logger::get_instance().warn(__VA_ARGS__)
 // #else
 // #define log_warn(...)
 // #endif // LOG_WARN
 
 // #if _LOG_LVL <= 3
-// #define log_error(...) stmepic::Logger::get_instance().error(__VA_ARGS__)
+// #define log_error(...) se::Logger::get_instance().error(__VA_ARGS__)
 // #else
 // #define log_error(...)
 // #endif // LOG_ERROR

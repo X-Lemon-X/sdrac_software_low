@@ -1,5 +1,4 @@
 import serial
-import serial
 import json
 import threading
 import serial.tools.list_ports as list_ports

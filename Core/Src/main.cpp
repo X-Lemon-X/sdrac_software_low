@@ -57,11 +57,12 @@ DMA_HandleTypeDef hdma_i2c3_tx;
 TIM_HandleTypeDef htim1;
 TIM_HandleTypeDef htim2;
 TIM_HandleTypeDef htim3;
-TIM_HandleTypeDef htim8;
 TIM_HandleTypeDef htim10;
+TIM_HandleTypeDef htim14;
 
 UART_HandleTypeDef huart3;
 
+/* Definitions for defaultTask */
 /* USER CODE BEGIN PV */
 
 /* USER CODE END PV */
@@ -76,10 +77,10 @@ static void MX_I2C1_Init(void);
 static void MX_TIM2_Init(void);
 static void MX_TIM3_Init(void);
 static void MX_TIM1_Init(void);
-static void MX_TIM8_Init(void);
 static void MX_USART3_UART_Init(void);
 static void MX_TIM10_Init(void);
 static void MX_I2C3_Init(void);
+static void MX_TIM14_Init(void);
 void StartDefaultTask(void *argument);
 
 /* USER CODE BEGIN PFP */
@@ -126,12 +127,12 @@ int main(void) {
   MX_TIM2_Init();
   MX_TIM3_Init();
   MX_TIM1_Init();
-  MX_TIM8_Init();
-  MX_USB_DEVICE_Init();
   MX_USART3_UART_Init();
   MX_TIM10_Init();
   MX_I2C3_Init();
+  MX_TIM14_Init();
   /* USER CODE BEGIN 2 */
+
   /* USER CODE END 2 */
 
   /* Init scheduler */
@@ -140,7 +141,8 @@ int main(void) {
   /* USER CODE BEGIN RTOS_MUTEX */
   /* add mutexes, ... */
   /* USER CODE END RTOS_MUTEX */
-
+  MX_USB_DEVICE_Init();
+  run_main_prog();
   /* USER CODE BEGIN RTOS_SEMAPHORES */
   /* add semaphores, ... */
   /* USER CODE END RTOS_SEMAPHORES */
@@ -159,13 +161,13 @@ int main(void) {
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
   /* USER CODE END RTOS_THREADS */
-  run_main_prog();
 
   /* USER CODE BEGIN RTOS_EVENTS */
   /* add events, ... */
   /* USER CODE END RTOS_EVENTS */
 
   /* Start scheduler */
+  osKernelStart();
 
   /* We should never get here as control is now taken by the scheduler */
 
@@ -184,8 +186,8 @@ int main(void) {
  * @retval None
  */
 void SystemClock_Config(void) {
-  RCC_OscInitTypeDef RCC_OscInitStruct = {};
-  RCC_ClkInitTypeDef RCC_ClkInitStruct = {};
+  RCC_OscInitTypeDef RCC_OscInitStruct = { 0 };
+  RCC_ClkInitTypeDef RCC_ClkInitStruct = { 0 };
 
   /** Configure the main internal regulator output voltage
    */
@@ -236,7 +238,7 @@ static void MX_ADC1_Init(void) {
 
   /* USER CODE END ADC1_Init 0 */
 
-  ADC_ChannelConfTypeDef sConfig = {};
+  ADC_ChannelConfTypeDef sConfig = { 0 };
 
   /* USER CODE BEGIN ADC1_Init 1 */
 
@@ -253,7 +255,7 @@ static void MX_ADC1_Init(void) {
   hadc1.Init.ExternalTrigConvEdge  = ADC_EXTERNALTRIGCONVEDGE_NONE;
   hadc1.Init.ExternalTrigConv      = ADC_SOFTWARE_START;
   hadc1.Init.DataAlign             = ADC_DATAALIGN_RIGHT;
-  hadc1.Init.NbrOfConversion       = 8;
+  hadc1.Init.NbrOfConversion       = 6;
   hadc1.Init.DMAContinuousRequests = ENABLE;
   hadc1.Init.EOCSelection          = ADC_EOC_SEQ_CONV;
   if(HAL_ADC_Init(&hadc1) != HAL_OK) {
@@ -305,22 +307,6 @@ static void MX_ADC1_Init(void) {
    */
   sConfig.Channel = ADC_CHANNEL_5;
   sConfig.Rank    = 6;
-  if(HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK) {
-    Error_Handler();
-  }
-
-  /** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
-   */
-  sConfig.Channel = ADC_CHANNEL_7;
-  sConfig.Rank    = 7;
-  if(HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK) {
-    Error_Handler();
-  }
-
-  /** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
-   */
-  sConfig.Channel = ADC_CHANNEL_14;
-  sConfig.Rank    = 8;
   if(HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK) {
     Error_Handler();
   }
@@ -436,9 +422,9 @@ static void MX_TIM1_Init(void) {
 
   /* USER CODE END TIM1_Init 0 */
 
-  TIM_MasterConfigTypeDef sMasterConfig               = {};
-  TIM_OC_InitTypeDef sConfigOC                        = {};
-  TIM_BreakDeadTimeConfigTypeDef sBreakDeadTimeConfig = {};
+  TIM_MasterConfigTypeDef sMasterConfig               = { 0 };
+  TIM_OC_InitTypeDef sConfigOC                        = { 0 };
+  TIM_BreakDeadTimeConfigTypeDef sBreakDeadTimeConfig = { 0 };
 
   /* USER CODE BEGIN TIM1_Init 1 */
 
@@ -494,9 +480,9 @@ static void MX_TIM2_Init(void) {
 
   /* USER CODE END TIM2_Init 0 */
 
-  TIM_ClockConfigTypeDef sClockSourceConfig = {};
-  TIM_MasterConfigTypeDef sMasterConfig     = {};
-  TIM_IC_InitTypeDef sConfigIC              = {};
+  TIM_ClockConfigTypeDef sClockSourceConfig = { 0 };
+  TIM_MasterConfigTypeDef sMasterConfig     = { 0 };
+  TIM_IC_InitTypeDef sConfigIC              = { 0 };
 
   /* USER CODE BEGIN TIM2_Init 1 */
 
@@ -545,9 +531,9 @@ static void MX_TIM3_Init(void) {
 
   /* USER CODE END TIM3_Init 0 */
 
-  TIM_ClockConfigTypeDef sClockSourceConfig = {};
-  TIM_MasterConfigTypeDef sMasterConfig     = {};
-  TIM_OC_InitTypeDef sConfigOC              = {};
+  TIM_ClockConfigTypeDef sClockSourceConfig = { 0 };
+  TIM_MasterConfigTypeDef sMasterConfig     = { 0 };
+  TIM_OC_InitTypeDef sConfigOC              = { 0 };
 
   /* USER CODE BEGIN TIM3_Init 1 */
 
@@ -587,47 +573,6 @@ static void MX_TIM3_Init(void) {
 }
 
 /**
- * @brief TIM8 Initialization Function
- * @param None
- * @retval None
- */
-static void MX_TIM8_Init(void) {
-
-  /* USER CODE BEGIN TIM8_Init 0 */
-
-  /* USER CODE END TIM8_Init 0 */
-
-  TIM_ClockConfigTypeDef sClockSourceConfig = {};
-  TIM_MasterConfigTypeDef sMasterConfig     = {};
-
-  /* USER CODE BEGIN TIM8_Init 1 */
-
-  /* USER CODE END TIM8_Init 1 */
-  htim8.Instance               = TIM8;
-  htim8.Init.Prescaler         = 0;
-  htim8.Init.CounterMode       = TIM_COUNTERMODE_UP;
-  htim8.Init.Period            = 65535;
-  htim8.Init.ClockDivision     = TIM_CLOCKDIVISION_DIV1;
-  htim8.Init.RepetitionCounter = 0;
-  htim8.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
-  if(HAL_TIM_Base_Init(&htim8) != HAL_OK) {
-    Error_Handler();
-  }
-  sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
-  if(HAL_TIM_ConfigClockSource(&htim8, &sClockSourceConfig) != HAL_OK) {
-    Error_Handler();
-  }
-  sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
-  sMasterConfig.MasterSlaveMode     = TIM_MASTERSLAVEMODE_DISABLE;
-  if(HAL_TIMEx_MasterConfigSynchronization(&htim8, &sMasterConfig) != HAL_OK) {
-    Error_Handler();
-  }
-  /* USER CODE BEGIN TIM8_Init 2 */
-
-  /* USER CODE END TIM8_Init 2 */
-}
-
-/**
  * @brief TIM10 Initialization Function
  * @param None
  * @retval None
@@ -653,6 +598,47 @@ static void MX_TIM10_Init(void) {
   /* USER CODE BEGIN TIM10_Init 2 */
 
   /* USER CODE END TIM10_Init 2 */
+}
+
+/**
+ * @brief TIM14 Initialization Function
+ * @param None
+ * @retval None
+ */
+static void MX_TIM14_Init(void) {
+
+  /* USER CODE BEGIN TIM14_Init 0 */
+
+  /* USER CODE END TIM14_Init 0 */
+
+  TIM_OC_InitTypeDef sConfigOC = { 0 };
+
+  /* USER CODE BEGIN TIM14_Init 1 */
+
+  /* USER CODE END TIM14_Init 1 */
+  htim14.Instance               = TIM14;
+  htim14.Init.Prescaler         = 0;
+  htim14.Init.CounterMode       = TIM_COUNTERMODE_UP;
+  htim14.Init.Period            = 65535;
+  htim14.Init.ClockDivision     = TIM_CLOCKDIVISION_DIV1;
+  htim14.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
+  if(HAL_TIM_Base_Init(&htim14) != HAL_OK) {
+    Error_Handler();
+  }
+  if(HAL_TIM_PWM_Init(&htim14) != HAL_OK) {
+    Error_Handler();
+  }
+  sConfigOC.OCMode     = TIM_OCMODE_PWM1;
+  sConfigOC.Pulse      = 0;
+  sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
+  sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
+  if(HAL_TIM_PWM_ConfigChannel(&htim14, &sConfigOC, TIM_CHANNEL_1) != HAL_OK) {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN TIM14_Init 2 */
+
+  /* USER CODE END TIM14_Init 2 */
+  HAL_TIM_MspPostInit(&htim14);
 }
 
 /**
@@ -718,7 +704,7 @@ static void MX_DMA_Init(void) {
  * @retval None
  */
 static void MX_GPIO_Init(void) {
-  GPIO_InitTypeDef GPIO_InitStruct = {};
+  GPIO_InitTypeDef GPIO_InitStruct = { 0 };
   /* USER CODE BEGIN MX_GPIO_Init_1 */
   /* USER CODE END MX_GPIO_Init_1 */
 

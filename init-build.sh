@@ -11,7 +11,7 @@ if [[ "$(id -u)" -eq 0 ]]; then
   sudo apt-get install -y cmake ninja-build clang ccache
 fi
 
-src/ariadna_constants/./generate-files.sh
+src/can_constants/./generate-files.sh -v
 
 cmake -B build -G "Ninja" -DCOPY_COMPILE_COMMANDS=ON
 cmake --build build

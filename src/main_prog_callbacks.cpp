@@ -1,5 +1,5 @@
 #include "Timing.hpp"
-#include "can.h"
+#include "can_messages.h"
 // #include "can_control.hpp"
 #include "config.hpp"
 #include "main.h"
@@ -8,10 +8,10 @@
 
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
   if(htim->Instance == TIM10) {
-    stmepic::Ticker::get_instance().irq_update_ticker();
+    se::Ticker::get_instance().irq_update_ticker();
   }
 
-  if(htim->Instance == TIM14) {
+  if(htim->Instance == TIM13) {
     HAL_IncTick();
   }
 }
@@ -34,12 +34,12 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc) {
   }
 }
 
-void can_callback_set_pos(stmepic::CanBase &can, stmepic::CanDataFrame &recived_msg, void *args) {
+void can_callback_set_pos(se::CanBase &can, se::CanDataFrame &received_msg, void *args) {
   (void)can;
   (void)args;
   can_disconnect_timeout_reset();
   can_konarm_1_set_pos_t signals;
-  (void)can_konarm_1_set_pos_unpack(&signals, recived_msg.data, recived_msg.data_size);
+  (void)can_konarm_1_set_pos_unpack(&signals, received_msg.data, received_msg.data_size);
   // float targetPosition = can_konarm_1_set_pos_position_decode(signals.position);
   // float targetVelocity = can_konarm_1_set_pos_velocity_decode(signals.velocity);
   movement_controler.set_velocity(signals.velocity);
@@ -48,12 +48,12 @@ void can_callback_set_pos(stmepic::CanBase &can, stmepic::CanDataFrame &recived_
   log_debug("Set position:" + std::to_string(signals.position) + "velocity:" + std::to_string(signals.velocity));
 }
 
-void can_callback_get_pos(stmepic::CanBase &can, stmepic::CanDataFrame &recived_msg, void *args) {
-  (void)recived_msg;
+void can_callback_get_pos(se::CanBase &can, se::CanDataFrame &received_msg, void *args) {
+  (void)received_msg;
   (void)args;
 
   can_disconnect_timeout_reset();
-  stmepic::CanDataFrame send_msg;
+  se::CanDataFrame send_msg;
   can_konarm_1_get_pos_t src_p;
   send_msg.frame_id  = config.can_konarm_get_pos_frame_id;
   src_p.position     = movement_controler.get_current_position();
@@ -63,11 +63,11 @@ void can_callback_get_pos(stmepic::CanBase &can, stmepic::CanDataFrame &recived_
   can.write(send_msg);
 }
 
-void can_callback_status(stmepic::CanBase &can, stmepic::CanDataFrame &recived_msg, void *args) {
-  (void)recived_msg;
+void can_callback_status(se::CanBase &can, se::CanDataFrame &received_msg, void *args) {
+  (void)received_msg;
   (void)args;
   can_disconnect_timeout_reset();
-  stmepic::CanDataFrame send_msg;
+  se::CanDataFrame send_msg;
   can_konarm_1_status_t src_p;
   send_msg.frame_id  = config.can_konarm_status_frame_id;
   src_p.status       = can_konarm_1_status_status_encode(CAN_KONARM_1_STATUS_STATUS_OK_CHOICE);
@@ -76,18 +76,18 @@ void can_callback_status(stmepic::CanBase &can, stmepic::CanDataFrame &recived_m
   can.write(send_msg);
 }
 
-void can_callback_clear_errors(stmepic::CanBase &can, stmepic::CanDataFrame &recived_msg, void *args) {
+void can_callback_clear_errors(se::CanBase &can, se::CanDataFrame &received_msg, void *args) {
   (void)can;
-  (void)recived_msg;
+  (void)received_msg;
   (void)args;
   can_disconnect_timeout_reset();
 }
 
-void can_callback_get_errors(stmepic::CanBase &can, stmepic::CanDataFrame &recived_msg, void *args) {
-  (void)recived_msg;
+void can_callback_get_errors(se::CanBase &can, se::CanDataFrame &received_msg, void *args) {
+  (void)received_msg;
   (void)args;
   can_disconnect_timeout_reset();
-  stmepic::CanDataFrame send_msg;
+  se::CanDataFrame send_msg;
   can_konarm_1_get_errors_t src_p;
   send_msg.frame_id                    = config.can_konarm_get_errors_frame_id;
   src_p.temp_engine_overheating        = error_data.temp_engine_overheating;
@@ -109,20 +109,21 @@ void can_callback_get_errors(stmepic::CanBase &can, stmepic::CanDataFrame &reciv
   error_data.can_error = false;
 }
 
-void can_callback_default(stmepic::CanBase &can, stmepic::CanDataFrame &recived_msg, void *args) {
+void can_callback_default(se::CanBase &can, se::CanDataFrame &received_msg, void *args) {
   (void)can;
-  (void)recived_msg;
+  (void)received_msg;
   (void)args;
   can_disconnect_timeout_reset();
   error_data.can_error = true;
 }
 
-void can_callback_set_control_mode(stmepic::CanBase &can, stmepic::CanDataFrame &recived_msg, void *args) {
+void can_callback_set_control_mode(se::CanBase &can, se::CanDataFrame &received_msg, void *args) {
   (void)can;
   (void)args;
   can_disconnect_timeout_reset();
   can_konarm_1_set_control_mode_t signals;
-  can_konarm_1_set_control_mode_unpack(&signals, recived_msg.data, recived_msg.data_size);
+  if(can_konarm_1_set_control_mode_unpack(&signals, received_msg.data, received_msg.data_size))
+    return;
   if(!can_konarm_1_set_control_mode_control_mode_is_in_range(signals.control_mode)) {
     error_data.can_error = true;
     log_error("Control mode is out of range");
@@ -130,4 +131,18 @@ void can_callback_set_control_mode(stmepic::CanBase &can, stmepic::CanDataFrame 
   }
   init_and_set_movement_controler_mode(signals.control_mode);
   log_debug("Set control mode:" + std::to_string(signals.control_mode));
+}
+
+void can_callback_set_effector_position(se::CanBase &can, se::CanDataFrame &received_msg, void *args) {
+  (void)can;
+  (void)args;
+  can_disconnect_timeout_reset();
+  can_konarm_1_set_effector_position_t signals;
+  if(can_konarm_1_set_effector_position_unpack(&signals, received_msg.data, received_msg.data_size))
+    return; // unpack error
+
+
+  servo_motor->set_enable(true);
+  float pos = (float)signals.pos_percentage / 100.0f * PI; // convert percentage to radians
+  servo_motor->set_position(pos);
 }

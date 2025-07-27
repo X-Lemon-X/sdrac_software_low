@@ -65,23 +65,9 @@ add_executable(${CMAKE_PROJECT_NAME})
 add_subdirectory(cmake/stm32cubemx)
 
 
-#include StmEpic library ( technically its not a library but it is)
-# set(STMEPIC_BARD_ID ON)
-# set(STMEPIC_CAN_CONTROLER ON)
-# set(STMEPIC_ENCODERS ON)
-# set(STMEPIC_LOGGER ON)
-# set(STMEPIC_MOVEMENT ON)
-# set(STMEPIC_SENSORS ON)
-# set(STMEPIC_DFU_PROGRAMING ON)
-
-# set(FREERTOS_PORT GCC_ARM_CM4F CACHE STRING "")
-# set(FREERTOS_HEAP 4 CACHE STRING "")
-# set(FREERTOS_CONFIG_FILE_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/src")
-# set(STMEPIC_GENERATE_DOCS OFF)
-
 add_subdirectory(src/StmEpic)
 
-add_subdirectory(src/ariadna_constants)
+add_subdirectory(src/can_constants)
 
 # Add sources to executable
 target_sources(${CMAKE_PROJECT_NAME} PRIVATE

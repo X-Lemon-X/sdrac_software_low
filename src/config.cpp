@@ -1,5 +1,5 @@
 #include "config.hpp"
-#include "can.h"
+#include "can_messages.h"
 #include "controler_pid.hpp"
 #include "dfu_usb_programer.hpp"
 #include "encoder_magnetic.hpp"
@@ -19,32 +19,32 @@
 
 //**************************************************************************************************
 // Gpio assigments
-stmepic::GpioPin pin_user_led_1(*GPIOC, GPIO_PIN_6);
-stmepic::GpioPin pin_user_led_2(*GPIOC, GPIO_PIN_7);
-stmepic::GpioPin pin_user_btn_1(*GPIOA, GPIO_PIN_9); // GPIOC, GPIO_PIN_9 for rev 1 of the board
-stmepic::GpioPin pin_tx_led(*GPIOB, GPIO_PIN_12);
-stmepic::GpioPin pin_rx_led(*GPIOB, GPIO_PIN_13);
-stmepic::GpioPin pin_encoder(*GPIOB, GPIO_PIN_3);
-stmepic::GpioPin pin_poz_zero_sensor(*GPIOA, GPIO_PIN_4);
-stmepic::GpioPin pin_inout_ca1(*GPIOA, GPIO_PIN_5);
-stmepic::GpioPin pin_inout_ca2(*GPIOA, GPIO_PIN_7);
-stmepic::GpioPin pin_inout_crx(*GPIOC, GPIO_PIN_4);
-stmepic::GpioPin pin_inout_ctx(*GPIOB, GPIO_PIN_10);
-stmepic::GpioPin pin_i2c1_sda(*GPIOB, GPIO_PIN_7);
-stmepic::GpioPin pin_i2c1_scl(*GPIOB, GPIO_PIN_6);
-stmepic::GpioPin pin_i2c3_sda(*GPIOC, GPIO_PIN_9);
-stmepic::GpioPin pin_i2c3_scl(*GPIOA, GPIO_PIN_8);
-stmepic::GpioAnalog pin_temp_steper_board(*GPIOA, GPIO_PIN_0);
-stmepic::GpioAnalog pin_temp_board(*GPIOA, GPIO_PIN_1);
-stmepic::GpioAnalog pin_temp_motor(*GPIOA, GPIO_PIN_2);
-stmepic::GpioAnalog pin_vsense(*GPIOA, GPIO_PIN_3);
-stmepic::GpioPin pin_steper_direction(*GPIOB, GPIO_PIN_0);
-stmepic::GpioPin pin_steper_enable(*GPIOB, GPIO_PIN_1);
-stmepic::GpioPin pin_steper_step(*GPIOA, GPIO_PIN_6);
-stmepic::GpioPin pin_boot_device(*GPIOC, GPIO_PIN_8);
-stmepic::GpioPin pin_cid_0(*GPIOC, GPIO_PIN_10);
-stmepic::GpioPin pin_cid_1(*GPIOC, GPIO_PIN_11);
-stmepic::GpioPin pin_cid_2(*GPIOC, GPIO_PIN_12);
+se::GpioPin pin_user_led_1(*GPIOC, GPIO_PIN_6);
+se::GpioPin pin_user_led_2(*GPIOC, GPIO_PIN_7);
+se::GpioPin pin_user_btn_1(*GPIOA, GPIO_PIN_9); // GPIOC, GPIO_PIN_9 for rev 1 of the board
+se::GpioPin pin_tx_led(*GPIOB, GPIO_PIN_12);
+se::GpioPin pin_rx_led(*GPIOB, GPIO_PIN_13);
+se::GpioPin pin_encoder(*GPIOB, GPIO_PIN_3);
+se::GpioPin pin_poz_zero_sensor(*GPIOA, GPIO_PIN_4);
+se::GpioPin pin_inout_ca1(*GPIOA, GPIO_PIN_5);
+se::GpioPin pin_inout_ca2(*GPIOA, GPIO_PIN_7);
+se::GpioPin pin_inout_crx(*GPIOC, GPIO_PIN_4);
+se::GpioPin pin_inout_ctx(*GPIOB, GPIO_PIN_10);
+se::GpioPin pin_i2c1_sda(*GPIOB, GPIO_PIN_7);
+se::GpioPin pin_i2c1_scl(*GPIOB, GPIO_PIN_6);
+se::GpioPin pin_i2c3_sda(*GPIOC, GPIO_PIN_9);
+se::GpioPin pin_i2c3_scl(*GPIOA, GPIO_PIN_8);
+se::GpioAnalog pin_temp_steper_board(*GPIOA, GPIO_PIN_0);
+se::GpioAnalog pin_temp_board(*GPIOA, GPIO_PIN_1);
+se::GpioAnalog pin_temp_motor(*GPIOA, GPIO_PIN_2);
+se::GpioAnalog pin_vsense(*GPIOA, GPIO_PIN_3);
+se::GpioPin pin_steper_direction(*GPIOB, GPIO_PIN_0);
+se::GpioPin pin_steper_enable(*GPIOB, GPIO_PIN_1);
+se::GpioPin pin_steper_step(*GPIOA, GPIO_PIN_6);
+se::GpioPin pin_boot_device(*GPIOC, GPIO_PIN_8);
+se::GpioPin pin_cid_0(*GPIOC, GPIO_PIN_10);
+se::GpioPin pin_cid_1(*GPIOC, GPIO_PIN_11);
+se::GpioPin pin_cid_2(*GPIOC, GPIO_PIN_12);
 
 
 //**************************************************************************************************
@@ -58,7 +58,7 @@ stmepic::GpioPin pin_cid_2(*GPIOC, GPIO_PIN_12);
 const IdConfig config_id_default = {
   0xff0,  0x000, 0x600, 0x000,
   0x601,  0x602, 0x603, 0x604,
-  0x605,  0x606,
+  0x605,  0x606, 0x60a,
 
   400.0f, 40.0f, 0.0f,  0.0f,
   false,  false, 960,
@@ -85,6 +85,7 @@ const IdConfig config_id_1 = { 0xff0,
                                CAN_KONARM_1_CLEAR_ERRORS_FRAME_ID,
                                CAN_KONARM_1_GET_ERRORS_FRAME_ID,
                                CAN_KONARM_1_SET_CONTROL_MODE_FRAME_ID,
+                               CAN_KONARM_1_SET_EFFECTOR_POSITION_FRAME_ID,
 
                                400.0f,
                                40.0f,
@@ -126,6 +127,7 @@ const IdConfig config_id_2 = { 0xff0,
                                CAN_KONARM_2_CLEAR_ERRORS_FRAME_ID,
                                CAN_KONARM_2_GET_ERRORS_FRAME_ID,
                                CAN_KONARM_2_SET_CONTROL_MODE_FRAME_ID,
+                               CAN_KONARM_2_SET_EFFECTOR_POSITION_FRAME_ID,
 
                                400.0f,
                                68.0f,
@@ -135,7 +137,7 @@ const IdConfig config_id_2 = { 0xff0,
                                false,
                                960,
 
-                               1.617966f, // 1.6218013763427734f
+                               2.738156f, // 1.617966f
                                false,
                                PI,
                                40,
@@ -167,6 +169,7 @@ const IdConfig config_id_3 = { 0xff0,
                                CAN_KONARM_3_CLEAR_ERRORS_FRAME_ID,
                                CAN_KONARM_3_GET_ERRORS_FRAME_ID,
                                CAN_KONARM_3_SET_CONTROL_MODE_FRAME_ID,
+                               CAN_KONARM_3_SET_EFFECTOR_POSITION_FRAME_ID,
 
                                400.0f,
                                40.0f,
@@ -208,6 +211,7 @@ const IdConfig config_id_4 = { 0xff0,
                                CAN_KONARM_4_CLEAR_ERRORS_FRAME_ID,
                                CAN_KONARM_4_GET_ERRORS_FRAME_ID,
                                CAN_KONARM_4_SET_CONTROL_MODE_FRAME_ID,
+                               CAN_KONARM_4_SET_EFFECTOR_POSITION_FRAME_ID,
 
                                6400.0f,
                                71.9f,
@@ -249,6 +253,7 @@ const IdConfig config_id_5 = { 0xff0,
                                CAN_KONARM_5_CLEAR_ERRORS_FRAME_ID,
                                CAN_KONARM_5_GET_ERRORS_FRAME_ID,
                                CAN_KONARM_5_SET_CONTROL_MODE_FRAME_ID,
+                               CAN_KONARM_5_SET_EFFECTOR_POSITION_FRAME_ID,
 
                                6400.0f,
                                71.9f,
@@ -291,6 +296,7 @@ const IdConfig config_id_6 = { 0xff0,
                                CAN_KONARM_6_CLEAR_ERRORS_FRAME_ID,
                                CAN_KONARM_6_GET_ERRORS_FRAME_ID,
                                CAN_KONARM_6_SET_CONTROL_MODE_FRAME_ID,
+                               CAN_KONARM_6_SET_EFFECTOR_POSITION_FRAME_ID,
 
                                6400.0f,
                                71.9f,
@@ -325,26 +331,27 @@ const IdConfig config_id_6 = { 0xff0,
 // Global stuff
 
 
-std::shared_ptr<stmepic::I2C> i2c1;
-std::shared_ptr<stmepic::I2C> i2c3;
-std::shared_ptr<stmepic::CAN> can1;
+std::shared_ptr<se::I2C> i2c1;
+std::shared_ptr<se::I2C> i2c3;
+std::shared_ptr<se::CAN> can1;
 
 std::string version_string =
 std::to_string(VERSION_MAJOR) + "." + std::to_string(VERSION_MINOR) + "." + std::to_string(VERSION_BUILD);
 uint32_t adc_dma_buffer[ADC_DMA_BUFFER_SIZE + 1];
 IdConfig config;
-// stmepic::Ticker &main_clock = stmepic::GlobalTicker::get_instance();
-// stmepic::Board_id board_id(pin_cid_0, pin_cid_1, pin_cid_2);
+// se::Ticker &main_clock = se::GlobalTicker::get_instance();
+// se::Board_id board_id(pin_cid_0, pin_cid_1, pin_cid_2);
 
-stmepic::motor::SteperMotorStepDir stp_motor(htim3, TIM_CHANNEL_1, pin_steper_direction, pin_steper_enable);
-std::shared_ptr<stmepic::memory::FRAM> fram;
-std::shared_ptr<stmepic::encoders::EncoderAbsoluteMagneticMT6701> encoder_arm;
-std::shared_ptr<stmepic::encoders::EncoderAbsoluteMagneticMT6701> encoder_vel_motor;
-std::shared_ptr<stmepic::motor::MotorClosedLoop> motor;
-stmepic::movement::MovementControler movement_controler;
-stmepic::dfu::UsbProgramer usb_programer(pin_boot_device);
-stmepic::sensors::temperature::NtcTermistor temp_steper_driver(UC_SUPPLY_VOLTAGE, TERMISTOR_RESISTANCE);
-stmepic::sensors::temperature::NtcTermistor temp_steper_motor(UC_SUPPLY_VOLTAGE, TERMISTOR_RESISTANCE);
+se::motor::SteperMotorStepDir stp_motor(htim3, TIM_CHANNEL_1, pin_steper_direction, pin_steper_enable);
+std::shared_ptr<se::memory::FRAM> fram;
+std::shared_ptr<se::encoders::EncoderAbsoluteMagneticMT6701> encoder_arm;
+std::shared_ptr<se::encoders::EncoderAbsoluteMagneticMT6701> encoder_vel_motor;
+std::shared_ptr<se::motor::MotorClosedLoop> motor;
+std::shared_ptr<se::motor::ServoMotorPWM> servo_motor;
+se::movement::MovementControler movement_controler;
+se::dfu::UsbProgramer usb_programer(pin_boot_device);
+se::sensors::temperature::NtcTermistor temp_steper_driver(UC_SUPPLY_VOLTAGE, TERMISTOR_RESISTANCE);
+se::sensors::temperature::NtcTermistor temp_steper_motor(UC_SUPPLY_VOLTAGE, TERMISTOR_RESISTANCE);
 ErrorData error_data;
 
 unsigned int ErrorData::get_amount_of_errors() const {

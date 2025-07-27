@@ -3,6 +3,13 @@
 # cmake -B build -G "Unix Makefiles" -DCOPY_COMPILE_COMMANDS=ON
 # cmake --build build
 
+
+source .venv/bin/activate
+
+
+src/can_constants/./generate-files.sh
+
+
 if [ "$1" == "r" ]; then
   cmake -B build -G "Ninja" -DCOPY_COMPILE_COMMANDS=ON -DCMAKE_BUILD_TYPE=Release
 else 

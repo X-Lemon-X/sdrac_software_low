@@ -4,3 +4,6 @@
 [submodule "src/StmEpic"]
 	path = src/StmEpic
 	url = git@github.com:X-Lemon-X/StmEpic.git
+[submodule "src/can_constants"]
+	path = src/can_constants
+	url = git@github.com:KoNarRobotics/can_constants.git

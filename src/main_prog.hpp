@@ -4,7 +4,7 @@
 #include "cmsis_os.h"
 
 
-#include "can.h"
+#include "can_messages.h"
 #include "encoder.hpp"
 
 #include "MCP9700AT.hpp"
@@ -23,7 +23,7 @@
 #include "movement_controler.hpp"
 #include "ntc_termistor.hpp"
 #include "steper_motor.hpp"
-
+#include "servo_motor.hpp"
 
 #include <cfloat>
 #include <cmath>
@@ -35,30 +35,30 @@
 #define MAIN_PROG_H
 
 
-extern stmepic::movement::PIDControler pid_pos;
-extern std::shared_ptr<stmepic::movement::BasicLinearPosControler> bacis_controler;
-extern std::shared_ptr<stmepic::movement::PassThroughControler> pass_through_controler;
-extern stmepic::filters::FilterMovingAvarage encoder_motor_moving_avarage;
-extern stmepic::filters::FilterSampleSkip encoder_arm_filter_velocity;
-extern stmepic::Timer tim_can_disconnecteded;
-extern stmepic::SimpleTask task_blink_timer;
-extern stmepic::SimpleTask task_blink_error_timer;
-extern stmepic::SimpleTask task_read_analog_values_timer;
-// extern stmepic::SimpleTask task_encoder_timer;
-extern stmepic::SimpleTask task_usb_timer;
-extern stmepic::SimpleTask task_data_usb_send_timer;
-// extern stmepic::SimpleTask task_caculate_temp_timer;
-extern stmepic::SimpleTask task_error_timer;
+extern se::movement::PIDControler pid_pos;
+extern std::shared_ptr<se::movement::BasicLinearPosControler> bacis_controler;
+extern std::shared_ptr<se::movement::PassThroughControler> pass_through_controler;
+extern se::filters::FilterMovingAvarage encoder_motor_moving_avarage;
+extern se::filters::FilterSampleSkip encoder_arm_filter_velocity;
+extern se::Timer tim_can_disconnecteded;
+extern se::SimpleTask task_blink_task;
+extern se::SimpleTask task_blink_error_task;
+extern se::SimpleTask task_read_analog_values_task;
+// extern se::SimpleTask task_encoder_timer;
+extern se::SimpleTask task_usb_task;
+extern se::SimpleTask task_data_usb_send_task;
+// extern se::SimpleTask task_caculate_temp_timer;
+extern se::SimpleTask task_error_task;
 
-// // extern std::shared_ptr<stmepic::Timing> task_blink_timer;
-// extern std::shared_ptr<stmepic::Timing> task_blink_error_timer;
-// extern std::shared_ptr<stmepic::Timing> task_read_analog_values_timer;
-// extern std::shared_ptr<stmepic::Timing> task_encoder_timer;
-// extern std::shared_ptr<stmepic::Timing> task_usb_timer;
-// extern std::shared_ptr<stmepic::Timing> task_data_usb_send_timer;
-// extern std::shared_ptr<stmepic::Timing> task_caculate_temp_timer;
-// extern std::shared_ptr<stmepic::Timing> task_nodelay_timer;
-extern std::shared_ptr<stmepic::Timer> task_can_disconnected_timer;
+// // extern std::shared_ptr<se::Timing> task_blink_timer;
+// extern std::shared_ptr<se::Timing> task_blink_error_timer;
+// extern std::shared_ptr<se::Timing> task_read_analog_values_timer;
+// extern std::shared_ptr<se::Timing> task_encoder_timer;
+// extern std::shared_ptr<se::Timing> task_usb_timer;
+// extern std::shared_ptr<se::Timing> task_data_usb_send_timer;
+// extern std::shared_ptr<se::Timing> task_caculate_temp_timer;
+// extern std::shared_ptr<se::Timing> task_nodelay_timer;
+extern std::shared_ptr<se::Timer> task_can_disconnected_timer;
 extern float temoperature_board;
 extern float temoperature_steper_driver;
 extern float temoperature_steper_motor;
@@ -108,26 +108,27 @@ void error_checks();
 
 ///**************************************************************************************************
 /// TASKS
-stmepic::Status task_error_check(stmepic::SimpleTask &task_handler, void *args);
-stmepic::Status task_blink(stmepic::SimpleTask &task_handler, void *arg);
-stmepic::Status task_blink_error(stmepic::SimpleTask &task_handler, void *arg);
-stmepic::Status task_encoders(stmepic::SimpleTask &task_handler, void *arg);
-stmepic::Status task_usb_handler(stmepic::SimpleTask &task_handler, void *arg);
-stmepic::Status task_usb_data_loging(stmepic::SimpleTask &task_handler, void *arg);
-stmepic::Status task_can_disconnect(stmepic::SimpleTask &task_handler, void *arg);
-stmepic::Status task_read_analog_values(stmepic::SimpleTask &task_handler, void *arg);
-stmepic::Status task_nodelay(stmepic::SimpleTask &task_handler, void *arg);
+se::Status task_error_check(se::SimpleTask &task_handler, void *args);
+se::Status task_blink(se::SimpleTask &task_handler, void *arg);
+se::Status task_blink_error(se::SimpleTask &task_handler, void *arg);
+se::Status task_encoders(se::SimpleTask &task_handler, void *arg);
+se::Status task_usb_handler(se::SimpleTask &task_handler, void *arg);
+se::Status task_usb_data_loging(se::SimpleTask &task_handler, void *arg);
+se::Status task_can_disconnect(se::SimpleTask &task_handler, void *arg);
+se::Status task_read_analog_values(se::SimpleTask &task_handler, void *arg);
+se::Status task_nodelay(se::SimpleTask &task_handler, void *arg);
 
 ///**************************************************************************************************
 /// CAN CALLBACKS
 
-void can_callback_default(stmepic::CanBase &can, stmepic::CanDataFrame &recived_msg, void *args);
-void can_callback_get_errors(stmepic::CanBase &can, stmepic::CanDataFrame &recived_msg, void *args);
-void can_callback_clear_errors(stmepic::CanBase &can, stmepic::CanDataFrame &recived_msg, void *args);
-void can_callback_status(stmepic::CanBase &can, stmepic::CanDataFrame &recived_msg, void *args);
-void can_callback_get_pos(stmepic::CanBase &can, stmepic::CanDataFrame &recived_msg, void *args);
-void can_callback_set_pos(stmepic::CanBase &can, stmepic::CanDataFrame &recived_msg, void *args);
-void can_callback_set_control_mode(stmepic::CanBase &can, stmepic::CanDataFrame &recived_msg, void *args);
+void can_callback_default(se::CanBase &can, se::CanDataFrame &received_msg, void *args);
+void can_callback_get_errors(se::CanBase &can, se::CanDataFrame &received_msg, void *args);
+void can_callback_clear_errors(se::CanBase &can, se::CanDataFrame &received_msg, void *args);
+void can_callback_status(se::CanBase &can, se::CanDataFrame &received_msg, void *args);
+void can_callback_get_pos(se::CanBase &can, se::CanDataFrame &received_msg, void *args);
+void can_callback_set_pos(se::CanBase &can, se::CanDataFrame &received_msg, void *args);
+void can_callback_set_control_mode(se::CanBase &can, se::CanDataFrame &received_msg, void *args);
+void can_callback_set_effector_position(se::CanBase &can, se::CanDataFrame &received_msg, void *args);
 
 
 #endif // MAIN_PROG_H
