@@ -6,8 +6,8 @@
 
 source .venv/bin/activate
 
-
 src/can_constants/./generate-files.sh
+./after_ioc.sh
 
 
 if [ "$1" == "r" ]; then
