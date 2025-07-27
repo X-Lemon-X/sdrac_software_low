@@ -6,18 +6,6 @@
 #include "simple_task.hpp"
 
 
-// void task_encoders(se::Timing& task_timer) {
-//   encoder_arm.handle();
-//   if(config.encoder_motor_enable)
-//     encoder_vel_motor.handle();
-// }
-
-// void task_nodelay(se::Timing& task_timer) {
-//   movement_controler.handle();
-//   can_controler.handle();
-//   error_checks();
-// }
-
 se::Status task_error_check(se::SimpleTask &task_handler, void *args) {
   (void)task_handler;
   (void)args;
@@ -99,7 +87,13 @@ se::Status task_usb_data_loging(se::SimpleTask &task_handler, void *args) {
 se::Status task_blink(se::SimpleTask &task_handler, void *args) {
   (void)task_handler;
   (void)args;
+  STMEPIC_NONE_OR_HRESET(task_handler.task_get_status());
   pin_user_led_1.toggle();
+
+  auto st = encoder_arm->device_get_status();
+  if(!st.ok())
+    i2c1->hardware_reset();
+
   return se::Status::OK();
 }
 

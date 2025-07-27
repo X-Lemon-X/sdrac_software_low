@@ -13,7 +13,7 @@ src/can_constants/./generate-files.sh
 if [ "$1" == "r" ]; then
   cmake -B build -G "Ninja" -DCOPY_COMPILE_COMMANDS=ON -DCMAKE_BUILD_TYPE=Release
 else 
-  cmake -B build -G "Ninja" -DCOPY_COMPILE_COMMANDS=ON 
+  cmake -B build -G "Ninja" -DCOPY_COMPILE_COMMANDS=ON -DCMAKE_BUILD_TYPE=Debug
 fi
 
 cmake --build build

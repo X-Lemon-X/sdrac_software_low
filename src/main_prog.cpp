@@ -22,7 +22,7 @@ std::shared_ptr<se::movement::BasicLinearPosControler> bacis_controler;
 std::shared_ptr<se::movement::PassThroughControler> pass_through_controler;
 se::Timer tim_can_disconnecteded(se::Ticker::get_instance());
 
-se::SimpleTask task_blink_task;
+se::SimpleTask task_default_task;
 se::SimpleTask task_blink_error_task;
 se::SimpleTask task_read_analog_values_task;
 se::SimpleTask task_encoder_timer;
@@ -39,21 +39,16 @@ float voltage_vcc                = 0;
 
 //**************************************************************************************************
 void run_main_prog() {
-  pre_periferal_config();
-  periferal_config();
-  id_config();
-  post_id_config();
-  config_tasks();
-  main_loop();
-}
 
-void pre_periferal_config() {
+  //**************************************************************************************************
+  // START BY CONFIGURING THE LOGGER
   log_debug(se::Logger::parse_to_json_format("state", "pre_perifial_config"));
   se::Ticker::get_instance().init(&htim10);
   se::Logger::get_instance().init(LOG_LOGER_LEVEL, LOG_SHOW_TIMESTAMP, CDC_Transmit_FS, false, version_string);
-}
 
-void periferal_config() {
+  //**************************************************************************************************
+  // CONFIGURING THE PERIPHERALS
+
   log_debug(se::Logger::parse_to_json_format("state", "periferal_config"));
   // dma adc1 settings
   HAL_ADC_Start_DMA(&hadc1, adc_dma_buffer, ADC_DMA_BUFFER_SIZE);
@@ -100,14 +95,17 @@ void periferal_config() {
   STMEPIC_ASSING_TO_OR_HRESET(can1, se::CAN::Make(hcan1, can_filter, &pin_tx_led, &pin_rx_led));
 
 
-  STMEPIC_NONE_OR_HRESET(i2c1->hardware_start());
-  STMEPIC_NONE_OR_HRESET(i2c3->hardware_start());
+  STMEPIC_NONE_OR_HRESET(i2c1->hardware_reset());
+  STMEPIC_NONE_OR_HRESET(i2c3->hardware_reset());
   STMEPIC_NONE_OR_HRESET(can1->hardware_start());
 
-  //-------------------FRAM CONFIGURATION-------------------
-  // fram = std::make_shared<se::memory::FramI2CFM24CLxx>(i2c1, FRAM_BEGIN_ADDRESS, FRAM_SIZE);
-  STMEPIC_ASSING_TO_OR_HRESET(fram, se::memory::FramI2CFM24CLxx::Make(i2c1, FRAM_BEGIN_ADDRESS, FRAM_SIZE));
-  fram->device_start();
+
+  //**************************************************************************************************
+  // START DEFAULT TASK
+  STMEPIC_NONE_OR_HRESET(task_default_task.task_init(task_blink, (void *)&pin_user_led_1,
+                                                     FREQUENCY_TO_PERIOD_MS(TIMING_LED_BLINK_FQ), startup_robot, 4000));
+  STMEPIC_NONE_OR_HRESET(task_default_task.task_run());
+  osKernelStart();
 }
 
 uint8_t get_board_id() {
@@ -118,8 +116,13 @@ uint8_t get_board_id() {
   return id;
 }
 
-void id_config() {
+se::Status id_config() {
   log_debug(se::Logger::parse_to_json_format("state", "id_config"));
+
+  //-------------------FRAM CONFIGURATION-------------------
+  // fram = std::make_shared<se::memory::FramI2CFM24CLxx>(i2c1, FRAM_BEGIN_ADDRESS, FRAM_SIZE);
+  STMEPIC_ASSING_TO_OR_RETURN(fram, se::memory::FramI2CFM24CLxx::Make(i2c1, FRAM_BEGIN_ADDRESS, FRAM_SIZE));
+  fram->device_start();
 
   // probably here load data from FRAM
   auto mayby_config = fram->readStruct<IdConfig>(FRAM_CONFIG_ADDRESS);
@@ -140,7 +143,9 @@ void id_config() {
   default: config = config_id_default; break;
   }
 
-  (void)fram->writeStruct(FRAM_CONFIG_ADDRESS, config);
+  auto s = fram->writeStruct(FRAM_CONFIG_ADDRESS, config);
+  i2c1->hardware_reset();
+  return se::Status::OK();
 }
 
 void can_disconnect_timeout_reset() {
@@ -180,7 +185,7 @@ void init_and_set_movement_controler_mode(uint8_t mode) {
   }
 }
 
-void post_id_config() {
+se::Status post_id_config() {
   std::string info = "SDRACboard\n";
   info += "Software version:" + version_string + "\n";
   info += "Board id: " + std::to_string(get_board_id()) + "\n";
@@ -204,7 +209,7 @@ void post_id_config() {
   stp_motor.set_reverse(config.stepper_motor_reverse);
   stp_motor.set_reversed_enable_pin(config.stepper_motor_enable_reversed);
   stp_motor.set_prescaler(config.stepper_motor_timer_prescaler);
-  STMEPIC_NONE_OR_HRESET(stp_motor.device_start());
+  STMEPIC_RETURN_ON_ERROR(stp_motor.device_start());
   stp_motor.set_enable(false);
 
 
@@ -218,8 +223,8 @@ void post_id_config() {
   servo_settings.min_angle_rad      = 0.0f;
   servo_settings.max_angle_rad      = 3.14f; // 180 degrees in radians
   servo_settings.n_multiplayer      = 4;     // Default multiplier for resolution
-  STMEPIC_NONE_OR_HRESET(servo_motor->device_set_settings(servo_settings));
-  STMEPIC_NONE_OR_HRESET(servo_motor->device_start());
+  STMEPIC_RETURN_ON_ERROR(servo_motor->device_set_settings(servo_settings));
+  STMEPIC_RETURN_ON_ERROR(servo_motor->device_start());
   // servo_motor->set_enable(true);
   // servo_motor->set_position(PI_d2);
 
@@ -234,9 +239,9 @@ void post_id_config() {
   encoder_arm->set_offset(config.encoder_arm_offset);
   encoder_arm->set_reverse(config.encoder_arm_reverse);
   encoder_arm->set_dead_zone_correction_angle(config.encoder_arm_dead_zone_correction_angle);
-  STMEPIC_NONE_OR_HRESET(encoder_arm->device_start());
-  STMEPIC_NONE_OR_HRESET(encoder_arm->device_task_set_settings(enc_device_settings));
-  STMEPIC_NONE_OR_HRESET(encoder_arm->device_task_start());
+  STMEPIC_RETURN_ON_ERROR(encoder_arm->device_start());
+  STMEPIC_RETURN_ON_ERROR(encoder_arm->device_task_set_settings(enc_device_settings));
+  STMEPIC_RETURN_ON_ERROR(encoder_arm->device_task_start());
 
   //-------------------ENCODER STEPER MOTOR POSITION CONFIGURATION-------------------
   // config.encoder_motor_enable
@@ -244,18 +249,16 @@ void post_id_config() {
     auto encoder_motor_moving_avarage = std::make_shared<se::filters::FilterMovingAvarage>();
     encoder_motor_moving_avarage->set_size(25); // 15 for smooth movement but delay with sampling to 50
     encoder_motor_moving_avarage->set_samples_to_skip(config.encoder_motor_velocity_sample_amount);
-
-    auto mayby_encoder_vel_motor =
-    se::encoders::EncoderAbsoluteMagneticMT6701::Make(i2c1, se::encoders::encoder_MT6701_addresses::MT6701_I2C_ADDRESS_2,
-                                                      nullptr, encoder_motor_moving_avarage);
-    encoder_vel_motor = mayby_encoder_vel_motor.valueOrDie();
+    STMEPIC_ASSING_TO_OR_RETURN(encoder_vel_motor, se::encoders::EncoderAbsoluteMagneticMT6701::Make(
+                                                   i2c1, se::encoders::encoder_MT6701_addresses::MT6701_I2C_ADDRESS_2,
+                                                   nullptr, encoder_motor_moving_avarage));
     encoder_vel_motor->set_offset(config.encoder_motor_offset);
     encoder_vel_motor->set_reverse(config.encoder_motor_reverse);
     encoder_vel_motor->set_dead_zone_correction_angle(config.encoder_motor_dead_zone_correction_angle);
     encoder_vel_motor->set_ratio(1.0f / stp_motor.get_gear_ratio());
 
-    STMEPIC_NONE_OR_HRESET(encoder_vel_motor->device_task_set_settings(enc_device_settings));
-    STMEPIC_NONE_OR_HRESET(encoder_vel_motor->device_task_start());
+    STMEPIC_RETURN_ON_ERROR(encoder_vel_motor->device_task_set_settings(enc_device_settings));
+    STMEPIC_RETURN_ON_ERROR(encoder_vel_motor->device_task_start());
   } else {
     encoder_vel_motor = encoder_arm;
   }
@@ -284,47 +287,50 @@ void post_id_config() {
   movement_controler.set_velocity(0.0f);
   movement_controler.set_enable(false);
   init_and_set_movement_controler_mode(config.movement_control_mode);
+  return se::Status::OK();
 }
 
+se::Status startup_robot(stmepic::SimpleTask &task, void *args) {
+  (void)task;
+  (void)args;
+  STMEPIC_RETURN_ON_ERROR(id_config());
+  STMEPIC_RETURN_ON_ERROR(post_id_config());
 
-void config_tasks() {
 
-  STMEPIC_NONE_OR_HRESET(can1->add_callback(config.can_konarm_clear_errors_frame_id, can_callback_clear_errors));
-  STMEPIC_NONE_OR_HRESET(can1->add_callback(config.can_konarm_set_control_mode_frame_id, can_callback_set_control_mode));
-  STMEPIC_NONE_OR_HRESET(can1->add_callback(config.can_konarm_get_errors_frame_id, can_callback_get_errors));
-  STMEPIC_NONE_OR_HRESET(can1->add_callback(config.can_konarm_status_frame_id, can_callback_status));
-  STMEPIC_NONE_OR_HRESET(can1->add_callback(config.can_konarm_set_pos_frame_id, can_callback_set_pos));
-  STMEPIC_NONE_OR_HRESET(can1->add_callback(config.can_konarm_get_pos_frame_id, can_callback_get_pos));
-  STMEPIC_NONE_OR_HRESET(
+  STMEPIC_RETURN_ON_ERROR(can1->add_callback(config.can_konarm_clear_errors_frame_id, can_callback_clear_errors));
+  STMEPIC_RETURN_ON_ERROR(can1->add_callback(config.can_konarm_set_control_mode_frame_id, can_callback_set_control_mode));
+  STMEPIC_RETURN_ON_ERROR(can1->add_callback(config.can_konarm_get_errors_frame_id, can_callback_get_errors));
+  STMEPIC_RETURN_ON_ERROR(can1->add_callback(config.can_konarm_status_frame_id, can_callback_status));
+  STMEPIC_RETURN_ON_ERROR(can1->add_callback(config.can_konarm_set_pos_frame_id, can_callback_set_pos));
+  STMEPIC_RETURN_ON_ERROR(can1->add_callback(config.can_konarm_get_pos_frame_id, can_callback_get_pos));
+  STMEPIC_RETURN_ON_ERROR(
   can1->add_callback(config.can_konarm_set_effector_position_frame_id, can_callback_set_effector_position));
+  STMEPIC_RETURN_ON_ERROR(can1->add_callback(0, can_callback_default));
 
-  STMEPIC_NONE_OR_HRESET(can1->add_callback(0, can_callback_default));
 
-  task_blink_task.task_init(task_blink, (void *)&pin_user_led_1, FREQUENCY_TO_PERIOD_MS(TIMING_LED_BLINK_FQ));
-  task_blink_error_task.task_init(task_blink_error, nullptr, FREQUENCY_TO_PERIOD_MS(TIMING_LED_ERROR_BLINK_FQ));
-  task_data_usb_send_task.task_init(task_usb_data_loging, nullptr,
-                                    FREQUENCY_TO_PERIOD_MS(TIMING_USB_SEND_DATA_FQ), nullptr, 15048);
+  STMEPIC_RETURN_ON_ERROR(task_blink_error_task.task_init(task_blink_error, nullptr,
+                                                          FREQUENCY_TO_PERIOD_MS(TIMING_LED_ERROR_BLINK_FQ)));
+  STMEPIC_RETURN_ON_ERROR(task_data_usb_send_task.task_init(task_usb_data_loging, nullptr,
+                                                            FREQUENCY_TO_PERIOD_MS(TIMING_USB_SEND_DATA_FQ),
+                                                            nullptr, 15048));
 
-  task_usb_task.task_init(task_usb_handler, nullptr, FREQUENCY_TO_PERIOD_MS(TIMING_USB_RECIVED_DATA_FQ), nullptr, 1050);
+  STMEPIC_RETURN_ON_ERROR(task_usb_task.task_init(task_usb_handler, nullptr,
+                                                  FREQUENCY_TO_PERIOD_MS(TIMING_USB_RECIVED_DATA_FQ), nullptr, 1050));
 
-  task_read_analog_values_task.task_init(task_read_analog_values, nullptr,
-                                         FREQUENCY_TO_PERIOD_MS(TIMING_READ_TEMPERATURE_FQ));
+  STMEPIC_RETURN_ON_ERROR(task_read_analog_values_task.task_init(task_read_analog_values, nullptr,
+                                                                 FREQUENCY_TO_PERIOD_MS(TIMING_READ_TEMPERATURE_FQ)));
 
-  task_error_task.task_init(task_error_check, nullptr, FREQUENCY_TO_PERIOD_MS(1000));
+  STMEPIC_RETURN_ON_ERROR(task_error_task.task_init(task_error_check, nullptr, FREQUENCY_TO_PERIOD_MS(1000)));
 
-  STMEPIC_ASSING_TO_OR_HRESET(task_can_disconnected_timer, se::Timer::Make(TIMING_CAN_DISCONNECTED_PERIOD, false));
+  STMEPIC_ASSING_TO_OR_RETURN(task_can_disconnected_timer, se::Timer::Make(TIMING_CAN_DISCONNECTED_PERIOD, false));
   task_can_disconnected_timer->timer_reset();
 
   error_data.can_disconnected = true;
-  task_blink_task.task_run();
-  task_blink_error_task.task_run();
-  task_data_usb_send_task.task_run();
-  task_usb_task.task_run();
-  task_read_analog_values_task.task_run();
-  task_error_task.task_run();
-}
 
-void main_loop() {
-  log_debug("Start scheduler\n");
-  osKernelStart();
+  STMEPIC_RETURN_ON_ERROR(task_blink_error_task.task_run());
+  STMEPIC_RETURN_ON_ERROR(task_data_usb_send_task.task_run());
+  STMEPIC_RETURN_ON_ERROR(task_usb_task.task_run());
+  STMEPIC_RETURN_ON_ERROR(task_read_analog_values_task.task_run());
+  STMEPIC_RETURN_ON_ERROR(task_error_task.task_run());
+  return se::Status::OK();
 }

@@ -86,7 +86,7 @@ namespace se = stmepic;
 //**************************************************************************************************
 // ADC CONSTANTS
 
-#define ADC_DMA_BUFFER_SIZE 8
+#define ADC_DMA_BUFFER_SIZE 6
 #define UC_SUPPLY_VOLTAGE 3.3f
 #define ADC_VSENSE_MULTIPLIER 43.830646314f
 #define TERMISTOR_RESISTANCE 100000.0f

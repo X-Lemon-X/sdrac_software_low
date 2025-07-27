@@ -41,7 +41,7 @@ extern std::shared_ptr<se::movement::PassThroughControler> pass_through_controle
 extern se::filters::FilterMovingAvarage encoder_motor_moving_avarage;
 extern se::filters::FilterSampleSkip encoder_arm_filter_velocity;
 extern se::Timer tim_can_disconnecteded;
-extern se::SimpleTask task_blink_task;
+extern se::SimpleTask task_default_task;
 extern se::SimpleTask task_blink_error_task;
 extern se::SimpleTask task_read_analog_values_task;
 // extern se::SimpleTask task_encoder_timer;
@@ -70,30 +70,22 @@ extern float voltage_vcc;
 /// @brief main program, this function is called from main and never returns
 void run_main_prog();
 
-/// @brief This function is used to configure things that have to be configurated before all the periferals
-void pre_periferal_config();
-
-/// @brief This function is used to configure the periferals
-/// mostly stuff that have to be configurated after CumeMX generation
-void periferal_config();
-
 /// @brief This function is used to handle the can controll
 void handle_can_rx();
-
-/// @brief This function is used to handle the main loop, never returns
-void main_loop();
 
 /// @brief get board if from hex encoded
 uint8_t get_board_id();
 
 /// @brief This function is used to configure the board base on it's hardware id
-void id_config();
+se::Status id_config();
 
 /// @brief  Initites stuff after id have been configured
-void post_id_config();
+se::Status post_id_config();
 
 /// @brief This function is used to configure the tasks
-void config_tasks();
+se::Status config_tasks();
+
+se::Status startup_robot(se::SimpleTask &task, void *args);
 
 /// @brief initites the movement controler and sets the mode initiation
 /// is also required to chnage control mode since wewant to have known state of the robot when
