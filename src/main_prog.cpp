@@ -17,7 +17,7 @@
 //**************************************************************************************************
 // SCARY GLOBAL VARIABLES
 
-se::movement::PIDControler pid_pos;
+se::movement::PIDController pid_pos;
 std::shared_ptr<se::movement::BasicLinearPosControler> bacis_controler;
 std::shared_ptr<se::movement::PassThroughControler> pass_through_controler;
 se::Timer tim_can_disconnecteded(se::Ticker::get_instance());
@@ -241,7 +241,7 @@ se::Status post_id_config() {
   encoder_arm->set_dead_zone_correction_angle(config.encoder_arm_dead_zone_correction_angle);
   STMEPIC_RETURN_ON_ERROR(encoder_arm->device_start());
   STMEPIC_RETURN_ON_ERROR(encoder_arm->device_task_set_settings(enc_device_settings));
-  STMEPIC_RETURN_ON_ERROR(encoder_arm->device_task_start());
+  STMEPIC_RETURN_ON_ERROR(encoder_arm->device_start());
 
   //-------------------ENCODER STEPER MOTOR POSITION CONFIGURATION-------------------
   // config.encoder_motor_enable
@@ -258,16 +258,16 @@ se::Status post_id_config() {
     encoder_vel_motor->set_ratio(1.0f / stp_motor.get_gear_ratio());
 
     STMEPIC_RETURN_ON_ERROR(encoder_vel_motor->device_task_set_settings(enc_device_settings));
-    STMEPIC_RETURN_ON_ERROR(encoder_vel_motor->device_task_start());
+    STMEPIC_RETURN_ON_ERROR(encoder_vel_motor->device_start());
   } else {
     encoder_vel_motor = encoder_arm;
   }
   //-------------------MOVEMENT CONTROLER CONFIGURATION-------------------
 
   // unly used if the pid controler is used
-  pid_pos.set_Kp(config.pid_p);
-  pid_pos.set_Ki(config.pid_i);
-  pid_pos.set_Kd(config.pid_d);
+  // pid_pos.set_Kp(config.pid_p);
+  // pid_pos.set_Ki(config.pid_i);
+  // pid_pos.set_Kd(config.pid_d);
 
   // pass through controler is used for the velocity control
   pass_through_controler = std::make_shared<se::movement::PassThroughControler>();

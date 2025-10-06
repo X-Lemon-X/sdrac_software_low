@@ -35,7 +35,7 @@
 #define MAIN_PROG_H
 
 
-extern se::movement::PIDControler pid_pos;
+extern se::movement::PIDController pid_pos;
 extern std::shared_ptr<se::movement::BasicLinearPosControler> bacis_controler;
 extern std::shared_ptr<se::movement::PassThroughControler> pass_through_controler;
 extern se::filters::FilterMovingAvarage encoder_motor_moving_avarage;
