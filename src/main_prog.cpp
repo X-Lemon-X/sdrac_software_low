@@ -103,7 +103,7 @@ void run_main_prog() {
   //**************************************************************************************************
   // START DEFAULT TASK
   STMEPIC_NONE_OR_HRESET(task_default_task.task_init(task_blink, (void *)&pin_user_led_1,
-                                                     FREQUENCY_TO_PERIOD_MS(TIMING_LED_BLINK_FQ), startup_robot, 4000));
+                                                     FREQUENCY_TO_PERIOD_MS(TIMING_LED_BLINK_FQ), startup_robot, 8000));
   STMEPIC_NONE_OR_HRESET(task_default_task.task_run());
   osKernelStart();
 }
@@ -194,10 +194,10 @@ se::Status post_id_config() {
   usb_programer.set_info(info);
 
 
-  se::DeviceThreadedSettings enc_device_settings;
-  enc_device_settings.period       = 20;
-  enc_device_settings.uxPriority   = 3;
-  enc_device_settings.uxStackDepth = 1054;
+  // se::DeviceThreadedSettings enc_device_settings;
+  // enc_device_settings.period       = 20;
+  // enc_device_settings.uxPriority   = 3;
+  // enc_device_settings.uxStackDepth = 1054;
 
   // new se::motor::MotorClosedLoop(stp_motor, &encoder_arm, &encoder_vel_motor, nullptr);
 
@@ -239,8 +239,7 @@ se::Status post_id_config() {
   encoder_arm->set_offset(config.encoder_arm_offset);
   encoder_arm->set_reverse(config.encoder_arm_reverse);
   encoder_arm->set_dead_zone_correction_angle(config.encoder_arm_dead_zone_correction_angle);
-  STMEPIC_RETURN_ON_ERROR(encoder_arm->device_start());
-  STMEPIC_RETURN_ON_ERROR(encoder_arm->device_task_set_settings(enc_device_settings));
+  // STMEPIC_RETURN_ON_ERROR(encoder_arm->device_task_set_settings(enc_device_settings));
   STMEPIC_RETURN_ON_ERROR(encoder_arm->device_start());
 
   //-------------------ENCODER STEPER MOTOR POSITION CONFIGURATION-------------------
@@ -257,7 +256,7 @@ se::Status post_id_config() {
     encoder_vel_motor->set_dead_zone_correction_angle(config.encoder_motor_dead_zone_correction_angle);
     encoder_vel_motor->set_ratio(1.0f / stp_motor.get_gear_ratio());
 
-    STMEPIC_RETURN_ON_ERROR(encoder_vel_motor->device_task_set_settings(enc_device_settings));
+    // STMEPIC_RETURN_ON_ERROR(encoder_vel_motor->device_task_set_settings(enc_device_settings));
     STMEPIC_RETURN_ON_ERROR(encoder_vel_motor->device_start());
   } else {
     encoder_vel_motor = encoder_arm;
