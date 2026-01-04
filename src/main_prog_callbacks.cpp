@@ -6,6 +6,10 @@
 #include "main_prog.hpp"
 #include "stm32f4xx_hal.h"
 
+#include "sdrac_shared_types.hpp"
+#include "can_helper.hpp"
+
+
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
   if(htim->Instance == TIM10) {
     se::Ticker::get_instance().irq_update_ticker();
@@ -146,4 +150,76 @@ void can_callback_set_effector_position(se::CanBase &can, se::CanDataFrame &rece
   servo_motor->set_enable(true);
   float pos = (float)signals.pos_percentage / 100.0f * PI; // convert percentage to radians
   servo_motor->set_position(pos);
+}
+
+
+void can_callback_get_torque(se::CanBase &can, se::CanDataFrame &received_msg, void *args) {
+  (void)received_msg;
+  (void)args;
+
+  can_disconnect_timeout_reset();
+  can_konarm_1_get_torque_t src_p;
+  se::CanDataFrame send_msg;
+  src_p.torque         = movement_controler.get_current_torque();
+  send_msg.frame_id    = config.can_konarm_get_torque_frame_id;
+  send_msg.data_size   = CAN_KONARM_1_GET_TORQUE_LENGTH;
+  send_msg.fdcan_frame = false;
+  send_msg.extended_id = CAN_KONARM_1_GET_TORQUE_IS_EXTENDED;
+  can_konarm_1_get_torque_pack(send_msg.data, &src_p, send_msg.data_size);
+  (void)can.write(send_msg);
+}
+
+void can_callback_get_config(se::CanBase &can, se::CanDataFrame &received_msg, void *args) {
+  (void)received_msg;
+  (void)args;
+  can_disconnect_timeout_reset();
+  se::CanDataFrame send_msg;
+  auto frames = can_config_sender.pack(config.can_konarm_get_config_frame_id, module_config);
+  for(const auto &frame : frames) {
+    send_msg.frame_id    = config.can_konarm_get_config_frame_id;
+    send_msg.data_size   = frame.size;
+    send_msg.fdcan_frame = frame.fdcan;
+    send_msg.extended_id = CAN_KONARM_1_GET_CONFIG_IS_EXTENDED;
+    std::memcpy(send_msg.data, frame.data, frame.size);
+    (void)can.write(send_msg);
+  }
+}
+
+void can_callback_send_config(se::CanBase &can, se::CanDataFrame &received_msg, void *args) {
+  (void)can;
+  (void)args;
+  can_disconnect_timeout_reset();
+  canc::CanMsg msg_canc;
+  msg_canc.id    = received_msg.frame_id;
+  msg_canc.size  = received_msg.data_size;
+  msg_canc.fdcan = received_msg.fdcan_frame;
+  std::memcpy(msg_canc.data, received_msg.data, received_msg.data_size);
+  if(can_config_sender.unpack(msg_canc)) {
+    module_config = can_config_sender.get_unpacked_structure();
+  }
+}
+
+void can_callback_set_and_reset(se::CanBase &can, se::CanDataFrame &received_msg, void *args) {
+  (void)can;
+  (void)args;
+  (void)received_msg;
+  can_disconnect_timeout_reset();
+  if(!fram->writeStruct(FRAM_CONFIG_ADDRESS, module_config).ok()) {
+    log_error("Failed to save config to FRAM");
+    return;
+  }
+  HAL_NVIC_SystemReset();
+}
+
+void can_callback_set_torque(se::CanBase &can, se::CanDataFrame &received_msg, void *args) {
+  (void)can;
+  (void)args;
+  can_disconnect_timeout_reset();
+  can_konarm_1_set_torque_t signals;
+  if(can_konarm_1_set_torque_unpack(&signals, received_msg.data, received_msg.data_size))
+    return; // unpack error
+
+  movement_controler.set_enable(true);
+  movement_controler.set_torque(signals.torque);
+  log_debug("Set torque:" + std::to_string(signals.torque));
 }

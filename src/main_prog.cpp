@@ -125,9 +125,9 @@ se::Status id_config() {
   fram->device_start();
 
   // probably here load data from FRAM
-  auto mayby_config = fram->readStruct<IdConfig>(FRAM_CONFIG_ADDRESS);
+  auto mayby_config = fram->readStruct<ModuleConfig>(FRAM_CONFIG_ADDRESS);
   if(mayby_config.ok()) {
-    config = mayby_config.valueOrDie();
+    module_config = mayby_config.valueOrDie();
     log_debug("Config loaded from FRAM");
   } else {
     log_debug("Config not loaded from FRAM");
@@ -164,7 +164,7 @@ se::Status id_config() {
     break;
   }
 
-  auto s = fram->writeStruct(FRAM_CONFIG_ADDRESS, config);
+  auto s = fram->writeStruct(FRAM_CONFIG_ADDRESS, module_config);
   i2c1->hardware_reset();
   return se::Status::OK();
 }
@@ -326,6 +326,11 @@ se::Status startup_robot(stmepic::SimpleTask &task, void *args) {
   STMEPIC_RETURN_ON_ERROR(
   can1->add_callback(config.can_konarm_set_effector_position_frame_id, can_callback_set_effector_position));
   STMEPIC_RETURN_ON_ERROR(can1->add_callback(0, can_callback_default));
+  STMEPIC_RETURN_ON_ERROR(can1->add_callback(config.can_konarm_get_torque_frame_id, can_callback_get_torque));
+  STMEPIC_RETURN_ON_ERROR(can1->add_callback(config.can_konarm_get_config_frame_id, can_callback_get_config));
+  STMEPIC_RETURN_ON_ERROR(can1->add_callback(config.can_konarm_send_config_frame_id, can_callback_send_config));
+  STMEPIC_RETURN_ON_ERROR(can1->add_callback(config.can_konarm_set_and_reset_frame_id, can_callback_set_and_reset));
+  STMEPIC_RETURN_ON_ERROR(can1->add_callback(config.can_konarm_set_torque_frame_id, can_callback_set_torque));
 
 
   STMEPIC_RETURN_ON_ERROR(task_blink_error_task.task_init(task_blink_error, nullptr,

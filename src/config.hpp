@@ -36,6 +36,7 @@
 #include <memory>
 #include <random>
 #include "sdrac_shared_types.hpp"
+#include "can_helper.hpp"
 
 namespace se = stmepic;
 
@@ -129,6 +130,12 @@ struct IdConfig {
   uint32_t can_konarm_get_errors_frame_id;
   uint32_t can_konarm_set_control_mode_frame_id;
   uint32_t can_konarm_set_effector_position_frame_id;
+
+  uint32_t can_konarm_get_torque_frame_id;
+  uint32_t can_konarm_get_config_frame_id;
+  uint32_t can_konarm_send_config_frame_id;
+  uint32_t can_konarm_set_and_reset_frame_id;
+  uint32_t can_konarm_set_torque_frame_id;
 };
 
 
@@ -247,6 +254,9 @@ extern ErrorData error_data;
 extern std::shared_ptr<se::I2C> i2c1;
 extern std::shared_ptr<se::I2C> i2c3;
 extern std::shared_ptr<se::CAN> can1;
+
+
+extern canc::CanStructureSender<ModuleConfig> can_config_sender;
 //**************************************************************************************************
 // debug loging options
 

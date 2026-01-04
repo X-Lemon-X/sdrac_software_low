@@ -17,6 +17,8 @@
 #include <limits>
 #include <string>
 #include "sdrac_shared_types.hpp"
+#include "can_helper.hpp"
+
 
 //**************************************************************************************************
 // Gpio assigments
@@ -56,8 +58,23 @@ se::GpioPin pin_cid_2(*GPIOC, GPIO_PIN_12);
 // software why 5 bits shift because we want tu push the 11 bit id to the 16 bit
 // regiser strting from 5th bit
 
-const IdConfig config_id_default = { 0xff0, 0x000, 0x600, 0x000, 0x601, 0x602,
-                                     0x603, 0x604, 0x605, 0x606, 0x60a };
+const IdConfig config_id_default = { 0xff0,
+                                     0x000,
+                                     0x610,
+                                     0x000,
+
+                                     CAN_KONARM_1_STATUS_FRAME_ID,
+                                     CAN_KONARM_1_SET_POS_FRAME_ID,
+                                     CAN_KONARM_1_GET_POS_FRAME_ID,
+                                     CAN_KONARM_1_CLEAR_ERRORS_FRAME_ID,
+                                     CAN_KONARM_1_GET_ERRORS_FRAME_ID,
+                                     CAN_KONARM_1_SET_CONTROL_MODE_FRAME_ID,
+                                     CAN_KONARM_1_SET_EFFECTOR_POSITION_FRAME_ID,
+                                     CAN_KONARM_1_GET_TORQUE_FRAME_ID,
+                                     CAN_KONARM_1_GET_CONFIG_FRAME_ID,
+                                     CAN_KONARM_1_SEND_CONFIG_FRAME_ID,
+                                     CAN_KONARM_1_SET_AND_RESET_FRAME_ID,
+                                     CAN_KONARM_1_SET_TORQUE_FRAME_ID };
 
 const ModuleConfig config_default = {
 
@@ -75,18 +92,25 @@ const ModuleConfig config_default = {
   0.7f
 };
 
-const IdConfig config_id_1  = { 0xff0,
-                                0x000,
-                                0x610,
-                                0x000,
+const IdConfig config_id_1 = { 0xff0,
+                               0x000,
+                               0x610,
+                               0x000,
 
-                                CAN_KONARM_1_STATUS_FRAME_ID,
-                                CAN_KONARM_1_SET_POS_FRAME_ID,
-                                CAN_KONARM_1_GET_POS_FRAME_ID,
-                                CAN_KONARM_1_CLEAR_ERRORS_FRAME_ID,
-                                CAN_KONARM_1_GET_ERRORS_FRAME_ID,
-                                CAN_KONARM_1_SET_CONTROL_MODE_FRAME_ID,
-                                CAN_KONARM_1_SET_EFFECTOR_POSITION_FRAME_ID };
+                               CAN_KONARM_1_STATUS_FRAME_ID,
+                               CAN_KONARM_1_SET_POS_FRAME_ID,
+                               CAN_KONARM_1_GET_POS_FRAME_ID,
+                               CAN_KONARM_1_CLEAR_ERRORS_FRAME_ID,
+                               CAN_KONARM_1_GET_ERRORS_FRAME_ID,
+                               CAN_KONARM_1_SET_CONTROL_MODE_FRAME_ID,
+                               CAN_KONARM_1_SET_EFFECTOR_POSITION_FRAME_ID,
+                               CAN_KONARM_1_GET_TORQUE_FRAME_ID,
+                               CAN_KONARM_1_GET_CONFIG_FRAME_ID,
+                               CAN_KONARM_1_SEND_CONFIG_FRAME_ID,
+                               CAN_KONARM_1_SET_AND_RESET_FRAME_ID,
+                               CAN_KONARM_1_SET_TORQUE_FRAME_ID };
+
+
 const ModuleConfig config_1 = { 400.0f,
                                 40.0f,
                                 PI_m2,
@@ -127,7 +151,12 @@ const IdConfig config_id_2 = { 0xff0,
                                CAN_KONARM_2_CLEAR_ERRORS_FRAME_ID,
                                CAN_KONARM_2_GET_ERRORS_FRAME_ID,
                                CAN_KONARM_2_SET_CONTROL_MODE_FRAME_ID,
-                               CAN_KONARM_2_SET_EFFECTOR_POSITION_FRAME_ID };
+                               CAN_KONARM_2_SET_EFFECTOR_POSITION_FRAME_ID,
+                               CAN_KONARM_2_GET_TORQUE_FRAME_ID,
+                               CAN_KONARM_2_GET_CONFIG_FRAME_ID,
+                               CAN_KONARM_2_SEND_CONFIG_FRAME_ID,
+                               CAN_KONARM_2_SET_AND_RESET_FRAME_ID,
+                               CAN_KONARM_2_SET_TORQUE_FRAME_ID };
 
 const ModuleConfig config_2 = {
 
@@ -146,18 +175,25 @@ const ModuleConfig config_2 = {
   1.5f
 };
 
-const IdConfig config_id_3  = { 0xff0,
-                                0x000,
-                                0x630,
-                                0x000,
+const IdConfig config_id_3 = { 0xff0,
+                               0x000,
+                               0x630,
+                               0x000,
 
-                                CAN_KONARM_3_STATUS_FRAME_ID,
-                                CAN_KONARM_3_SET_POS_FRAME_ID,
-                                CAN_KONARM_3_GET_POS_FRAME_ID,
-                                CAN_KONARM_3_CLEAR_ERRORS_FRAME_ID,
-                                CAN_KONARM_3_GET_ERRORS_FRAME_ID,
-                                CAN_KONARM_3_SET_CONTROL_MODE_FRAME_ID,
-                                CAN_KONARM_3_SET_EFFECTOR_POSITION_FRAME_ID };
+                               CAN_KONARM_3_STATUS_FRAME_ID,
+                               CAN_KONARM_3_SET_POS_FRAME_ID,
+                               CAN_KONARM_3_GET_POS_FRAME_ID,
+                               CAN_KONARM_3_CLEAR_ERRORS_FRAME_ID,
+                               CAN_KONARM_3_GET_ERRORS_FRAME_ID,
+                               CAN_KONARM_3_SET_CONTROL_MODE_FRAME_ID,
+                               CAN_KONARM_3_SET_EFFECTOR_POSITION_FRAME_ID,
+                               CAN_KONARM_3_GET_TORQUE_FRAME_ID,
+                               CAN_KONARM_3_GET_CONFIG_FRAME_ID,
+                               CAN_KONARM_3_SEND_CONFIG_FRAME_ID,
+                               CAN_KONARM_3_SET_AND_RESET_FRAME_ID,
+                               CAN_KONARM_3_SET_TORQUE_FRAME_ID };
+
+
 const ModuleConfig config_3 = {
 
   400.0f,
@@ -190,18 +226,24 @@ const ModuleConfig config_3 = {
   1.5f
 };
 
-const IdConfig config_id_4  = { 0xff0,
-                                0x000,
-                                0x640,
-                                0x000,
+const IdConfig config_id_4 = { 0xff0,
+                               0x000,
+                               0x640,
+                               0x000,
 
-                                CAN_KONARM_4_STATUS_FRAME_ID,
-                                CAN_KONARM_4_SET_POS_FRAME_ID,
-                                CAN_KONARM_4_GET_POS_FRAME_ID,
-                                CAN_KONARM_4_CLEAR_ERRORS_FRAME_ID,
-                                CAN_KONARM_4_GET_ERRORS_FRAME_ID,
-                                CAN_KONARM_4_SET_CONTROL_MODE_FRAME_ID,
-                                CAN_KONARM_4_SET_EFFECTOR_POSITION_FRAME_ID };
+                               CAN_KONARM_4_STATUS_FRAME_ID,
+                               CAN_KONARM_4_SET_POS_FRAME_ID,
+                               CAN_KONARM_4_GET_POS_FRAME_ID,
+                               CAN_KONARM_4_CLEAR_ERRORS_FRAME_ID,
+                               CAN_KONARM_4_GET_ERRORS_FRAME_ID,
+                               CAN_KONARM_4_SET_CONTROL_MODE_FRAME_ID,
+                               CAN_KONARM_4_SET_EFFECTOR_POSITION_FRAME_ID,
+                               CAN_KONARM_4_GET_TORQUE_FRAME_ID,
+                               CAN_KONARM_4_GET_CONFIG_FRAME_ID,
+                               CAN_KONARM_4_SEND_CONFIG_FRAME_ID,
+                               CAN_KONARM_4_SET_AND_RESET_FRAME_ID,
+                               CAN_KONARM_4_SET_TORQUE_FRAME_ID };
+
 const ModuleConfig config_4 = {
 
   6400.0f,
@@ -245,7 +287,14 @@ const IdConfig config_id_5 = { 0xff0,
                                CAN_KONARM_5_CLEAR_ERRORS_FRAME_ID,
                                CAN_KONARM_5_GET_ERRORS_FRAME_ID,
                                CAN_KONARM_5_SET_CONTROL_MODE_FRAME_ID,
-                               CAN_KONARM_5_SET_EFFECTOR_POSITION_FRAME_ID };
+                               CAN_KONARM_5_SET_EFFECTOR_POSITION_FRAME_ID,
+                               CAN_KONARM_5_GET_TORQUE_FRAME_ID,
+                               CAN_KONARM_5_GET_CONFIG_FRAME_ID,
+                               CAN_KONARM_5_SEND_CONFIG_FRAME_ID,
+                               CAN_KONARM_5_SET_AND_RESET_FRAME_ID,
+                               CAN_KONARM_5_SET_TORQUE_FRAME_ID
+
+};
 
 const ModuleConfig config_5 = {
 
@@ -280,18 +329,25 @@ const ModuleConfig config_5 = {
   1.5f
 };
 
-const IdConfig config_id_6  = { 0xff0,
-                                0x000,
-                                0x660,
-                                0x000,
+const IdConfig config_id_6 = { 0xff0,
+                               0x000,
+                               0x660,
+                               0x000,
 
-                                CAN_KONARM_6_STATUS_FRAME_ID,
-                                CAN_KONARM_6_SET_POS_FRAME_ID,
-                                CAN_KONARM_6_GET_POS_FRAME_ID,
-                                CAN_KONARM_6_CLEAR_ERRORS_FRAME_ID,
-                                CAN_KONARM_6_GET_ERRORS_FRAME_ID,
-                                CAN_KONARM_6_SET_CONTROL_MODE_FRAME_ID,
-                                CAN_KONARM_6_SET_EFFECTOR_POSITION_FRAME_ID };
+                               CAN_KONARM_6_STATUS_FRAME_ID,
+                               CAN_KONARM_6_SET_POS_FRAME_ID,
+                               CAN_KONARM_6_GET_POS_FRAME_ID,
+                               CAN_KONARM_6_CLEAR_ERRORS_FRAME_ID,
+                               CAN_KONARM_6_GET_ERRORS_FRAME_ID,
+                               CAN_KONARM_6_SET_CONTROL_MODE_FRAME_ID,
+                               CAN_KONARM_6_SET_EFFECTOR_POSITION_FRAME_ID,
+                               CAN_KONARM_6_GET_TORQUE_FRAME_ID,
+                               CAN_KONARM_6_GET_CONFIG_FRAME_ID,
+                               CAN_KONARM_6_SEND_CONFIG_FRAME_ID,
+                               CAN_KONARM_6_SET_AND_RESET_FRAME_ID,
+                               CAN_KONARM_6_SET_TORQUE_FRAME_ID };
+
+
 const ModuleConfig config_6 = {
 
   6400.0f,
@@ -337,6 +393,7 @@ std::to_string(VERSION_MAJOR) + "." + std::to_string(VERSION_MINOR) + "." + std:
 uint32_t adc_dma_buffer[ADC_DMA_BUFFER_SIZE + 1];
 IdConfig config;
 ModuleConfig module_config;
+canc::CanStructureSender<ModuleConfig> can_config_sender;
 // se::Ticker &main_clock = se::GlobalTicker::get_instance();
 // se::Board_id board_id(pin_cid_0, pin_cid_1, pin_cid_2);
 

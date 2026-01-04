@@ -122,5 +122,11 @@ void can_callback_set_pos(se::CanBase &can, se::CanDataFrame &received_msg, void
 void can_callback_set_control_mode(se::CanBase &can, se::CanDataFrame &received_msg, void *args);
 void can_callback_set_effector_position(se::CanBase &can, se::CanDataFrame &received_msg, void *args);
 
+void can_callback_get_torque(se::CanBase &can, se::CanDataFrame &received_msg, void *args);
+void can_callback_get_config(se::CanBase &can, se::CanDataFrame &received_msg, void *args);
+void can_callback_send_config(se::CanBase &can, se::CanDataFrame &received_msg, void *args);
+void can_callback_set_and_reset(se::CanBase &can, se::CanDataFrame &received_msg, void *args);
+void can_callback_set_torque(se::CanBase &can, se::CanDataFrame &received_msg, void *args);
+
 
 #endif // MAIN_PROG_H
