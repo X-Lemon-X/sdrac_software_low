@@ -18,8 +18,8 @@
 // SCARY GLOBAL VARIABLES
 
 se::movement::PIDController pid_pos;
-std::shared_ptr<se::movement::BasicLinearPosControler> bacis_controler;
-std::shared_ptr<se::movement::PassThroughControler> pass_through_controler;
+std::shared_ptr<se::movement::BasicLinearPosControler> basic_controller;
+std::shared_ptr<se::movement::PassThroughControler> pass_through_controller;
 se::Timer tim_can_disconnecteded(se::Ticker::get_instance());
 
 se::SimpleTask task_default_task;
@@ -134,13 +134,34 @@ se::Status id_config() {
   }
 
   switch(get_board_id()) {
-  case BOARD_ID_1: config = config_id_1; break;
-  case BOARD_ID_2: config = config_id_2; break;
-  case BOARD_ID_3: config = config_id_3; break;
-  case BOARD_ID_4: config = config_id_4; break;
-  case BOARD_ID_5: config = config_id_5; break;
-  case BOARD_ID_6: config = config_id_6; break;
-  default: config = config_id_default; break;
+  case BOARD_ID_1:
+    config        = config_id_1;
+    module_config = config_1;
+    break;
+  case BOARD_ID_2:
+    config        = config_id_2;
+    module_config = config_2;
+    break;
+  case BOARD_ID_3:
+    config        = config_id_3;
+    module_config = config_3;
+    break;
+  case BOARD_ID_4:
+    config        = config_id_4;
+    module_config = config_4;
+    break;
+  case BOARD_ID_5:
+    config        = config_id_5;
+    module_config = config_5;
+    break;
+  case BOARD_ID_6:
+    config        = config_id_6;
+    module_config = config_6;
+    break;
+  default:
+    config        = config_id_default;
+    module_config = config_default;
+    break;
   }
 
   auto s = fram->writeStruct(FRAM_CONFIG_ADDRESS, config);
@@ -158,7 +179,7 @@ void init_and_set_movement_controler_mode(uint8_t mode) {
   movement_controler.set_velocity(0.0f);
   movement_controler.set_enable(false);
   std::shared_ptr<se::encoders::EncoderAbsoluteMagnetic> engine_encoder = nullptr;
-  if(config.encoder_motor_enable) {
+  if(module_config.encoder_motor_enable) {
     engine_encoder = encoder_vel_motor;
   }
 
@@ -169,18 +190,18 @@ void init_and_set_movement_controler_mode(uint8_t mode) {
     // motor don't have the position control yet implemented we will use
     // the velocity control with BasicLinearPosControler that will achive
     // the position control
-    movement_controler.init(motor, se::movement::MovementControlMode::VELOCITY, bacis_controler);
+    movement_controler.init(motor, se::movement::MovementControlMode::VELOCITY, basic_controller);
     break;
   case CAN_KONARM_1_SET_CONTROL_MODE_CONTROL_MODE_VELOCITY_CONTROL_CHOICE:
-    movement_controler.init(motor, se::movement::MovementControlMode::VELOCITY, pass_through_controler);
+    movement_controler.init(motor, se::movement::MovementControlMode::VELOCITY, pass_through_controller);
     break;
   case CAN_KONARM_1_SET_CONTROL_MODE_CONTROL_MODE_TORQUE_CONTROL_CHOICE:
     // torque control is not implemented yet so we will use the velocity control
-    movement_controler.init(motor, se::movement::MovementControlMode::TORQUE, pass_through_controler);
+    movement_controler.init(motor, se::movement::MovementControlMode::TORQUE, pass_through_controller);
     break;
   default:
     // if the mode is not supported we will use the velocity control
-    movement_controler.init(motor, se::movement::MovementControlMode::VELOCITY, pass_through_controler);
+    movement_controler.init(motor, se::movement::MovementControlMode::VELOCITY, pass_through_controller);
     break;
   }
 }
@@ -202,13 +223,13 @@ se::Status post_id_config() {
   // new se::motor::MotorClosedLoop(stp_motor, &encoder_arm, &encoder_vel_motor, nullptr);
 
   //-------------------STEPER MOTOR CONFIGURATION-------------------
-  stp_motor.set_steps_per_revolution(config.stepper_motor_steps_per_rev);
-  stp_motor.set_gear_ratio(config.stepper_motor_gear_ratio);
-  stp_motor.set_max_velocity(config.stepper_motor_max_velocity);
-  stp_motor.set_min_velocity(config.stepper_motor_min_velocity);
-  stp_motor.set_reverse(config.stepper_motor_reverse);
-  stp_motor.set_reversed_enable_pin(config.stepper_motor_enable_reversed);
-  stp_motor.set_prescaler(config.stepper_motor_timer_prescaler);
+  stp_motor.set_steps_per_revolution(module_config.stepper_motor_steps_per_rev);
+  stp_motor.set_gear_ratio(module_config.stepper_motor_gear_ratio);
+  stp_motor.set_max_velocity(module_config.stepper_motor_max_velocity);
+  stp_motor.set_min_velocity(module_config.stepper_motor_min_velocity);
+  stp_motor.set_reverse(module_config.stepper_motor_reverse);
+  stp_motor.set_reversed_enable_pin(module_config.stepper_motor_enable_reversed);
+  stp_motor.set_prescaler(module_config.stepper_motor_timer_prescaler);
   STMEPIC_RETURN_ON_ERROR(stp_motor.device_start());
   stp_motor.set_enable(false);
 
@@ -231,29 +252,29 @@ se::Status post_id_config() {
 
   //-------------------ENCODER ARM POSITION CONFIGURATION-------------------
   auto encoder_arm_filter_velocity = std::make_shared<se::filters::FilterSampleSkip>();
-  encoder_arm_filter_velocity->set_samples_to_skip(config.encoder_arm_velocity_sample_amount);
+  encoder_arm_filter_velocity->set_samples_to_skip(module_config.encoder_arm_velocity_sample_amount);
   auto mayby_encoder_arm =
   se::encoders::EncoderAbsoluteMagneticMT6701::Make(i2c1, se::encoders::encoder_MT6701_addresses::MT6701_I2C_ADDRESS_1,
                                                     nullptr, encoder_arm_filter_velocity);
   encoder_arm = mayby_encoder_arm.valueOrDie();
-  encoder_arm->set_offset(config.encoder_arm_offset);
-  encoder_arm->set_reverse(config.encoder_arm_reverse);
-  encoder_arm->set_dead_zone_correction_angle(config.encoder_arm_dead_zone_correction_angle);
+  encoder_arm->set_offset(module_config.encoder_arm_offset);
+  encoder_arm->set_reverse(module_config.encoder_arm_reverse);
+  encoder_arm->set_dead_zone_correction_angle(module_config.encoder_arm_dead_zone_correction_angle);
   // STMEPIC_RETURN_ON_ERROR(encoder_arm->device_task_set_settings(enc_device_settings));
   STMEPIC_RETURN_ON_ERROR(encoder_arm->device_start());
 
   //-------------------ENCODER STEPER MOTOR POSITION CONFIGURATION-------------------
-  // config.encoder_motor_enable
-  if(config.encoder_motor_enable) {
+  // module_config.encoder_motor_enable
+  if(module_config.encoder_motor_enable) {
     auto encoder_motor_moving_avarage = std::make_shared<se::filters::FilterMovingAvarage>();
     encoder_motor_moving_avarage->set_size(25); // 15 for smooth movement but delay with sampling to 50
-    encoder_motor_moving_avarage->set_samples_to_skip(config.encoder_motor_velocity_sample_amount);
+    encoder_motor_moving_avarage->set_samples_to_skip(module_config.encoder_motor_velocity_sample_amount);
     STMEPIC_ASSING_TO_OR_RETURN(encoder_vel_motor, se::encoders::EncoderAbsoluteMagneticMT6701::Make(
                                                    i2c1, se::encoders::encoder_MT6701_addresses::MT6701_I2C_ADDRESS_2,
                                                    nullptr, encoder_motor_moving_avarage));
-    encoder_vel_motor->set_offset(config.encoder_motor_offset);
-    encoder_vel_motor->set_reverse(config.encoder_motor_reverse);
-    encoder_vel_motor->set_dead_zone_correction_angle(config.encoder_motor_dead_zone_correction_angle);
+    encoder_vel_motor->set_offset(module_config.encoder_motor_offset);
+    encoder_vel_motor->set_reverse(module_config.encoder_motor_reverse);
+    encoder_vel_motor->set_dead_zone_correction_angle(module_config.encoder_motor_dead_zone_correction_angle);
     encoder_vel_motor->set_ratio(1.0f / stp_motor.get_gear_ratio());
 
     // STMEPIC_RETURN_ON_ERROR(encoder_vel_motor->device_task_set_settings(enc_device_settings));
@@ -264,28 +285,28 @@ se::Status post_id_config() {
   //-------------------MOVEMENT CONTROLER CONFIGURATION-------------------
 
   // unly used if the pid controler is used
-  // pid_pos.set_Kp(config.pid_p);
-  // pid_pos.set_Ki(config.pid_i);
-  // pid_pos.set_Kd(config.pid_d);
+  // pid_pos.set_Kp(module_config.pid_p);
+  // pid_pos.set_Ki(module_config.pid_i);
+  // pid_pos.set_Kd(module_config.pid_d);
 
   // pass through controler is used for the velocity control
-  pass_through_controler = std::make_shared<se::movement::PassThroughControler>();
+  pass_through_controller = std::make_shared<se::movement::PassThroughControler>();
 
   // used for the position control
-  bacis_controler = std::make_shared<se::movement::BasicLinearPosControler>();
-  bacis_controler->set_max_acceleration(config.movement_max_acceleration);
-  bacis_controler->set_target_pos_max_error(0.01f);
+  basic_controller = std::make_shared<se::movement::BasicLinearPosControler>();
+  basic_controller->set_max_acceleration(module_config.movement_max_acceleration);
+  basic_controller->set_target_pos_max_error(0.01f);
 
   // for velocity control we use the pass through controler whitch doesn't do
   // anything
 
-  movement_controler.set_limit_position(config.movement_limit_lower, config.movement_limit_upper);
-  movement_controler.set_max_velocity(config.movement_max_velocity);
-  movement_controler.set_position(config.movement_limit_upper);
+  movement_controler.set_limit_position(module_config.movement_limit_lower, module_config.movement_limit_upper);
+  movement_controler.set_max_velocity(module_config.movement_max_velocity);
+  movement_controler.set_position(module_config.movement_limit_upper);
   movement_controler.set_position(encoder_arm->get_angle());
   movement_controler.set_velocity(0.0f);
   movement_controler.set_enable(false);
-  init_and_set_movement_controler_mode(config.movement_control_mode);
+  init_and_set_movement_controler_mode(module_config.movement_control_mode);
   return se::Status::OK();
 }
 

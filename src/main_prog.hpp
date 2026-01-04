@@ -36,8 +36,8 @@
 
 
 extern se::movement::PIDController pid_pos;
-extern std::shared_ptr<se::movement::BasicLinearPosControler> bacis_controler;
-extern std::shared_ptr<se::movement::PassThroughControler> pass_through_controler;
+extern std::shared_ptr<se::movement::BasicLinearPosControler> basic_controller;
+extern std::shared_ptr<se::movement::PassThroughControler> pass_through_controller;
 extern se::filters::FilterMovingAvarage encoder_motor_moving_avarage;
 extern se::filters::FilterSampleSkip encoder_arm_filter_velocity;
 extern se::Timer tim_can_disconnecteded;

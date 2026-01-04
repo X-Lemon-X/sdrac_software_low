@@ -4,6 +4,7 @@
 #include "main_prog.hpp"
 #include "stmepic.hpp"
 #include "simple_task.hpp"
+#include "sdrac_shared_types.hpp"
 
 
 se::Status task_error_check(se::SimpleTask &task_handler, void *args) {
@@ -29,7 +30,7 @@ se::Status task_error_check(se::SimpleTask &task_handler, void *args) {
   error_data.temp_engine_sensor_disconnect = std::isnan(temoperature_steper_motor);
 
   error_data.encoder_arm_disconnect = !encoder_arm->device_is_connected().valueOrDie();
-  if(config.encoder_motor_enable) {
+  if(module_config.encoder_motor_enable) {
     error_data.encoder_motor_disconnect = !encoder_vel_motor->device_is_connected().valueOrDie();
   } else {
     error_data.encoder_motor_disconnect = false;

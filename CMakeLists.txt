@@ -69,6 +69,8 @@ add_subdirectory(src/StmEpic)
 
 add_subdirectory(src/can_constants)
 
+add_subdirectory(src/sdrac_shared_types)
+
 # Add sources to executable
 target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     # Add user sources here
@@ -94,6 +96,7 @@ target_link_libraries(${CMAKE_PROJECT_NAME}
   # ${stmepic}
   stmepic
   can_constants
+  sdrac_shared_types
   # Add user defined libraries
 )
 

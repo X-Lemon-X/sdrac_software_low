@@ -7,3 +7,6 @@
 [submodule "src/can_constants"]
 	path = src/can_constants
 	url = git@github.com:KoNarRobotics/can_constants.git
+[submodule "src/sdrac_shared_types"]
+	path = src/sdrac_shared_types
+	url = git@github.com:X-Lemon-X/sdrac_shared_types.git
