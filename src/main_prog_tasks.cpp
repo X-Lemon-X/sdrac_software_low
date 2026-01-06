@@ -10,15 +10,8 @@
 se::Status task_error_check(se::SimpleTask &task_handler, void *args) {
   (void)task_handler;
   (void)args;
-  if(task_can_disconnected_timer->triggered()) {
-    movement_controler.set_enable(false);
-    movement_controler.set_velocity(0);
-    movement_controler.set_position(movement_controler.get_current_position());
 
-    // servo_motor->set_enable(false);
-    error_data.can_disconnected = true;
-  }
-
+  // TEMPERATURE ERRORS
   error_data.temp_board_overheating =
   !std::isnan(temoperature_board) && temoperature_board > ERRORS_MAX_TEMP_BOARD ? true : false;
   error_data.temp_driver_overheating =
@@ -29,6 +22,7 @@ se::Status task_error_check(se::SimpleTask &task_handler, void *args) {
   error_data.temp_driver_sensor_disconnect = std::isnan(temoperature_steper_driver);
   error_data.temp_engine_sensor_disconnect = std::isnan(temoperature_steper_motor);
 
+  // BOARD ENCODERS ERRORS
   error_data.encoder_arm_disconnect = !encoder_arm->device_is_connected().valueOrDie();
   if(module_config.encoder_motor_enable) {
     error_data.encoder_motor_disconnect = !encoder_vel_motor->device_is_connected().valueOrDie();
@@ -36,12 +30,39 @@ se::Status task_error_check(se::SimpleTask &task_handler, void *args) {
     error_data.encoder_motor_disconnect = false;
   }
 
+  // BOARD VOLTAGE ERRORS
   error_data.baord_overvoltage  = voltage_vcc > ERRORS_MAX_VCC_VOLTAGE ? true : false;
   error_data.baord_undervoltage = voltage_vcc < ERRORS_MIN_VCC_VOLTAGE ? true : false;
 
-  // can errors are handled in the handle_can_rx function
-
+  // MOTION ERRORS
   error_data.controler_motor_limit_position = movement_controler.get_limit_position_achieved();
+
+  // CAN ERRORS
+  if(task_can_disconnected_timer->triggered()) {
+    error_data.can_disconnected = true;
+  }
+
+  // WHICH ERRORS TRIGGER SPECIF ERROR LEVELS
+  if(emergency_stop || error_data.baord_undervoltage || error_data.baord_overvoltage || error_data.can_disconnected ||
+     error_data.encoder_arm_disconnect || error_data.temp_board_overheating || error_data.encoder_motor_disconnect) {
+    module_status = KonarStatus::EMERGENCY_STOP;
+  } else if(error_data.controler_motor_limit_position || error_data.can_error || error_data.temp_driver_sensor_disconnect ||
+            error_data.temp_engine_sensor_disconnect || error_data.can_error) {
+    module_status = KonarStatus::FAULT;
+  } else if(error_data.temp_engine_overheating || error_data.temp_driver_overheating) {
+    module_status = KonarStatus::OVERHEAT;
+  }
+
+  // WHAT TO DO WHEN SPECIFIC ERROR IS ON
+  if(module_status == KonarStatus::EMERGENCY_STOP || module_status == KonarStatus::OVERHEAT) {
+    movement_controler.set_enable(false);
+    movement_controler.set_velocity(0);
+    movement_controler.set_torque(0);
+    movement_controler.set_position(movement_controler.get_current_position());
+
+  } else if(module_status == KonarStatus::FAULT || module_status == KonarStatus::OK) {
+    movement_controler.set_enable(true);
+  }
   return se::Status::OK();
 }
 

@@ -72,8 +72,7 @@ namespace se = stmepic;
 #define FRAM_SIZE 16000
 #define FRAM_BEGIN_ADDRESS 0x10
 #define FRAM_CONFIG_ADDRESS 0x01
-
-#define FRAM_CONFIG_ADDRESS 0x01
+#define FRAM_CONFIG_CAN_ADDRESS 0x80
 
 //**************************************************************************************************
 // I2C CONSTANTS
@@ -136,6 +135,13 @@ struct IdConfig {
   uint32_t can_konarm_send_config_frame_id;
   uint32_t can_konarm_set_and_reset_frame_id;
   uint32_t can_konarm_set_torque_frame_id;
+};
+
+enum class KonarStatus : uint8_t {
+  OK             = CAN_KONARM_1_STATUS_STATUS_OK_CHOICE,
+  FAULT          = CAN_KONARM_1_STATUS_STATUS_FAULT_CHOICE,
+  OVERHEAT       = CAN_KONARM_1_STATUS_STATUS_OVERHEAT_CHOICE,
+  EMERGENCY_STOP = CAN_KONARM_1_STATUS_STATUS_EMERGENCY_STOP_CHOICE,
 };
 
 
@@ -244,6 +250,8 @@ extern se::motor::SteperMotorStepDir stp_motor;
 extern std::shared_ptr<se::memory::FRAM> fram;
 extern std::shared_ptr<se::motor::MotorClosedLoop> motor;
 extern std::shared_ptr<se::motor::ServoMotorPWM> servo_motor;
+extern KonarStatus module_status;
+extern bool emergency_stop;
 // extern se::CanControl<> can_controler;
 extern se::dfu::UsbProgramer usb_programer;
 extern se::movement::MovementControler movement_controler;

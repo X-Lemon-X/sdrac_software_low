@@ -47,8 +47,19 @@ void can_callback_set_pos(se::CanBase &can, se::CanDataFrame &received_msg, void
   (void)can_konarm_1_set_pos_unpack(&signals, received_msg.data, received_msg.data_size);
   movement_controler.set_velocity(signals.velocity);
   movement_controler.set_position(signals.position);
-  movement_controler.set_enable(true);
+  // movement_controler.set_enable(true);
   log_debug("Set position:" + std::to_string(signals.position) + "velocity:" + std::to_string(signals.velocity));
+}
+
+void can_callback_set_torque(se::CanBase &can, se::CanDataFrame &received_msg, void *args) {
+  (void)can;
+  (void)args;
+  can_disconnect_timeout_reset();
+  can_konarm_1_set_torque_t signals;
+  if(can_konarm_1_set_torque_unpack(&signals, received_msg.data, received_msg.data_size))
+    return; // unpack error
+  movement_controler.set_torque(signals.torque);
+  log_debug("Set torque:" + std::to_string(signals.torque));
 }
 
 void can_callback_get_pos(se::CanBase &can, se::CanDataFrame &received_msg, void *args) {
@@ -70,13 +81,26 @@ void can_callback_status(se::CanBase &can, se::CanDataFrame &received_msg, void 
   (void)received_msg;
   (void)args;
   can_disconnect_timeout_reset();
-  se::CanDataFrame send_msg;
-  can_konarm_1_status_t src_p;
-  send_msg.frame_id  = config.can_konarm_status_frame_id;
-  src_p.status       = can_konarm_1_status_status_encode(CAN_KONARM_1_STATUS_STATUS_OK_CHOICE);
-  send_msg.data_size = CAN_KONARM_1_STATUS_LENGTH;
-  can_konarm_1_status_pack(send_msg.data, &src_p, send_msg.data_size);
-  can.write(send_msg);
+  if(received_msg.remote_request) {
+    se::CanDataFrame send_msg;
+    can_konarm_1_status_t src_p;
+    send_msg.frame_id  = config.can_konarm_status_frame_id;
+    src_p.status       = static_cast<uint8_t>(module_status);
+    send_msg.data_size = CAN_KONARM_1_STATUS_LENGTH;
+    can_konarm_1_status_pack(send_msg.data, &src_p, send_msg.data_size);
+    can.write(send_msg);
+  } else {
+    can_konarm_1_status_t src_p;
+    if(can_konarm_1_status_unpack(&src_p, received_msg.data, received_msg.data_size) != 0) {
+      return;
+    }
+    KonarStatus status = static_cast<KonarStatus>(src_p.status);
+    if(status == KonarStatus::OK) {
+      emergency_stop = false;
+    } else if(status == KonarStatus::EMERGENCY_STOP) {
+      emergency_stop = true;
+    }
+  }
 }
 
 void can_callback_clear_errors(se::CanBase &can, se::CanDataFrame &received_msg, void *args) {
@@ -150,7 +174,6 @@ void can_callback_set_effector_position(se::CanBase &can, se::CanDataFrame &rece
   servo_motor->set_position(pos);
 }
 
-
 void can_callback_get_torque(se::CanBase &can, se::CanDataFrame &received_msg, void *args) {
   (void)received_msg;
   (void)args;
@@ -207,17 +230,4 @@ void can_callback_set_and_reset(se::CanBase &can, se::CanDataFrame &received_msg
     return;
   }
   HAL_NVIC_SystemReset();
-}
-
-void can_callback_set_torque(se::CanBase &can, se::CanDataFrame &received_msg, void *args) {
-  (void)can;
-  (void)args;
-  can_disconnect_timeout_reset();
-  can_konarm_1_set_torque_t signals;
-  if(can_konarm_1_set_torque_unpack(&signals, received_msg.data, received_msg.data_size))
-    return; // unpack error
-
-  movement_controler.set_enable(true);
-  movement_controler.set_torque(signals.torque);
-  log_debug("Set torque:" + std::to_string(signals.torque));
 }

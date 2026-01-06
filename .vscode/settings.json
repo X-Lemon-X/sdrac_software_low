@@ -118,5 +118,6 @@
     "/opt/ros/humble/lib/python3.10/site-packages",
     "/opt/ros/humble/local/lib/python3.10/dist-packages"
   ],
-  "C_Cpp.default.compilerPath": "/home/lemonx/.local/share/arm-gnu-toolchain-14/bin/arm-none-eabi-g++"
+  "C_Cpp.default.compilerPath": "/home/lemonx/.local/share/arm-gnu-toolchain-14/bin/arm-none-eabi-g++",
+  "ROS2.distro": "jazzy"
 }

@@ -388,8 +388,8 @@ std::shared_ptr<se::I2C> i2c1;
 std::shared_ptr<se::I2C> i2c3;
 std::shared_ptr<se::CAN> can1;
 
-std::string version_string =
-std::to_string(VERSION_MAJOR) + "." + std::to_string(VERSION_MINOR) + "." + std::to_string(VERSION_BUILD);
+std::string version_string = std::to_string(VERSION_MAJOR) + "." + std::to_string(VERSION_MINOR) + "." +
+                             std::to_string(VERSION_BUILD) + ":" + std::string(VERSION_DEF_BUILD_STRING);
 uint32_t adc_dma_buffer[ADC_DMA_BUFFER_SIZE + 1];
 IdConfig config;
 ModuleConfig module_config;
@@ -403,6 +403,8 @@ std::shared_ptr<se::encoders::EncoderAbsoluteMagneticMT6701> encoder_arm;
 std::shared_ptr<se::encoders::EncoderAbsoluteMagneticMT6701> encoder_vel_motor;
 std::shared_ptr<se::motor::MotorClosedLoop> motor;
 std::shared_ptr<se::motor::ServoMotorPWM> servo_motor;
+KonarStatus module_status = KonarStatus::EMERGENCY_STOP;
+bool emergency_stop       = true;
 se::movement::MovementControler movement_controler;
 se::dfu::UsbProgramer usb_programer(pin_boot_device);
 se::sensors::temperature::NtcTermistor temp_steper_driver(UC_SUPPLY_VOLTAGE, TERMISTOR_RESISTANCE);

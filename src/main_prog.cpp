@@ -125,13 +125,13 @@ se::Status id_config() {
   fram->device_start();
 
   // probably here load data from FRAM
-  auto mayby_config = fram->readStruct<ModuleConfig>(FRAM_CONFIG_ADDRESS);
-  if(mayby_config.ok()) {
-    module_config = mayby_config.valueOrDie();
-    log_debug("Config loaded from FRAM");
-  } else {
-    log_debug("Config not loaded from FRAM");
+  auto maybe_module_config = fram->readStruct<ModuleConfig>(FRAM_CONFIG_ADDRESS);
+  auto maybe_config        = fram->readStruct<IdConfig>(FRAM_CONFIG_CAN_ADDRESS);
+  if(!maybe_module_config.ok() || !maybe_config.ok()) {
+    log_error("Failed to read config from FRAM");
   }
+  config        = maybe_config.valueOrDie();
+  module_config = maybe_module_config.valueOrDie();
 
   switch(get_board_id()) {
   case BOARD_ID_1:
@@ -163,8 +163,10 @@ se::Status id_config() {
     module_config = config_default;
     break;
   }
+  sizeof(module_config);
+  STMEPIC_RETURN_ON_ERROR(fram->writeStruct(FRAM_CONFIG_ADDRESS, module_config));
+  STMEPIC_RETURN_ON_ERROR(fram->writeStruct(FRAM_CONFIG_CAN_ADDRESS, config));
 
-  auto s = fram->writeStruct(FRAM_CONFIG_ADDRESS, module_config);
   i2c1->hardware_reset();
   return se::Status::OK();
 }
