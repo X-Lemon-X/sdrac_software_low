@@ -44,7 +44,8 @@ void can_callback_set_pos(se::CanBase &can, se::CanDataFrame &received_msg, void
   (void)args;
   can_disconnect_timeout_reset();
   can_konarm_1_set_pos_t signals;
-  (void)can_konarm_1_set_pos_unpack(&signals, received_msg.data, received_msg.data_size);
+  if(can_konarm_1_set_pos_unpack(&signals, received_msg.data, received_msg.data_size))
+    return; // unpack error
   movement_controler.set_velocity(signals.velocity);
   movement_controler.set_position(signals.position);
   // movement_controler.set_enable(true);
