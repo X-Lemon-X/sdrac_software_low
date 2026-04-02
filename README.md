@@ -23,15 +23,22 @@ After cloning the project to automatically configure the project run the followi
 ./init-build.sh
 ```
 
+## Building the project using CMake
+To build the project using CMake run the following command
+```bash
+./build-firmware.sh
+```
+
+
 ## Building the project:
 Building the project requires GNU Arm Embedded Toolchain to be installed.
-1. Download it from this site https://developer.arm.com/downloads/-/gnu-rm 
-2. Move the extracted files in some directory for example "$HOME/.local/share/gccarm", 
-3. Add this in your ___.profile___ file 
+1. Download it from this site https://developer.arm.com/downloads/-/gnu-rm
+2. Move the extracted files in some directory for example "$HOME/.local/share/gccarm",
+3. Add this in your ___.profile___ file
 ```bash
 # Add the arm-none-aebi to the path
 if [ -d "$HOME/.local/share/gccarm/bin" ]; then
-    PATH="$HOME/.local/share/gccarm/bin:$PATH" 
+    PATH="$HOME/.local/share/gccarm/bin:$PATH"
 fi
 ```
 4. Restart reload the environment
@@ -41,7 +48,7 @@ There are three ways to flash the board:
 1. Using the ST-Link
 2. Using the USB-flash-script (Preferred unless the board was never flashed before)
 3. Using the USB DFU-mode (can be used if the board supports it, meanging it has a bootloader flashed to it)
-### Using the USB-flash-script 
+### Using the USB-flash-script
 1. Connect the board to the pc via USB
 2. To flash the board using the USB you just have to run the following command
 ```bash
@@ -62,7 +69,7 @@ dfu-util -a 0 -i 0 -s 0x08000000:leave -D build/executable.bin
 ```
 
 ### Using the ST-Link
-To flash the board using the ST-Link you need to have the ST-Link utility installed. 
+To flash the board using the ST-Link you need to have the ST-Link utility installed.
 You can download it by running the following command
 ```bash
 sudo apt-get install stlink-tools -y
@@ -112,7 +119,7 @@ lsusb -tv
 ```bash
 ls /dev | grep ttyAC # to check on which port the converter is
 sudo slcand -o -c -s8 /dev/ttyACM0 can0 # dont forget to change the port
-sudo ip link set dev can0 up type can bitrate 1000000 
+sudo ip link set dev can0 up type can bitrate 1000000
 ```
 flag -s sets the speed of the transmission
 ```bash
@@ -148,7 +155,7 @@ then chnage the extension of the main.c to main.cpp
 
 ### Adding code to USB_DEVICE (for SDRAC project)
 Open file usbd_cdc_if.c "USB_DEVICE/App/usbd_cdc_if.c".
-Find this function. 
+Find this function.
  ```c
  int8_t CDC_Receive_FS(uint8_t* Buf, uint32_t *Len) {
   //...
