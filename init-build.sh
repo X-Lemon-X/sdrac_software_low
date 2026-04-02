@@ -13,5 +13,4 @@ fi
 
 src/can_constants/./generate-files.sh -v
 
-cmake -B build -G "Ninja" -DCOPY_COMPILE_COMMANDS=ON
-cmake --build build
+./build-firmware.sh 
